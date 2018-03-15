@@ -1,37 +1,37 @@
 # Metrics
 
-Metrics is a tool to collect, store and manipulate metrics timeseriess.
-Metrics uses a collection of primitives borrowed from Prometheus TSDB,
-which can be used to build complex metrics with Server-side aggregation and filtering.
+Metrics is a tool to collect, store and manipulate metrics timeseriess.  
+Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can be used to build complex metrics with Server-side aggregation and filtering.
 
 ## Architecture
 
 ### Overview
 
-Metrics uses a client-server architecture.
-`server.lua` is a Lua-module which is essentially a database, storing timeseriess and supporting flexible quering.
-`client.lua` is a Lua-module which is responsible for pushing single observations to the Server 
+Metrics uses a client-server architecture.  
+`server.lua` is a Lua-module which is essentially a database, storing timeseriess and supporting flexible quering.  
+`client.lua` is a Lua-module which is responsible for pushing single observations to the Server   
 
 The application using Client module has 3 primitives (called collectors) at its disposal:
 - Counter
 - Gauge
 - Histogram
+
 They are called Collectors.
 
 ### Collectors
 Collectors represent an observation or a few that are changing over time.
 
-Counter and Gauge collectors support `labels`, which are essentially a key-value pairs.
-Labels allow collectors to store a separate observation per each label set added.
+Counter and Gauge collectors support `labels`, which are essentially a key-value pairs.  
+Labels allow collectors to store a separate observation per each label set added.  
 New label sets are added automatically when collector invokes modification function with this label set specified for the first time.
 
 
 The Server must expose `metric_server.execute(query_snippet)` global function to allow outside parties to access metrics stored in it.
 
 ### Client-Server Communication
-Client uses net.box builtin module to communicate observations to the Server.
-It creates a fiber that is periodically collects data from the collectors and pushes it to the Server.
-The push is handled via `metric_server.add_observation(obs)` globally exposed function on the Server side.
+Client uses net.box builtin module to communicate observations to the Server.  
+It creates a fiber that is periodically collects data from the collectors and pushes it to the Server.  
+The push is handled via `metric_server.add_observation(obs)` globally exposed function on the Server side.  
 
 ------------------------------------------------------------------------
 
@@ -108,13 +108,13 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
     - `retention_tuples` Server host (string). Default is 'localhost'.
 
 #### `metrics_server.execute(query_snippet)`
-  Evaluates `query` in a special sandbox allowing for some syntax sugar.
-  Returns the result.
+  Evaluates `query` in a special sandbox allowing for some syntax sugar.  
+  Returns the result.  
   Intended to be used via `net.box`.
   * `query_snippet` String with Lua code. Here you can use `collector_name(...)` instead of `vector('collector_name', ...)`.
 
 #### (Used by Metrics Client transparently, MAKE IT GLOBAL) `metrics_server.add_observation(obs)`
-  A gateway function to Metrics Client.
+  A gateway function to Metrics Client.  
   YOU MUST MAKE IT GLOBAL for Metrics Client to be able to upload observation to the Server.
   * `metric_name` Name of collector (string).
   * `label_pairs` Table containing label names as keys, label values as values (table).
@@ -122,14 +122,14 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
   * `timestamp` fiber.time64() output from Client side (cdata).
 
 #### `metrics_server.histogram_quantile(phi, vec)`
-  Approximates percentile given histogram
+  Approximates percentile given histogram.  
   Returns the quantile.
   * `phi` Percentage (number between 0 and 1) for quantile (e.g. 0.99 would calculate 99th percentile)
   * `vec` Histogram's `_bucket` collector vector.
 
 #### `metrics_server.vector(metric_name, label_pairs, past)`
-  Returns vector object holding timeseriess for every label set that is a superset of `label_pairs` in a collector with `metric_name`.
-  If `past` is `nil`, than instant vector is returned.
+  Returns vector object holding timeseriess for every label set that is a superset of `label_pairs` in a collector with `metric_name`.  
+  If `past` is `nil`, than instant vector is returned.  
   Otherwise range vector is returned.
   
   * `metric_name` Name of collector (string).
@@ -142,17 +142,17 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
   * `num` Right hand side -- number.
 
 #### `metrics_server.avg_over_time(vec)`
-  Averages vector per timeseries.
+  Averages vector per timeseries.  
   Returns averaged vector.
   * `vec` Vector.
 
 #### `metrics_server.rate(vec)`
-  Returns a vector in which for every timeseries of `vec` there will be a timeseries with single value -- average increase rate of timeseries.
+  Returns a vector in which for every timeseries of `vec` there will be a timeseries with single value -- average increase rate of timeseries.  
   This accounts for counter resets.
   * `vec` Vector created from Counter collector.
 
 #### `metrics_server.increase(vec)`
-  Returns a vector in which for every timeseries of `vec` there will be a timeseries with single value -- increase of timeseries.
+  Returns a vector in which for every timeseries of `vec` there will be a timeseries with single value -- increase of timeseries.  
   This accounts for counter resets.
   * `vec` Vector created from Counter collector.
 
