@@ -21,10 +21,10 @@ build = {
     type = 'builtin',
 
     modules = {
-        ['metrics.client']                       = 'metrics_client.lua'
-        ['metrics.server']                       = 'metrics_server.lua'
-        ['metrics.details.prometheus']           = 'details/prometheus.lua'
-        ['metrics.details.validation']           = 'details/validation.lua'
+        ['metrics.client']                       = 'metrics_client.lua',
+        ['metrics.server']                       = 'metrics_server.lua',
+        ['metrics.details.prometheus']           = 'details/prometheus.lua',
+        ['metrics.details.validation']           = 'details/validation.lua',
     }
 }
 
