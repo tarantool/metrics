@@ -2,7 +2,7 @@
 package.path = package.path .. ";../?.lua"
 
 -- Create a Metrics Client
-local client = require('metrics_client').new()
+local client = require('metrics.client').new()
 
 -------------------------- Create Collectors ---------------------------
 

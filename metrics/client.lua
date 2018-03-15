@@ -1,13 +1,13 @@
 -- vim: ts=4:sw=4:sts=4:expandtab
 
-require('details.validation')
+require('metrics.details.validation')
 
 local net_box = require('net.box')
 local fiber = require('fiber')
 local log = require('log')
 local json = require('json')
 
-local prometheus = require('details.prometheus')
+local prometheus = require('metrics.details.prometheus')
 
 --- Fiber which periodically sends observations from all local collectors
 --  to the Server.

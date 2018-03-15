@@ -6,7 +6,7 @@ box.once('guest_security', function()
 end)
 
 package.path = package.path .. ";../?.lua"
-local metrics_server = require('metrics_server')
+local metrics_server = require('metrics.server')
 
 -- expose add_observation for net.box
 _G.add_observation = metrics_server.add_observation

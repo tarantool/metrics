@@ -1,6 +1,6 @@
 --- Metrics Server
 
-require('details.validation')
+require('metrics.details.validation')
 
 local expirationd = require('expirationd')
 local log = require('log')
