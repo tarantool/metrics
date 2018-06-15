@@ -144,7 +144,6 @@ end
 local function metric(metric_name, label_pairs)
     local ts_id, err = timeseries_id(metric_name, label_pairs)
     if not ts_id then
-        log.info('get_metric_ts: %s', err)
         return nil
     end
 
@@ -174,7 +173,6 @@ local function add_observation_impl(obs)
         obs.value,
         obs.timestamp
     }
-    log.info('Observation inserted!')
 end
 
 local function add_observation(obs)
