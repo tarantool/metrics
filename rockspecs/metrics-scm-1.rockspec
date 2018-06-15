@@ -16,13 +16,14 @@ description = {
 dependencies = {
     'lua >= 5.1',
     'expirationd'
+    'checks >= 2.0.0'
 }
 
 build = {
     type = 'builtin',
 
     modules = {
-        ['metrics.client']                       = 'metrics/client.lua',
+        ['metrics']                              = 'metrics/init.lua',
         ['metrics.server']                       = 'metrics/server.lua',
         ['metrics.details.prometheus']           = 'metrics/details/prometheus.lua',
         ['metrics.details.validation']           = 'metrics/details/validation.lua',

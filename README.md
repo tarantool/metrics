@@ -8,8 +8,8 @@ Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can
 ### Overview
 
 Metrics uses a client-server architecture.  
-`server.lua` is a Lua-module which is essentially a database, storing timeseriess and supporting flexible quering.  
-`client.lua` is a Lua-module which is responsible for pushing single observations to the Server   
+`require('metrics.server')` is a Lua-module which is essentially a database, storing timeseriess and supporting flexible quering.  
+`require('metrics')` is a Lua-module which is responsible for pushing single observations to the Server   
 
 The application using Client module has 3 primitives (called collectors) at its disposal:
 - Counter
@@ -35,30 +35,55 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
 
 ------------------------------------------------------------------------
 
-## API 
+## Installation
+
+```bash
+cd ${PROJECT_ROOT}
+tarantoolctl rocks install metrics
+```
+
+## API
 
 ### Client API
 
-#### `metrics_client.new(options)`
-  Creates new client which provides methods for creating collectors.
-  Returns Client object.
+```lua
+-- import client module
+metrics_client = require('metrics')
+```
+
+#### `metrics_client.connect(options)`
+  Creates new connection which uploads collectors to remote metrics server.  
+  Returns Client object.  
+  Internally, uses `client_obj.registry:collect()` to collect the data.  
   * `option` Table containing configuration.
     - `host` Server host (string). Default is 'localhost'.
     - `port` Server port (number). Default is 3301.
     - `upload_timeout` Timeout (number) with which collectors observations are uploaded to the Server in seconds. Default is 1 (second).
 
-#### `client_obj:counter(name, help)`
+#### `client_obj.counter(name, help)`
   Registers a new counter.
   Returns Counter object.
   * `name` Collector name (string). Must be unique.
   * `help` Help description (string). Currently it's just ignored.
-  
+
 #### `counter_obj:inc(num, label_pairs)`
   Increments observation under `label_pairs`. If `label_pairs` didn't exist before - this creates it.
   * `num` Increase value (number).
   * `label_pairs` Table containing label names as keys, label values as values (table).
-  
-#### `client_obj:gauge(name, help)`
+
+#### `counter_obj:collect()`
+  Returns array of `data`s.
+  `data` is a Lua table:
+  ```lua
+  {
+    label_pairs: table,          -- `label_pairs` key-value table
+    timestamp: ctype<uint64_t>,  -- current system time (in microseconds)
+    value: number,               -- current value
+    metric_name: string,         -- name of `counter_obj`
+  }
+  ```
+
+#### `client_obj.gauge(name, help)`
   Registers a new gauge.
   Returns Gauge object.
   * `name` Collector name (string). Must be unique.
@@ -73,7 +98,20 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
 #### `gauge_obj:set(num, label_pairs)`
   Same as `inc()`, but sets the observation.
 
-#### `client_obj:histogram(name, help, buckets)`
+#### `gauge_obj:collect()`
+  (same as `counter_obj:collect()`)
+  Returns array of `data`s.
+  `data` is a Lua table:
+  ```lua
+  {
+    label_pairs: table,          -- `label_pairs` key-value table
+    timestamp: ctype<uint64_t>,  -- current system time (in microseconds)
+    value: number,               -- current value
+    metric_name: string,         -- name of `counter_obj`
+  }
+  ```
+
+#### `client_obj.histogram(name, help, buckets)`
   Registers a new histogram.
   Returns Histogram object.
   * `name` Collector name (string). Must be unique.
@@ -87,12 +125,34 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
   * `name .. "_sum"` -- Counter holding sum of added observations. Has only empty labelset.
   * `name .. "_count"` -- Counter holding number of added observations. Has only empty labelset.
   * `name .. "_bucket"` -- Counter holding all bucket sizes under label `le`. So to access specific bucket x (x is a number), you should specify value x for label `le`.
-  
+
 #### `histogram_obj:observe(num)`
   Records a new value in histogram. This puts `num` to the last bucket that is >= `num`.
   * `num` Value to put in histogram (number).
 
+#### `histogram_obj:collect()`
+  Returns concatenation of `counter_obj:collect()` across all internal counters
+  of `histogram_obj`. See above `counter_obj:collect()` for details.
+
+#### `client_obj.registry`
+  Global registry.  
+  All collectors created via `client_obj.(counter()|gauge()|histogram())` are
+  automatically registered in it.
+
+#### `client_obj.registry:collect()`
+  Returns concatenation of `obj:collect()` across all collectors created.
+
+#### `client_obj.registry:register_callback(callback)`
+  Registers a callback `callback` which will be called before  
+  `client_obj.registry:collect()`.
+  * `callback` Function which takes no parameters.
+
 ### Server API
+
+```lua
+-- import server module
+metrics_server = require('metrics.server')
+```
 
 #### `metrics_server`
   Metrics Server. Returns Metrics Server object having following fields:
@@ -136,7 +196,7 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
   * `label_pairs` Table containing label names as keys, label values as values (table). This is a filtering table. The available label sets are matched against it.
   * `past` Number of past milliseconds (number) for which to store observations in timeseriess since moment of invoking.
 
-#### `vector_obj.{__add, __unm, __sub, __pow, __mul, __div}(self, num)`
+#### `vector_obj.(__add | __unm | __sub | __pow | __mul | __div)(self, num)`
   Returns an original vector in which to every observation in every timeseries the specified operation has been applied.
   * `self` Left hand side -- vector.
   * `num` Right hand side -- number.
@@ -160,10 +220,10 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
   Returns a vector in which for every timeseries of `vec` there will be a timeseries with single value -- number of counter resets.
   * `vec` Vector created from Counter collector.
 
-#### `metrics_server.{secs, seconds}(num)`
+#### `metrics_server.(secs | seconds)(num)`
   Returns number of milliseconds in `num` seconds.
 
-#### `metrics_server.{mins, minutes}(num)`
+#### `metrics_server.(mins | minutes)(num)`
   Returns number of milliseconds in `num` minutes.
 
 #### `metrics_server.hours(num)`
@@ -178,7 +238,7 @@ The push is handled via `metric_server.add_observation(obs)` globally exposed fu
 ## CONTRIBUTION
 
 Feel free to send Pull Requests. E.g. you can support new timeseriess aggregation / manipulation functions (but be sure to check if there are any Prometheus analogues to borrow API from).
-  
+
 ## CREDIT
 
 We would like to thank Prometheus for a great API that we brusquely borrowed.

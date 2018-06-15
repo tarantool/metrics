@@ -8,8 +8,6 @@ local NAN = math.huge * 0
 local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
-local REGISTRY = nil
-
 local Registry = {}
 Registry.__index = Registry
 
@@ -22,14 +20,14 @@ function Registry.new()
 end
 
 function Registry:register(collector)
-    if self.collectors[collector.name]~=nil then
+    if self.collectors[collector.name] ~= nil then
         return self.collectors[collector.name]
     end
     self.collectors[collector.name] = collector
 end
 
 function Registry:unregister(collector)
-    if self.collectors[collector.name]~=nil then
+    if self.collectors[collector.name] ~= nil then
         table.remove(self.collectors, collector.name)
     end
 end
@@ -60,6 +58,8 @@ function Registry:register_callback(callback)
     end
 end
 
+global_metrics_registry = Registry.new()
+
 ------------------------------- Common Methods -------------------------------
 
 local Shared = {}
@@ -75,6 +75,8 @@ function Shared.new(name, help, collector)
     obj.observations = {}
     obj.label_pairs = {}
     obj.collector = collector
+
+    global_metrics_registry:register(obj)
     return obj
 end
 
@@ -227,7 +229,6 @@ function Histogram:collect()
 end
 
 return {
-    Registry = Registry,
     Counter = Counter,
     Gauge = Gauge,
     Histogram = Histogram,

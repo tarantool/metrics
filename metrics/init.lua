@@ -1,6 +1,6 @@
 -- vim: ts=4:sw=4:sts=4:expandtab
 
-require('metrics.details.validation')
+require('checks')
 
 local net_box = require('net.box')
 local fiber = require('fiber')
@@ -20,7 +20,7 @@ local prometheus = require('metrics.details.prometheus')
 local function upload_metrics_worker(client, upload_timeout)
     while true do
         client.conn:wait_connected()
-        local all_observations = client.registry:collect()
+        local all_observations = global_metrics_registry:collect()
         for _, obs in pairs(all_observations) do
             client.conn:call('add_observation', {obs})
         end
@@ -30,20 +30,16 @@ end
 
 ------------------------------ CLIENT METHODS --------------------------------
 
-local function counter(self, name, help)
-    checks('metrics_client', 'string', '?string')
+local function counter(name, help)
+    checks('string', '?string')
 
-    local obj = prometheus.Counter.new(name, help)
-    self.registry:register(obj)
-    return obj
+    return prometheus.Counter.new(name, help)
 end
 
-local function gauge(self, name, help)
-    checks('metrics_client', 'string', '?string')
+local function gauge(name, help)
+    checks('string', '?string')
 
-    local obj = prometheus.Gauge.new(name, help)
-    self.registry:register(obj)
-    return obj
+    return prometheus.Gauge.new(name, help)
 end
 
 function checkers.buckets(buckets)
@@ -58,19 +54,15 @@ function checkers.buckets(buckets)
     return true
 end
 
-local function histogram(self, name, help, buckets)
-    checks('metrics_client', 'string', '?string', '?buckets')
+local function histogram(name, help, buckets)
+    checks('string', '?string', '?buckets')
 
-    local obj = prometheus.Histogram.new(name, help, buckets)
-    self.registry:register(obj)
-    return obj
+    return prometheus.Histogram.new(name, help, buckets)
 end
 
-local function clear(self)
-    checks('metrics_client')
-
-    self.registry.collectors = {}
-    self.registry.callbacks = {}
+local function clear()
+    global_metrics_registry.collectors = {}
+    global_metrics_registry.callbacks = {}
 end
 
 -------------------------- PUBLIC INTERFACE ----------------------------------
@@ -83,7 +75,7 @@ function checkers.port(n)
     return type(n) == 'number' and 0 <= n and n <= 65535
 end
 
---  Creates new client which provides methods for creating collectors.
+--  Creates new connection to remote server.
 --
 --  @param options Table containing configuration.
 --  @param options.host Server host. Default is 'localhost'.
@@ -92,16 +84,15 @@ end
 --
 --  @returns Client object
 --
-local function new(options)
+local function connect(options)
     checks {
-        host            = {default = 'localhost'},
-        port            = {default = 3301,  type = 'port'},
-        upload_timeout  = {default = 1,     type = 'positive_number'},
+        host            = '?string',
+        port            = '?port',
+        upload_timeout  = '?positive_number',
     }
-
-    -- All collectors will be stored in this registry
-    local registry = prometheus.Registry.new()
-    assert(registry ~= nil)
+    options.host = options.host or 'localhost'
+    options.port = options.port or 3301
+    options.upload_timeout = options.upload_timeout or 1
 
     -- Connect to the Server. net_box will try to reconnect every
     -- `upload_timeout` seconds, since we won't be sending data more
@@ -111,22 +102,21 @@ local function new(options)
         reconnect_after = options.upload_timeout
     })
 
-    local client = setmetatable({
-        registry = registry,
-        conn = conn,
-    }, {
-        __type = 'metrics_client',  -- for validation
-        __index = {
-            counter = counter,
-            gauge = gauge,
-            histogram = histogram,
-            clear = clear,
-        },
-    })
+    client = {
+        conn = conn
+    }
 
     -- Start uploader fiber and return new client
     fiber.create(upload_metrics_worker, client, options.upload_timeout)
     return client
 end
 
-return {new = new}
+return {
+    connect = connect,
+
+    counter = counter,
+    gauge = gauge,
+    histogram = histogram,
+
+    registry = global_metrics_registry,
+}

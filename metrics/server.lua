@@ -1,6 +1,6 @@
 --- Metrics Server
 
-require('metrics.details.validation')
+require('checks')
 
 local expirationd = require('expirationd')
 local log = require('log')
@@ -179,11 +179,12 @@ end
 
 local function add_observation(obs)
     checks {
-        metric_name = {type = 'string'},
-        label_pairs = {default = {}},
-        value = {type = 'number'},
-        timestamp = {type = 'cdata'},  -- fiber.time64() returns cdata
+        metric_name = 'string',
+        label_pairs = '?table',
+        value = 'number',
+        timestamp = 'cdata',  -- fiber.time64() returns cdata
     }
+    obs.label_pairs = obs.label_pairs or {}
 
     local ok, status = xpcall(
         add_observation_impl,
@@ -584,11 +585,9 @@ end
 --  @param options TODO
 local function start(options)
     checks {
-        retention_tuples = {
-            default = 10 * 1000 * 1000,
-            type = 'positive_number'
-        }
+        retention_tuples = 'positive_number'
     }
+    options.retention_tuples = options.retention_tuples or 10 * 1000 * 1000
 
     -- bootstrap tarantool schema
     init()
