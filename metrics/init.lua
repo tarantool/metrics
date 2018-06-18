@@ -118,5 +118,10 @@ return {
     gauge = gauge,
     histogram = histogram,
 
-    registry = global_metrics_registry,
+    collect = function(...)
+        return global_metrics_registry:collect(...)
+    end,
+    register_callback = function(...)
+        return global_metrics_registry:register_callback(...)
+    end
 }

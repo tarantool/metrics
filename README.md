@@ -139,10 +139,10 @@ metrics_client = require('metrics')
   All collectors created via `client_obj.(counter()|gauge()|histogram())` are
   automatically registered in it.
 
-#### `client_obj.registry:collect()`
+#### `client_obj.collect()`
   Returns concatenation of `obj:collect()` across all collectors created.
 
-#### `client_obj.registry:register_callback(callback)`
+#### `client_obj.register_callback(callback)`
   Registers a callback `callback` which will be called before  
   `client_obj.registry:collect()`.
   * `callback` Function which takes no parameters.
