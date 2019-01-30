@@ -102,7 +102,7 @@ local function connect(options)
         reconnect_after = options.upload_timeout
     })
 
-    client = {
+    local client = {
         conn = conn
     }
 
