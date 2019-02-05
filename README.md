@@ -141,6 +141,7 @@ metrics_client = require('metrics')
 
 #### `client_obj.collect()`
   Returns concatenation of `obj:collect()` across all collectors created.
+  See above `counter_obj:collect()` for details.
 
 #### `client_obj.register_callback(callback)`
   Registers a callback `callback` which will be called before  
