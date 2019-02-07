@@ -2,24 +2,24 @@
 package.path = package.path .. ";../?.lua"
 
 -- Create a Metrics Client
-local client = require('metrics')
+local metrics = require('metrics')
 
-client.connect()
+metrics.connect()
 
 -------------------------- Create Collectors ---------------------------
 
 -- Create Counter "total_http_requests"
-local total_http_requests = client.counter('total_http_requests')
+local total_http_requests = metrics.counter('total_http_requests')
 
 -- Create Gauge "cpu_usage"
-local cpu_usage = client.gauge('cpu_usage')
+local cpu_usage = metrics.gauge('cpu_usage')
 
 -- Create Histogram "total_http_requests" with buckets {2, 4, 6}
 -- NOTE: no name clashing here, since on the Server there will be created 3 separate Counters with names:
 --   total_http_request_count,
 --   total_http_request_sum,
 --   total_http_request_buckets
-local total_http_requests_hist = client.histogram('total_http_requests', nil, {2, 4, 6})
+local total_http_requests_hist = metrics.histogram('total_http_requests', nil, {2, 4, 6})
 
 ---------------------------- Use Collectors ----------------------------
 

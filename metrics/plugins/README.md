@@ -11,5 +11,5 @@ If you want to use another DB to store metrics data, you can use appropriate exp
 
 ## How To Write Your Custom Plugin?
 
-If you want to write your custom export plugin you can use [`metrics.collect()`](https://github.com/tarantool/metrics#client_objcollect) function there.
+If you want to write your custom export plugin you can use `metrics.collect()` function there.
 It returns all observations for all collectors registered via metrics client.

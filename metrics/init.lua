@@ -90,6 +90,7 @@ local function connect(options)
         port            = '?port',
         upload_timeout  = '?positive_number',
     }
+    options = options or {}
     options.host = options.host or 'localhost'
     options.port = options.port or 3301
     options.upload_timeout = options.upload_timeout or 1

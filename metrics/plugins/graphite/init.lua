@@ -26,6 +26,7 @@ local function format_observation(prefix, obs)
         local label_pairs_str = table.concat(label_pairs_str_parts, LABELS_SEP)
         metric_path = metric_path .. LABELS_SEP .. label_pairs_str
     end
+    metric_path = metric_path:gsub(' ', '_') -- remove spaces (e.g. in values)
 
     local ts = tostring(obs.timestamp):sub(1, -4) -- remove ULL suffix
     local graph = ('%s %s %s\n'):format(metric_path, obs.value, ts)
@@ -42,7 +43,7 @@ local function graphite_worker(opts)
             local data = format_observation(opts.prefix, obs)
             local numbytes = opts.sock:sendto(opts.host, opts.port, data)
             if numbytes == nil then
-                log.info('Error while sending to host %s port %s data %s',
+                log.error('Error while sending to host %s port %s data %s',
                     opts.host, opts.port, data)
             end
         end
