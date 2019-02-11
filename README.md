@@ -1,8 +1,7 @@
 # Metrics
 
 Metrics is a tool to collect, store and manipulate metrics timeseriess.  
-Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can be [exported](./metrics/plugins/README.md) to any TSDB or can be used to build complex metrics with [Server-side](./metrics/server/README.md) aggregation and filtering.
-
+Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can be exported to any TSDB or can be used to build complex metrics with server-side aggregation and filtering.
 
 
 ## Installation
@@ -11,6 +10,14 @@ Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can
 cd ${PROJECT_ROOT}
 tarantoolctl rocks install metrics
 ```
+
+## Export Plugins
+In order to easily export metrics to any TSDB you can use one of supported export plugins:
+
+- [Graphite](./metrics/plugins/graphite/README.md)
+
+or you can write your [custom plugin](./metrics/plugins/README.md) and use it. 
+Hopefully, plugins for other TSDBs will be supported soon.
 
 ## API
 
