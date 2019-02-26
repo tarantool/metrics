@@ -24,8 +24,9 @@ build = {
 
     modules = {
         ['metrics']                              = 'metrics/init.lua',
-        ['metrics.server']                       = 'metrics/server.lua',
-        ['metrics.details.prometheus']           = 'metrics/details/prometheus.lua',
+        ['metrics.server']                       = 'metrics/server/init.lua',
+        ['metrics.details']                      = 'metrics/details/init.lua',
+        ['metrics.plugins.graphite']             = 'metrics/plugins/graphite/init.lua',
     }
 }
 

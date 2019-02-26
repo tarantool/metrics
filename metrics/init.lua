@@ -7,7 +7,7 @@ local fiber = require('fiber')
 local log = require('log')
 local json = require('json')
 
-local prometheus = require('metrics.details.prometheus')
+local details = require('metrics.details')
 
 --- Fiber which periodically sends observations from all local collectors
 --  to the Server.
@@ -33,13 +33,13 @@ end
 local function counter(name, help)
     checks('string', '?string')
 
-    return prometheus.Counter.new(name, help)
+    return details.Counter.new(name, help)
 end
 
 local function gauge(name, help)
     checks('string', '?string')
 
-    return prometheus.Gauge.new(name, help)
+    return details.Gauge.new(name, help)
 end
 
 function checkers.buckets(buckets)
@@ -57,7 +57,7 @@ end
 local function histogram(name, help, buckets)
     checks('string', '?string', '?buckets')
 
-    return prometheus.Histogram.new(name, help, buckets)
+    return details.Histogram.new(name, help, buckets)
 end
 
 local function clear()
@@ -90,6 +90,7 @@ local function connect(options)
         port            = '?port',
         upload_timeout  = '?positive_number',
     }
+    options = options or {}
     options.host = options.host or 'localhost'
     options.port = options.port or 3301
     options.upload_timeout = options.upload_timeout or 1
