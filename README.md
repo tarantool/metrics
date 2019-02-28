@@ -118,9 +118,10 @@ metrics = require('metrics')
   * `name .. "_count"` - Counter holding number of added observations. Has only empty labelset.
   * `name .. "_bucket"` - Counter holding all bucket sizes under label `le` (low or equal). So to access specific bucket `x` (`x` is a number), you should specify value `x` for label `le`.
 
-#### `histogram_obj:observe(num)`
-  Records a new value in histogram. This increments all buckets sizes under labels `le` >= `num`.
+#### `histogram_obj:observe(num, label_pairs)`
+  Records a new value in histogram. This increments all buckets sizes under labels `le` >= `num` and labels matching `label_pairs`.
   * `num` Value to put in histogram (number).
+  * `label_pairs` Table containing label names as keys, label values as values (table). New value is observed by all internal counters with these labels specified 
 
 #### `histogram_obj:collect()`
   Returns concatenation of `counter_obj:collect()` across all internal counters

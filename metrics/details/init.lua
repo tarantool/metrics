@@ -89,16 +89,16 @@ local function make_key(label_pairs)
 end
 
 function Shared:set(num, label_pairs)
-    num = num or 0
-    label_pairs = label_pairs or {}
+    local num = num or 0
+    local label_pairs = label_pairs or {}
     local key = make_key(label_pairs)
     self.observations[key] = num
     self.label_pairs[key] = label_pairs
 end
 
 function Shared:inc(num, label_pairs)
-    num = num or 1
-    label_pairs = label_pairs or {}
+    local num = num or 1
+    local label_pairs = label_pairs or {}
     local key = make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value + num
@@ -106,8 +106,8 @@ function Shared:inc(num, label_pairs)
 end
 
 function Shared:dec(num, label_pairs)
-    num = num or 1
-    label_pairs = label_pairs or {}
+    local num = num or 1
+    local label_pairs = label_pairs or {}
     local key = make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
@@ -199,17 +199,22 @@ function Histogram.new(name, help, buckets)
     return setmetatable(obj, Histogram)
 end
 
-function Histogram:observe(num)
-    self.count_collector:inc(1)
-    self.sum_collector:inc(num)
+function Histogram:observe(num, label_pairs)
+    local label_pairs = label_pairs or {}
+
+    self.count_collector:inc(1, label_pairs)
+    self.sum_collector:inc(num, label_pairs)
 
     for _, bucket in pairs(self.buckets) do
+        label_pairs.le = bucket  -- we reuse local `label_pairs` to avoid
+                                 -- creating lots of lua tables.
+
         if num <= bucket then
-            self.bucket_collector:inc(1, {le = bucket})
+            self.bucket_collector:inc(1, label_pairs)
         else
             -- all buckets are needed for histogram quantile approximation
             -- this creates buckets if they were not created before
-            self.bucket_collector:inc(0, {le = bucket})
+            self.bucket_collector:inc(0, label_pairs)
         end
     end
 end
