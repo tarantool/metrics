@@ -206,8 +206,8 @@ function Histogram:observe(num, label_pairs)
     self.sum_collector:inc(num, label_pairs)
 
     for _, bucket in pairs(self.buckets) do
-        label_pairs.le = bucket  -- we reuse local `label_pairs` to avoid
-                                 -- creating lots of lua tables.
+        local bkt_label_pairs = table.deepcopy(label_pairs) -- luacheck: ignore
+        bkt_label_pairs.le = bucket
 
         if num <= bucket then
             self.bucket_collector:inc(1, label_pairs)
