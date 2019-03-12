@@ -1,5 +1,5 @@
 Name: tarantool-metrics
-Version: 1.1.0
+Version: 1.0.0
 Release: 1%{?dist}
 Summary: Tool to collect metrics with Tarantool
 Group: Applications/Databases
@@ -37,5 +37,5 @@ ls %{br_luapkgdir}
 
 
 %changelog
-* Thu Mar 07 2019 Elizaveta Dokshina <dokshina@tarantool.org> 1.1.0
+* Thu Mar 07 2019 Elizaveta Dokshina <dokshina@tarantool.org> 1.0.0
 - Initial version of the RPM spec
