@@ -10,11 +10,11 @@ local function escape(str)
         :gsub('"', '\\"')
 end
 
-local function pickle_name(name)
+local function serialize_name(name)
     return escape(name)
 end
 
-local function pickle_label_pairs(label_pairs)
+local function serialize_label_pairs(label_pairs)
     if next(label_pairs) == nil then
         return ''
     end
@@ -29,7 +29,7 @@ local function pickle_label_pairs(label_pairs)
     return string.format('{%s}', enumerated_via_comma)
 end
 
-local function pickle_value(value)
+local function serialize_value(value)
     if value == metrics.INF then
         return '+Inf'
     elseif value == -metrics.INF then
@@ -41,16 +41,16 @@ local function pickle_value(value)
     end
 end
 
-local function pickle_all()
+local function serialize_all()
     local parts = {}
     for _, c in pairs(metrics.collectors()) do
         table.insert(parts, "# HELP " .. c.name .. " " .. c.help)
         table.insert(parts, "# TYPE " .. c.name .. " " .. c.collector)
         for _, obs in ipairs(c:collect()) do
-            local s = pickle_name(obs.metric_name)
-                   .. pickle_label_pairs(obs.label_pairs)
+            local s = serialize_name(obs.metric_name)
+                   .. serialize_label_pairs(obs.label_pairs)
                    .. ' '
-                   .. pickle_value(obs.value)
+                   .. serialize_value(obs.value)
             table.insert(parts, s)
         end
     end
@@ -61,7 +61,7 @@ function prometheus.collect_http()
     return {
         status = 200,
         headers = { ['content-type'] = 'text/plain; charset=utf8' },
-        body = pickle_all(),
+        body = serialize_all(),
     }
 end
 
