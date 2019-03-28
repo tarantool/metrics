@@ -4,10 +4,26 @@ require('checks')
 
 local net_box = require('net.box')
 local fiber = require('fiber')
-local log = require('log')
-local json = require('json')
 
 local details = require('metrics.details')
+
+local function collectors()
+    return global_metrics_registry.collectors
+end
+
+local function register_callback(...)
+    return global_metrics_registry:register_callback(...)
+end
+
+local function collect()
+    local res = {}
+    for _, c in pairs(collectors()) do
+        for _, obs in ipairs(c:collect()) do
+            table.insert(res, obs)
+        end
+    end
+    return res
+end
 
 --- Fiber which periodically sends observations from all local collectors
 --  to the Server.
@@ -20,52 +36,14 @@ local details = require('metrics.details')
 local function upload_metrics_worker(client, upload_timeout)
     while true do
         client.conn:wait_connected()
-        local all_observations = global_metrics_registry:collect()
-        for _, obs in pairs(all_observations) do
-            client.conn:call('add_observation', {obs})
+        for _, c in pairs(collectors()) do
+            for _, obs in ipairs(c:collect()) do
+                client.conn:call('add_observation', {obs})
+            end
         end
         fiber.sleep(upload_timeout)
     end
 end
-
------------------------------- CLIENT METHODS --------------------------------
-
-local function counter(name, help)
-    checks('string', '?string')
-
-    return details.Counter.new(name, help)
-end
-
-local function gauge(name, help)
-    checks('string', '?string')
-
-    return details.Gauge.new(name, help)
-end
-
-function checkers.buckets(buckets)
-    local prev = -math.huge
-    for k, v in pairs(buckets) do
-        if type(k) ~= 'number' then return false end
-        if type(v) ~= 'number' then return false end
-        if v <= 0 then return false end
-        if prev > v then return false end
-        prev = v
-    end
-    return true
-end
-
-local function histogram(name, help, buckets)
-    checks('string', '?string', '?buckets')
-
-    return details.Histogram.new(name, help, buckets)
-end
-
-local function clear()
-    global_metrics_registry.collectors = {}
-    global_metrics_registry.callbacks = {}
-end
-
--------------------------- PUBLIC INTERFACE ----------------------------------
 
 function checkers.positive_number(n)
     return type(n) == 'number' and n > 0
@@ -112,6 +90,41 @@ local function connect(options)
     return client
 end
 
+local function counter(name, help)
+    checks('string', '?string')
+
+    return details.Counter.new(name, help)
+end
+
+local function gauge(name, help)
+    checks('string', '?string')
+
+    return details.Gauge.new(name, help)
+end
+
+function checkers.buckets(buckets)
+    local prev = -math.huge
+    for k, v in pairs(buckets) do
+        if type(k) ~= 'number' then return false end
+        if type(v) ~= 'number' then return false end
+        if v <= 0 then return false end
+        if prev > v then return false end
+        prev = v
+    end
+    return true
+end
+
+local function histogram(name, help, buckets)
+    checks('string', '?string', '?buckets')
+
+    return details.Histogram.new(name, help, buckets)
+end
+
+local function clear()
+    global_metrics_registry.collectors = {}
+    global_metrics_registry.callbacks = {}
+end
+
 return {
     connect = connect,
 
@@ -119,10 +132,12 @@ return {
     gauge = gauge,
     histogram = histogram,
 
-    collect = function(...)
-        return global_metrics_registry:collect(...)
-    end,
-    register_callback = function(...)
-        return global_metrics_registry:register_callback(...)
-    end
+    INF = details.INF,
+    NAN = details.NAN,
+
+    clear = clear,
+    collectors = collectors,
+    register_callback = register_callback,
+
+    collect = collect,
 }

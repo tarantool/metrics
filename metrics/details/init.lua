@@ -14,21 +14,26 @@ Registry.__index = Registry
 function Registry.new()
     local obj = {}
     setmetatable(obj, Registry)
+
     obj.collectors = {}
     obj.callbacks = {}
     return obj
 end
 
 function Registry:register(collector)
-    if self.collectors[collector.name] ~= nil then
-        return self.collectors[collector.name]
+    for _, c in ipairs(self.collectors) do
+        if c.name == collector.name and c.collector == collector.collector then
+            return
+        end
     end
-    self.collectors[collector.name] = collector
+    table.insert(self.collectors, collector)
 end
 
 function Registry:unregister(collector)
-    if self.collectors[collector.name] ~= nil then
-        table.remove(self.collectors, collector.name)
+    for i, c in ipairs(self.collectors) do
+        if c.name == collector.name and c.collectors == collector.collector then
+            table.remove(self.collectors, i)
+        end
     end
 end
 
@@ -76,7 +81,6 @@ function Shared.new(name, help, collector)
     obj.label_pairs = {}
     obj.collector = collector
 
-    global_metrics_registry:register(obj)
     return obj
 end
 
@@ -136,8 +140,14 @@ end
 local Counter = {}
 Counter.__index = Counter
 
-function Counter.new(name, help)
+function Counter.new(name, help, opts)
+    local opts = opts or {}
+
     local obj = Shared.new(name, help, 'counter')
+    if not opts.dont_register then
+        global_metrics_registry:register(obj)
+    end
+
     return setmetatable(obj, Counter)
 end
 
@@ -157,6 +167,8 @@ Gauge.__index = Gauge
 
 function Gauge.new(name, help)
     local obj = Shared.new(name, help, 'gauge')
+    global_metrics_registry:register(obj)
+
     return setmetatable(obj, Gauge)
 end
 
@@ -184,6 +196,8 @@ function Histogram.new(name, help, buckets)
 
     -- for registry
     obj.name = name
+    obj.help = help or ''
+    obj.collector = 'histogram'
 
     -- introduce buckets
     obj.buckets = buckets or DEFAULT_BUCKETS
@@ -191,10 +205,20 @@ function Histogram.new(name, help, buckets)
     if obj.buckets[#obj.buckets] ~= INF then
         obj.buckets[#obj.buckets+1] = INF
     end
+
     -- create counters
-    obj.count_collector = Counter.new(name .. '_count', help)
-    obj.sum_collector = Counter.new(name .. '_sum', help)
-    obj.bucket_collector = Counter.new(name .. '_bucket', help)
+    obj.count_collector = Counter.new(
+        name .. '_count', help, {dont_register = true}
+    )
+    obj.sum_collector = Counter.new(
+        name .. '_sum', help, {dont_register = true}
+    )
+    obj.bucket_collector = Counter.new(
+        name .. '_bucket', help, {dont_register = true}
+    )
+
+    -- register
+    global_metrics_registry:register(obj)
 
     return setmetatable(obj, Histogram)
 end
@@ -234,6 +258,9 @@ function Histogram:collect()
 end
 
 return {
+    INF = INF,
+    NAN = NAN,
+
     Counter = Counter,
     Gauge = Gauge,
     Histogram = Histogram,
