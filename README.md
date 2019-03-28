@@ -42,7 +42,20 @@ New label sets are added automatically when collector invokes modification funct
 metrics = require('metrics')
 ```
 
+#### `metrics.collectors()`
+   Returns a list of created collectors.
+   Designed to be used in exporters in favor of `metrics.collect()`.
+
 #### `metrics.collect()`
+    **NOTE**: You'll probably want to use `metrics.collectors()` instead.
+    Equivalent to:
+    ```lua
+    for _, c in pairs(metrics.collectors()) do_
+        for _, obs in ipairs(c:collect()) do
+            ...  -- handle observation
+        end_
+    end
+    ```
 
   Returns concatenation of `observation` objects across all collectors created.  
 
