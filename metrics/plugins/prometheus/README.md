@@ -11,10 +11,11 @@ local prometheus = require('metrics.plugins.prometheus')
 ```
 
 #### `prometheus.collect_http()`
+See [Prometheus Exposition Format](https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md) for details on `<body>` and `<headers>`.
 Returns:
 ```lua
 {
-    status = <http-status>,
+    status = 200,
     headers = <headers>,
     body = <body>,
 }
