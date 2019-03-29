@@ -21,7 +21,7 @@ local function serialize_label_pairs(label_pairs)
 
     local parts = {}
     for name, value in pairs(label_pairs) do
-        local s = tostring(name) .. '=' .. escape(tostring(value))
+        local s = string.format('%s=%s', tostring(name), escape(tostring(value)))
         table.insert(parts, s)
     end
 
@@ -41,16 +41,17 @@ local function serialize_value(value)
     end
 end
 
-local function serialize_all()
+local function collect_and_serialize()
     local parts = {}
     for _, c in pairs(metrics.collectors()) do
-        table.insert(parts, "# HELP " .. c.name .. " " .. c.help)
-        table.insert(parts, "# TYPE " .. c.name .. " " .. c.collector)
+        table.insert(parts, string.format("# HELP %s %s", c.name, c.help))
+        table.insert(parts, string.format("# TYPE %s %s", c.name, c.collector))
         for _, obs in ipairs(c:collect()) do
-            local s = serialize_name(obs.metric_name)
-                   .. serialize_label_pairs(obs.label_pairs)
-                   .. ' '
-                   .. serialize_value(obs.value)
+            local s = string.format('%s%s %s',
+                serialize_name(obs.metric_name),
+                serialize_label_pairs(obs.label_pairs),
+                serialize_value(obs.value)
+            )
             table.insert(parts, s)
         end
     end
@@ -61,7 +62,7 @@ function prometheus.collect_http()
     return {
         status = 200,
         headers = { ['content-type'] = 'text/plain; charset=utf8' },
-        body = serialize_all(),
+        body = collect_and_serialize(),
     }
 end
 
