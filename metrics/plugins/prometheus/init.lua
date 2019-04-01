@@ -45,7 +45,7 @@ local function collect_and_serialize()
     local parts = {}
     for _, c in pairs(metrics.collectors()) do
         table.insert(parts, string.format("# HELP %s %s", c.name, c.help))
-        table.insert(parts, string.format("# TYPE %s %s", c.name, c.type))
+        table.insert(parts, string.format("# TYPE %s %s", c.name, c.kind))
         for _, obs in ipairs(c:collect()) do
             local s = string.format('%s%s %s',
                 serialize_name(obs.metric_name),

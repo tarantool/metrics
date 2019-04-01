@@ -22,7 +22,7 @@ end
 
 function Registry:register(collector)
     for _, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.collector == collector.type then
+        if c.name == collector.name and c.kind == collector.kind then
             return
         end
     end
@@ -31,7 +31,7 @@ end
 
 function Registry:unregister(collector)
     for i, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.collectors == collector.type then
+        if c.name == collector.name and c.kind == collector.kind then
             table.remove(self.collectors, i)
         end
     end
@@ -69,9 +69,9 @@ global_metrics_registry = Registry.new()
 
 local Shared = {}
 
-function Shared.new(name, help, type)
+function Shared.new(name, help, kind)
     if not name then
-        error("Name should be set for %s", type)
+        error("Name should be set for %s", kind)
     end
 
     local obj = {}
@@ -79,7 +79,7 @@ function Shared.new(name, help, type)
     obj.help = help or ""
     obj.observations = {}
     obj.label_pairs = {}
-    obj.type = type
+    obj.kind = kind
 
     return obj
 end
@@ -197,7 +197,7 @@ function Histogram.new(name, help, buckets)
     -- for registry
     obj.name = name
     obj.help = help or ''
-    obj.type = 'histogram'
+    obj.kind = 'histogram'
 
     -- introduce buckets
     obj.buckets = buckets or DEFAULT_BUCKETS
