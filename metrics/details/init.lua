@@ -22,7 +22,7 @@ end
 
 function Registry:register(collector)
     for _, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.collector == collector.collector then
+        if c.name == collector.name and c.collector == collector.type then
             return
         end
     end
@@ -31,7 +31,7 @@ end
 
 function Registry:unregister(collector)
     for i, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.collectors == collector.collector then
+        if c.name == collector.name and c.collectors == collector.type then
             table.remove(self.collectors, i)
         end
     end
@@ -69,9 +69,9 @@ global_metrics_registry = Registry.new()
 
 local Shared = {}
 
-function Shared.new(name, help, collector)
+function Shared.new(name, help, type)
     if not name then
-        error("Name should be set for %s", collector)
+        error("Name should be set for %s", type)
     end
 
     local obj = {}
@@ -79,7 +79,7 @@ function Shared.new(name, help, collector)
     obj.help = help or ""
     obj.observations = {}
     obj.label_pairs = {}
-    obj.collector = collector
+    obj.type = type
 
     return obj
 end
@@ -197,7 +197,7 @@ function Histogram.new(name, help, buckets)
     -- for registry
     obj.name = name
     obj.help = help or ''
-    obj.collector = 'histogram'
+    obj.type = 'histogram'
 
     -- introduce buckets
     obj.buckets = buckets or DEFAULT_BUCKETS
@@ -234,11 +234,11 @@ function Histogram:observe(num, label_pairs)
         bkt_label_pairs.le = bucket
 
         if num <= bucket then
-            self.bucket_collector:inc(1, label_pairs)
+            self.bucket_collector:inc(1, bkt_label_pairs)
         else
             -- all buckets are needed for histogram quantile approximation
             -- this creates buckets if they were not created before
-            self.bucket_collector:inc(0, label_pairs)
+            self.bucket_collector:inc(0, bkt_label_pairs)
         end
     end
 end
