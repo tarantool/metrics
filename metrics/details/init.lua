@@ -142,9 +142,10 @@ Counter.__index = Counter
 
 function Counter.new(name, help, opts)
     local opts = opts or {}
+    opts.do_register = opts.do_register or true
 
     local obj = Shared.new(name, help, 'counter')
-    if not opts.dont_register then
+    if opts.do_register then
         global_metrics_registry:register(obj)
     end
 
@@ -208,13 +209,13 @@ function Histogram.new(name, help, buckets)
 
     -- create counters
     obj.count_collector = Counter.new(
-        name .. '_count', help, {dont_register = true}
+        name .. '_count', help, {do_register = false}
     )
     obj.sum_collector = Counter.new(
-        name .. '_sum', help, {dont_register = true}
+        name .. '_sum', help, {do_register = false}
     )
     obj.bucket_collector = Counter.new(
-        name .. '_bucket', help, {dont_register = true}
+        name .. '_bucket', help, {do_register = false}
     )
 
     -- register
