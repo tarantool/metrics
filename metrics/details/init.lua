@@ -37,11 +37,13 @@ function Registry:unregister(collector)
     end
 end
 
-function Registry:collect()
+function Registry:invoke_callbacks()
     for _, registered_callback in ipairs(self.callbacks) do
         registered_callback()
     end
+end
 
+function Registry:collect()
     local result = {}
     for _, collector in pairs(self.collectors) do
         for _, obs in ipairs(collector:collect()) do

@@ -55,6 +55,7 @@ local function serialize_value(value)
 end
 
 local function collect_and_serialize()
+    metrics.invoke_callbacks()
     local parts = {}
     for _, c in pairs(metrics.collectors()) do
         table.insert(parts, string.format("# HELP %s %s", c.name, c.help))

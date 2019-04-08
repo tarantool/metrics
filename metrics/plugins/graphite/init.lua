@@ -38,6 +38,7 @@ local function graphite_worker(opts)
     fiber.name('metrics_graphite_worker')
 
     while true do
+        metrics.invoke_callbacks()
         for _, c in pairs(metrics.collectors()) do
             for _, obs in ipairs(c:collect()) do
                 local data = format_observation(opts.prefix, obs)

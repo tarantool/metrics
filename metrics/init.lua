@@ -15,14 +15,12 @@ local function register_callback(...)
     return global_metrics_registry:register_callback(...)
 end
 
+local function invoke_callbacks()
+    return global_metrics_registry:invoke_callbacks()
+end
+
 local function collect()
-    local res = {}
-    for _, c in pairs(collectors()) do
-        for _, obs in ipairs(c:collect()) do
-            table.insert(res, obs)
-        end
-    end
-    return res
+    return global_metrics_registry:collect()
 end
 
 --- Fiber which periodically sends observations from all local collectors
@@ -36,11 +34,14 @@ end
 local function upload_metrics_worker(client, upload_timeout)
     while true do
         client.conn:wait_connected()
+
+        invoke_callbacks()
         for _, c in pairs(collectors()) do
             for _, obs in ipairs(c:collect()) do
                 client.conn:call('add_observation', {obs})
             end
         end
+
         fiber.sleep(upload_timeout)
     end
 end
@@ -138,6 +139,7 @@ return {
     clear = clear,
     collectors = collectors,
     register_callback = register_callback,
+    invoke_callbacks = invoke_callbacks,
 
     collect = collect,
 }
