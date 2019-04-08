@@ -14,6 +14,18 @@ local function serialize_name(name)
     return escape(name)
 end
 
+local function serialize_value(value)
+    if value == metrics.INF then
+        return '+Inf'
+    elseif value == -metrics.INF then
+        return '-Inf'
+    elseif value ~= value then
+        return 'Nan'
+    else
+        return escape(tostring(value))
+    end
+end
+
 local function serialize_label_pairs(label_pairs)
     if next(label_pairs) == nil then
         return ''
@@ -21,7 +33,8 @@ local function serialize_label_pairs(label_pairs)
 
     local parts = {}
     for name, value in pairs(label_pairs) do
-        local s = string.format('%s=%s', tostring(name), escape(tostring(value)))
+        local s = string.format('%s="%s"',
+            serialize_value(name), serialize_value(value))
         table.insert(parts, s)
     end
 
