@@ -14,29 +14,36 @@ Registry.__index = Registry
 function Registry.new()
     local obj = {}
     setmetatable(obj, Registry)
+
     obj.collectors = {}
     obj.callbacks = {}
     return obj
 end
 
 function Registry:register(collector)
-    if self.collectors[collector.name] ~= nil then
-        return self.collectors[collector.name]
+    for _, c in ipairs(self.collectors) do
+        if c.name == collector.name and c.kind == collector.kind then
+            return
+        end
     end
-    self.collectors[collector.name] = collector
+    table.insert(self.collectors, collector)
 end
 
 function Registry:unregister(collector)
-    if self.collectors[collector.name] ~= nil then
-        table.remove(self.collectors, collector.name)
+    for i, c in ipairs(self.collectors) do
+        if c.name == collector.name and c.kind == collector.kind then
+            table.remove(self.collectors, i)
+        end
+    end
+end
+
+function Registry:invoke_callbacks()
+    for _, registered_callback in ipairs(self.callbacks) do
+        registered_callback()
     end
 end
 
 function Registry:collect()
-    for _, registered_callback in ipairs(self.callbacks) do
-        registered_callback()
-    end
-
     local result = {}
     for _, collector in pairs(self.collectors) do
         for _, obs in ipairs(collector:collect()) do
@@ -64,9 +71,9 @@ global_metrics_registry = Registry.new()
 
 local Shared = {}
 
-function Shared.new(name, help, collector)
+function Shared.new(name, help, kind)
     if not name then
-        error("Name should be set for %s", collector)
+        error("Name should be set for %s", kind)
     end
 
     local obj = {}
@@ -74,9 +81,8 @@ function Shared.new(name, help, collector)
     obj.help = help or ""
     obj.observations = {}
     obj.label_pairs = {}
-    obj.collector = collector
+    obj.kind = kind
 
-    global_metrics_registry:register(obj)
     return obj
 end
 
@@ -136,8 +142,15 @@ end
 local Counter = {}
 Counter.__index = Counter
 
-function Counter.new(name, help)
+function Counter.new(name, help, opts)
+    local opts = opts or {}
+    opts.do_register = opts.do_register or true
+
     local obj = Shared.new(name, help, 'counter')
+    if opts.do_register then
+        global_metrics_registry:register(obj)
+    end
+
     return setmetatable(obj, Counter)
 end
 
@@ -157,6 +170,8 @@ Gauge.__index = Gauge
 
 function Gauge.new(name, help)
     local obj = Shared.new(name, help, 'gauge')
+    global_metrics_registry:register(obj)
+
     return setmetatable(obj, Gauge)
 end
 
@@ -184,6 +199,8 @@ function Histogram.new(name, help, buckets)
 
     -- for registry
     obj.name = name
+    obj.help = help or ''
+    obj.kind = 'histogram'
 
     -- introduce buckets
     obj.buckets = buckets or DEFAULT_BUCKETS
@@ -191,10 +208,20 @@ function Histogram.new(name, help, buckets)
     if obj.buckets[#obj.buckets] ~= INF then
         obj.buckets[#obj.buckets+1] = INF
     end
+
     -- create counters
-    obj.count_collector = Counter.new(name .. '_count', help)
-    obj.sum_collector = Counter.new(name .. '_sum', help)
-    obj.bucket_collector = Counter.new(name .. '_bucket', help)
+    obj.count_collector = Counter.new(
+        name .. '_count', help, {do_register = false}
+    )
+    obj.sum_collector = Counter.new(
+        name .. '_sum', help, {do_register = false}
+    )
+    obj.bucket_collector = Counter.new(
+        name .. '_bucket', help, {do_register = false}
+    )
+
+    -- register
+    global_metrics_registry:register(obj)
 
     return setmetatable(obj, Histogram)
 end
@@ -210,11 +237,11 @@ function Histogram:observe(num, label_pairs)
         bkt_label_pairs.le = bucket
 
         if num <= bucket then
-            self.bucket_collector:inc(1, label_pairs)
+            self.bucket_collector:inc(1, bkt_label_pairs)
         else
             -- all buckets are needed for histogram quantile approximation
             -- this creates buckets if they were not created before
-            self.bucket_collector:inc(0, label_pairs)
+            self.bucket_collector:inc(0, bkt_label_pairs)
         end
     end
 end
@@ -234,6 +261,9 @@ function Histogram:collect()
 end
 
 return {
+    INF = INF,
+    NAN = NAN,
+
     Counter = Counter,
     Gauge = Gauge,
     Histogram = Histogram,
