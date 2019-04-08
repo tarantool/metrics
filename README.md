@@ -75,6 +75,10 @@ metrics = require('metrics')
 
   It may be used for calculation some metric right before collecting.
 
+#### `metrics.invoke_callbacks()`
+   Invokes function registered via `metrics.register_callback(<callback>)`
+   Used in exporters.
+
 
 ### Creating and Using Collectors
 
