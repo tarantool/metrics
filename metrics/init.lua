@@ -140,6 +140,8 @@ return {
     collectors = collectors,
     register_callback = register_callback,
     invoke_callbacks = invoke_callbacks,
-
+    enable_default_metrics = function()
+        return require('metrics.default_metrics.tarantool').enable()
+    end,
     collect = collect,
 }
