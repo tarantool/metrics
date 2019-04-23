@@ -42,6 +42,10 @@ New label sets are added automatically when collector invokes modification funct
 metrics = require('metrics')
 ```
 
+#### `metrics.enable_default_metrics()`
+   Enables default metrics collections. 
+   Collects tarantool metrics, ported from https://github.com/tarantool/stat
+
 #### `metrics.collectors()`
    Returns a list of created collectors.
    Designed to be used in exporters in favor of `metrics.collect()`.
