@@ -20,34 +20,38 @@ Easy collecting, storing and manipulating metrics timeseriess.
 
 %install
 mkdir -p %{br_luapkgdir}
-cp -av metrics %{br_luapkgdir}
+cp -rv metrics %{br_luapkgdir}
 
 %files
-%dir %{luapkgdir}
 %dir %{luapkgdir}/metrics
      %{luapkgdir}/metrics/init.lua
 %dir %{luapkgdir}/metrics/details
      %{luapkgdir}/metrics/details/init.lua
 %dir %{luapkgdir}/metrics/plugins
+     %{luapkgdir}/metrics/plugins/README.md
 %dir %{luapkgdir}/metrics/plugins/prometheus
      %{luapkgdir}/metrics/plugins/prometheus/init.lua
+     %{luapkgdir}/metrics/plugins/prometheus/README.md
 %dir %{luapkgdir}/metrics/plugins/graphite
      %{luapkgdir}/metrics/plugins/graphite/init.lua
+     %{luapkgdir}/metrics/plugins/graphite/README.md
 %dir %{luapkgdir}/metrics/server
      %{luapkgdir}/metrics/server/init.lua
-%dir %{luapkgdir}/default_metrics
-     %{luapkgdir}/default_metrics/fiber.lua
-     %{luapkgdir}/default_metrics/info.lua
-     %{luapkgdir}/default_metrics/init.lua
-     %{luapkgdir}/default_metrics/memory.lua
-     %{luapkgdir}/default_metrics/network.lua
-     %{luapkgdir}/default_metrics/operations.lua
-     %{luapkgdir}/default_metrics/replicas.lua
-     %{luapkgdir}/default_metrics/runtime.lua
-     %{luapkgdir}/default_metrics/slab.lua
-     %{luapkgdir}/default_metrics/spaces.lua
-     %{luapkgdir}/default_metrics/system.lua
-     %{luapkgdir}/default_metrics/utils.lua
+     %{luapkgdir}/metrics/server/README.md
+%dir %{luapkgdir}/metrics/default_metrics
+%dir %{luapkgdir}/metrics/default_metrics/tarantool
+     %{luapkgdir}/metrics/default_metrics/tarantool/fibers.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/info.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/init.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/memory.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/network.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/operations.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/replicas.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/runtime.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/slab.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/spaces.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/system.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/utils.lua
 
 %doc README.md
 %{!?_licensedir:%global license %doc}
