@@ -23,10 +23,23 @@ build = {
     type = 'builtin',
 
     modules = {
-        ['metrics']                              = 'metrics/init.lua',
-        ['metrics.server']                       = 'metrics/server/init.lua',
-        ['metrics.details']                      = 'metrics/details/init.lua',
-        ['metrics.plugins.graphite']             = 'metrics/plugins/graphite/init.lua',
+        ['metrics']                                      = 'metrics/init.lua',
+        ['metrics.server']                               = 'metrics/server/init.lua',
+        ['metrics.details']                              = 'metrics/details/init.lua',
+        ['metrics.plugins.graphite']                     = 'metrics/plugins/graphite/init.lua',
+        ['metrics.plugins.prometheus']                   = 'metrics/plugins/prometheus/init.lua',
+        ['metrics.default_metrics.tarantool']            = 'metrics/default_metrics/tarantool/init.lua',
+        ['metrics.default_metrics.tarantool.fibers']     = 'metrics/default_metrics/tarantool/fibers.lua',
+        ['metrics.default_metrics.tarantool.info']       = 'metrics/default_metrics/tarantool/info.lua',
+        ['metrics.default_metrics.tarantool.memory']     = 'metrics/default_metrics/tarantool/memory.lua',
+        ['metrics.default_metrics.tarantool.network']    = 'metrics/default_metrics/tarantool/network.lua',
+        ['metrics.default_metrics.tarantool.operations'] = 'metrics/default_metrics/tarantool/operations.lua',
+        ['metrics.default_metrics.tarantool.replicas']   = 'metrics/default_metrics/tarantool/replicas.lua',
+        ['metrics.default_metrics.tarantool.runtime']    = 'metrics/default_metrics/tarantool/runtime.lua',
+        ['metrics.default_metrics.tarantool.slab']       = 'metrics/default_metrics/tarantool/slab.lua',
+        ['metrics.default_metrics.tarantool.spaces']     = 'metrics/default_metrics/tarantool/spaces.lua',
+        ['metrics.default_metrics.tarantool.system']     = 'metrics/default_metrics/tarantool/system.lua',
+        ['metrics.default_metrics.tarantool.utils']      = 'metrics/default_metrics/tarantool/utils.lua',
     }
 }
 
