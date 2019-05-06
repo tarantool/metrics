@@ -1,0 +1,44 @@
+sudo: required
+
+services:
+  - docker
+
+env:
+    global:
+      - PRODUCT=tarantool-metrics
+    matrix:
+      - TARGET=test VERSION=1_7
+      - TARGET=test VERSION=1_9
+      - TARGET=test VERSION=1_10
+      - TARGET=test VERSION=2_0
+      - OS=el DIST=6
+      - OS=el DIST=7
+      - OS=fedora DIST=26
+      - OS=fedora DIST=27
+      - OS=ubuntu DIST=trusty
+      - OS=ubuntu DIST=xenial
+      - OS=ubuntu DIST=artful
+      - OS=debian DIST=wheezy
+      - OS=debian DIST=jessie
+      - OS=debian DIST=stretch
+
+script:
+  - git describe --long
+  - |
+    if [ "${TARGET}" = "test" ]; then
+        ./run-travis-tests.sh;
+    else
+        git clone https://github.com/packpack/packpack.git packpack;
+        packpack/packpack;
+    fi;
+
+before_deploy:
+  - ls -l build/
+
+notifications:
+  email:
+    recipients:
+      - build@tarantool.org
+    on_success: change
+    on_failure: always
+
