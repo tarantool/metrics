@@ -20,11 +20,18 @@ function Registry.new()
     return obj
 end
 
-function Registry:register(collector)
+function Registry:is_registered(collector)
     for _, c in ipairs(self.collectors) do
         if c.name == collector.name and c.kind == collector.kind then
-            return
+            return true
         end
+    end
+    return false
+end
+
+function Registry:register(collector)
+    if self:is_registered(collector) then
+        return
     end
     table.insert(self.collectors, collector)
 end
