@@ -144,7 +144,9 @@ Counter.__index = Counter
 
 function Counter.new(name, help, opts)
     local opts = opts or {}
-    opts.do_register = opts.do_register or true
+    if opts.do_register == nil then
+        opts.do_register = true
+    end
 
     local obj = Shared.new(name, help, 'counter')
     if opts.do_register then
