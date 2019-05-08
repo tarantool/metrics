@@ -69,7 +69,7 @@ local function collect_and_serialize()
             table.insert(parts, s)
         end
     end
-    return table.concat(parts, '\n')
+    return table.concat(parts, '\n') .. '\n'
 end
 
 function prometheus.collect_http()
