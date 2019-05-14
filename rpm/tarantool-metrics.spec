@@ -35,6 +35,9 @@ cp -rv metrics %{br_luapkgdir}
 %dir %{luapkgdir}/metrics/plugins/graphite
      %{luapkgdir}/metrics/plugins/graphite/init.lua
      %{luapkgdir}/metrics/plugins/graphite/README.md
+%dir %{luapkgdir}/metrics/plugins/json
+     %{luapkgdir}/metrics/plugins/json/init.lua
+     %{luapkgdir}/metrics/plugins/json/README.md
 %dir %{luapkgdir}/metrics/server
      %{luapkgdir}/metrics/server/init.lua
      %{luapkgdir}/metrics/server/README.md
