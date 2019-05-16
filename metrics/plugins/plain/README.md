@@ -1,28 +1,36 @@
-## Plain metrics
+## Plain
 
 Plugin to collect metrics to simple table.
 
 ### API
 
-Import Plain metrics plugin:
+Import plain plugin:
 
 ```lua
-local plain_metrics = require('metrics.plugins.plain_metrics')
+local plain_metrics = require('metrics.plugins.plain')
 ```
 
-#### `prometheus.collect_http()`
-See [Prometheus Exposition Format](https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md) for details on `<body>` and `<headers>`.
+#### `plain.collect()`
 Returns:
 ```lua
 {
-    status = 200,
-    headers = <headers>,
-    body = <body>,
+    metric_name = value,
+    ...
 }
 ```
 To be used in Tarantool `http.server` as follows:
 ```lua
 local httpd = require('http.server').new(...)
 ...
-httpd:route( { path = '/metrics' }, prometheus.collect_http)
+httpd:route({
+        method = 'GET',
+        path = '/metrics',
+        public = true,
+    },
+    function(req)
+        return req:render({
+            json = plain_metrics.collect()
+        })
+    end
+)
 ```
