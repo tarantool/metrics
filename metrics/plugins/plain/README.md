@@ -14,8 +14,11 @@ local plain_metrics = require('metrics.plugins.plain')
 Returns:
 ```lua
 {
-    metric_name = value,
-    ...
+    metric_name = {
+        timestamp = 1558087314351497,
+        label_pairs = []
+        value = '2.18'
+    },
 }
 ```
 To be used in Tarantool `http.server` as follows:
