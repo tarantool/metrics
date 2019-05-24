@@ -1,6 +1,6 @@
 #!/usr/bin/env tarantool
 
-local json_exporter = require('metrics.plugin.json')
+local json_metrics = require('metrics.plugin.json')
 local metrics = require('metrics')
 local json = require('json')
 local tap = require('tap')
@@ -11,7 +11,7 @@ box.schema.user.grant(
     'guest', 'read,write,execute', 'universe', nil, {if_not_exists = true}
 )
 
-local test = tap.test('json_exporter')
+local test = tap.test('json_metrics')
 test:plan(2)
 
 test:test(
@@ -27,7 +27,7 @@ test:test(
         test_inf:set( metrics.INF, { type =  metrics.INF })
         test_inf:set(-metrics.INF, { type = -metrics.INF })
 
-        local json_metrics = json.decode(json_exporter.collect())
+        local json_metrics = json.decode(json_metrics.export())
 
         test:is(
             json_metrics['test_nan{type="nan"}'].value,
@@ -54,7 +54,7 @@ test:test(
         local test_num = metrics.gauge('test_num')
 
         test_num:set(0.333, { type = 'number', degree = -1 })
-        local json_metrics = json.decode(json_exporter.collect())
+        local json_metrics = json.decode(json_metrics.export())
         test:is(
             json_metrics['test_num{type="number",degree="-1"}'].value,
             0.333,

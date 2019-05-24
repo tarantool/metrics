@@ -44,7 +44,7 @@ local function serialize_label_pairs(label_pairs)
     return string.format('{%s}', serialized)
 end
 
-function json_exporter.collect()
+function json_exporter.export()
     metrics.invoke_callbacks()
     local stat = {}
 
