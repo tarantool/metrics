@@ -8,7 +8,7 @@ If you want to use another DB to store metrics data, you can use appropriate exp
 
 - [Graphite](./graphite/README.md)
 - [Prometheus](./prometheus/README.md)
-- [Plain](./plain/README.md)
+- [Json](./json/README.md)
 
 
 ## How To Write Your Custom Plugin?
