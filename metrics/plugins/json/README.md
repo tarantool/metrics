@@ -1,4 +1,4 @@
-## Plain
+## Json
 
 Plugin to collect metrics and encode to json string.
 
@@ -7,19 +7,24 @@ Plugin to collect metrics and encode to json string.
 Import json plugin:
 
 ```lua
-local json_metrics = require('metrics.plugins.plain')
+local json_metrics = require('metrics.plugins.json')
 ```
 
 #### `json.export()`
 Returns:
 ```lua
 string:
-{
-    "<name_obs>{<key>=\"value\"}":{
+[
+    {
+        "name":<name>,
+        "label_name_1":<label_value_1>,
+        ...
+        "label_name_n":<label_value_n>,
         "timestamp":<number>,
         "value":<value>
-    }
-}
+    },
+    ...
+]
 ```
 **Important** - values can be **+-math.huge**, **math.huge * 0**
 In such cases, the value will be represented by the string, in other cases the number.
@@ -27,24 +32,27 @@ In such cases, the value will be represented by the string, in other cases the n
 Example:
 ```lua
 string:
-{
-    "name{label=\"-math.huge\"}":{
-        "timestamp":1558699055876857,
-        "value":"-inf"
-    },
-    "name{label=\"math.huge\"}":{
-        "timestamp":1558699055876857,
-        "value":"inf"
-    },
-    "name{label=\"math.huge * 0\"}":{
-        "timestamp":1558699055876857,
+[
+    {
+        "timestamp":1559036539723610,
+        "type":"nan",
+        "name":"test_nan",
         "value":"nan"
     },
-    "name{label=\"number\"}":{
-        "timestamp":1558700701857282,
-        "value":0.333
+    {
+        "timestamp":1559036539723610,
+        "type":"-inf",
+        "name":"test_inf",
+        "value":"-inf"
+    },
+    {
+        "timestamp":1559036539723610,
+        "type":"inf",
+        "name":"test_inf",
+        "value":"inf"
     }
-}
+]
+
 ```
 
 To be used in Tarantool `http.server` as follows:

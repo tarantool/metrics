@@ -19,29 +19,32 @@ local function finite(value)
     return value > -metrics.INF and value < metrics.INF
 end
 
-local function serialize_value(value)
-    if not finite(value) then
-        return tostring(value)
-    else
-        return value
-    end
+local function format_value(value)
+    return finite(value) and value or tostring(value)
 end
 
-local function serialize_label_pairs(label_pairs)
-    if next(label_pairs) == nil then
-        return ''
+local function format_label_pairs(label_pairs)
+    local part = {}
+    if next(label_pairs) ~= nil then
+        for name, value in pairs(label_pairs) do
+            part[escape(tostring(name))] = format_value(value)
+        end
     end
+    return part
+end
 
-    local parts = {}
-    for name, value in pairs(label_pairs) do
-        local str = string.format(
-            '%s="%s"',
-            escape(tostring(name)), tostring(value))
-        table.insert(parts, str)
+local function format_observation(obs)
+    local part = {
+        name = escape(obs.metric_name),
+        value = format_value(obs.value),
+        timestamp = obs.timestamp
+    }
+    local label_pairs = format_label_pairs(obs.label_pairs)
+
+    for key, val in pairs(label_pairs) do
+        part[key] = val
     end
-
-    local serialized = table.concat(parts, ',')
-    return string.format('{%s}', serialized)
+    return part
 end
 
 function json_exporter.export()
@@ -50,16 +53,8 @@ function json_exporter.export()
 
     for _, c in pairs(metrics.collectors()) do
         for _, obs in ipairs(c:collect()) do
-            local serialized_name = string.format(
-                '%s%s',
-                escape(obs.metric_name),
-                serialize_label_pairs(obs.label_pairs))
-
-            local serialized_value = finite(obs.value) and obs.value or tostring(obs.value)
-            stat[serialized_name] = {
-                value = serialized_value,
-                timestamp = obs.timestamp
-            }
+            local part = format_observation(obs)
+            table.insert(stat, part)
         end
     end
     return json.encode(stat)
