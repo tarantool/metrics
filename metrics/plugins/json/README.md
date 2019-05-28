@@ -26,8 +26,11 @@ string:
     ...
 ]
 ```
-**Important** - values can be **+-math.huge**, **math.huge * 0**
-In such cases, the value will be represented by the string, in other cases the number.
+**Important** - values can be `+-math.huge`, `math.huge * 0`
+Then:
+`math.inf` serialized to `"inf"`
+`-math.inf` serialized to `"-inf"`
+`nan` serialized to `"nan"`
 
 Example:
 ```lua

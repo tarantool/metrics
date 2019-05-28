@@ -2,13 +2,6 @@ local metrics = require('metrics')
 local json = require('json')
 local json_exporter = {}
 
-local function escape(str)
-    return str
-        :gsub("\\", "\\\\")
-        :gsub("\n", "\\n")
-        :gsub('"', '\\"')
-end
-
 local function finite(value)  
     if type(value) == "string" then
         value = tonumber(value)
@@ -27,7 +20,7 @@ local function format_label_pairs(label_pairs)
     local part = {}
     if next(label_pairs) ~= nil then
         for name, value in pairs(label_pairs) do
-            part[escape(tostring(name))] = format_value(value)
+            part[tostring(name)] = format_value(value)
         end
     end
     return part
@@ -35,7 +28,7 @@ end
 
 local function format_observation(obs)
     local part = {
-        name = escape(obs.metric_name),
+        name = obs.metric_name,
         value = format_value(obs.value),
         timestamp = obs.timestamp
     }
