@@ -17,9 +17,10 @@ string:
 [
     {
         "name":<name>,
-        "label_name_1":<label_value_1>,
-        ...
-        "label_name_n":<label_value_n>,
+        "label_pairs": {
+            <name>:<value>,
+            ...
+        },
         "timestamp":<number>,
         "value":<value>
     },
@@ -36,26 +37,31 @@ Example:
 ```lua
 string:
 [
-    {
-        "timestamp":1559036539723610,
-        "type":"nan",
-        "name":"test_nan",
-        "value":"nan"
-    },
-    {
-        "timestamp":1559036539723610,
-        "type":"-inf",
-        "name":"test_inf",
-        "value":"-inf"
-    },
-    {
-        "timestamp":1559036539723610,
-        "type":"inf",
-        "name":"test_inf",
-        "value":"inf"
-    }
+   {
+      "label_pairs":{
+         "type":"nan"
+      },
+      "timestamp":1559211080514607,
+      "metric_name":"test_nan",
+      "value":"nan"
+   },
+   {
+      "label_pairs":{
+         "type":"-inf"
+      },
+      "timestamp":1559211080514607,
+      "metric_name":"test_inf",
+      "value":"-inf"
+   },
+   {
+      "label_pairs":{
+         "type":"inf"
+      },
+      "timestamp":1559211080514607,
+      "metric_name":"test_inf",
+      "value":"inf"
+   }
 ]
-
 ```
 
 To be used in Tarantool `http.server` as follows:

@@ -28,15 +28,11 @@ end
 
 local function format_observation(obs)
     local part = {
-        name = obs.metric_name,
+        metric_name = obs.metric_name,
         value = format_value(obs.value),
+        label_pairs = format_label_pairs(obs.label_pairs),
         timestamp = obs.timestamp
     }
-    local label_pairs = format_label_pairs(obs.label_pairs)
-
-    for key, val in pairs(label_pairs) do
-        part[key] = val
-    end
     return part
 end
 

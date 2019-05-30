@@ -2,6 +2,7 @@
 
 local metrics = require('metrics')
 local tap = require('tap')
+local utils = require('utils')
 
 -- initialize tarantool
 box.cfg{}                           -- luacheck: ignore
@@ -14,30 +15,7 @@ local function ensure_throws(test, desc, f)
     test:ok(not ok, desc .. ' throws')
 end
 
--- a < b
-local function subset_of(a, b)
-    for name, value in pairs(a) do
-        if b[name] ~= value then
-            return false
-        end
-    end
-    return true
-end
 
--- a = b
-local function equal_sets(a, b)
-    return subset_of(a, b) and subset_of(b, a)
-end
-
-local function find_obs(metric_name, label_pairs, observations)
-    for _, obs in pairs(observations) do
-        local same_label_pairs = equal_sets(obs.label_pairs, label_pairs)
-        if obs.metric_name == metric_name and same_label_pairs then
-            return obs
-        end
-    end
-    assert(false, 'haven\'t found observation')
-end
 
 local test = tap.test("http")
 test:plan(3)
@@ -65,7 +43,7 @@ test:test('counter', function(test)
 
     local collectors = metrics.collectors()
     local observations = metrics.collect()
-    local obs = find_obs('cnt', {}, observations)
+    local obs = utils.find_obs('cnt', {}, observations)
     test:is(#collectors, 1, 'counter seen as only collector')
     test:is(obs.value, 8, '3 + 5 = 8 (via metrics.collectors())')
 
@@ -107,7 +85,7 @@ test:test('gauge', function(test)
 
     local collectors = metrics.collectors()
     local observations = metrics.collect()
-    local obs = find_obs('gauge', {}, observations)
+    local obs = utils.find_obs('gauge', {}, observations)
     test:is(#collectors, 1, 'gauge seen as only collector')
     test:is(obs.value, -2, '3 - 5 = -2 (via metrics.collectors())')
 
@@ -149,11 +127,11 @@ test:test('histogram', function(test)
     local collectors = metrics.collectors()
     test:is(#collectors, 1, 'histogram seen as only 1 collector')
     local observations = metrics.collect()
-    local obs_sum = find_obs('hist_sum', {}, observations)
-    local obs_count = find_obs('hist_count', {}, observations)
-    local obs_bucket_2 = find_obs('hist_bucket', {le = 2}, observations)
-    local obs_bucket_4 = find_obs('hist_bucket', {le = 4}, observations)
-    local obs_bucket_inf = find_obs('hist_bucket', {le = metrics.INF}, observations)
+    local obs_sum = utils.find_obs('hist_sum', {}, observations)
+    local obs_count = utils.find_obs('hist_count', {}, observations)
+    local obs_bucket_2 = utils.find_obs('hist_bucket', {le = 2}, observations)
+    local obs_bucket_4 = utils.find_obs('hist_bucket', {le = 4}, observations)
+    local obs_bucket_inf = utils.find_obs('hist_bucket', {le = metrics.INF}, observations)
     test:is(#observations, 5, '<name>_sum, <name>_count, and <name>_bucket with 3 labelpairs')
     test:is(obs_sum.value, 8, '3 + 5 = 8')
     test:is(obs_count.value, 2, '2 observed values')
@@ -167,11 +145,11 @@ test:test('histogram', function(test)
     collectors = metrics.collectors()
     test:is(#collectors, 1, 'still histogram seen as only 1 collector')
     observations = metrics.collect()
-    obs_sum = find_obs('hist_sum', {foo = 'bar'}, observations)
-    obs_count = find_obs('hist_count', {foo = 'bar'}, observations)
-    obs_bucket_2 = find_obs('hist_bucket', {le = 2, foo = 'bar'}, observations)
-    obs_bucket_4 = find_obs('hist_bucket', {le = 4, foo = 'bar'}, observations)
-    obs_bucket_inf = find_obs('hist_bucket', {le = metrics.INF, foo = 'bar'}, observations)
+    obs_sum = utils.find_obs('hist_sum', {foo = 'bar'}, observations)
+    obs_count = utils.find_obs('hist_count', {foo = 'bar'}, observations)
+    obs_bucket_2 = utils.find_obs('hist_bucket', {le = 2, foo = 'bar'}, observations)
+    obs_bucket_4 = utils.find_obs('hist_bucket', {le = 4, foo = 'bar'}, observations)
+    obs_bucket_inf = utils.find_obs('hist_bucket', {le = metrics.INF, foo = 'bar'}, observations)
 
     test:is(#observations, 10, '+ <name>_sum, <name>_count, and <name>_bucket with 3 labelpairs')
     test:is(obs_sum.value, 3, '3 = 3')
