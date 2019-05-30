@@ -1,9 +1,9 @@
 package = 'metrics'
-version = '0.1.1-1'
+version = '0.1.3-1'
 
 source  = {
     url = 'git://github.com/tarantool/metrics.git',
-    tag = '0.1.1'
+    tag = '0.1.3'
 }
 
 description = {
@@ -28,6 +28,7 @@ build = {
         ['metrics.details']                              = 'metrics/details/init.lua',
         ['metrics.plugins.graphite']                     = 'metrics/plugins/graphite/init.lua',
         ['metrics.plugins.prometheus']                   = 'metrics/plugins/prometheus/init.lua',
+        ['metrics.plugins.json']                         = 'metrics/plugins/json/init.lua',
         ['metrics.default_metrics.tarantool']            = 'metrics/default_metrics/tarantool/init.lua',
         ['metrics.default_metrics.tarantool.fibers']     = 'metrics/default_metrics/tarantool/fibers.lua',
         ['metrics.default_metrics.tarantool.info']       = 'metrics/default_metrics/tarantool/info.lua',
