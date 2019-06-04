@@ -22,6 +22,47 @@ In order to easily export metrics to any TSDB you can use one of supported expor
 or you can write your [custom plugin](./metrics/plugins/README.md) and use it. 
 Hopefully, plugins for other TSDBs will be supported soon.
 
+## Examples
+
+Below are the examples of using metrics primitives.
+
+Note that this usage is independent of export-plugins such as Prometheus / Graphite / etc.
+For documentation on plugins usage go to their respective README under `metrics/plugins/<name>/README.md`.
+
+Using counters:
+```lua
+local metrics = require('metrics')
+
+-- create counter
+local http_requests_total_counter = metrics.counter('http_requests_total')
+
+-- somewhere in HTTP requests middleware:
+http_requests_total_counter:inc(1, {method = 'GET'})
+```
+
+Using gauges:
+```lua
+local cpu_usage_gauge = metrics.gauge('cpu_usage', 'CPU usage')
+
+-- register a lazy the gauge value update
+-- this will be called whenever the export is invoked in any plugins.
+metrics.register_callback(function()
+    local current_cpu_usage = math.random()
+    cpu_usage_gauge:set(current_cpu_usage, {app = 'tarantool'})
+end)
+```
+
+Using histograms:
+```lua
+local http_requests_latency_hist = metrics.histogram(
+    'http_requests_latency', 'HTTP requests total', {2, 4, 6})
+
+-- somewhere in HTTP requests middleware:
+local latency = math.random(1, 10)
+http_requests_latency_hist:observe(latency)
+```
+
+
 ## API
 
 ### Collectors
@@ -64,7 +105,7 @@ metrics = require('metrics')
   Registers a new counter.
   Returns Counter object.
   * `name` Collector name (string). Must be unique.
-  * `help` Help description (string). Currently it's just ignored.
+  * `help` (optional) Help description (string).
 
 #### `counter_obj:inc(num, label_pairs)`
   Increments observation under `label_pairs`. If `label_pairs` didn't exist before - this creates it.
@@ -89,7 +130,7 @@ metrics = require('metrics')
   Registers a new gauge.
   Returns Gauge object.
   * `name` Collector name (string). Must be unique.
-  * `help` Help description (string). Currently it's just ignored.
+  * `help` (optional) Help description (string).
 
 #### `gauge_obj:inc(num, label_pairs)`
   Same as Counter `inc()`.
@@ -106,11 +147,11 @@ metrics = require('metrics')
 
 #### Histogram
 
-#### `client_obj.histogram(name, help, buckets)`
+#### `metrics.histogram(name, help, buckets)`
   Registers a new histogram.
   Returns Histogram object.
   * `name` Collector name (string). Must be unique.
-  * `help` Help description (string). Currently it's just ignored.
+  * `help` (optional) Help description (string).
   * `buckets` Histogram buckets (array of positive sorted numbers). `INF` bucket is added automatically. Default is 
 {.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}.
 
