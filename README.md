@@ -50,10 +50,11 @@ metrics = require('metrics')
    Collects tarantool metrics, ported from https://github.com/tarantool/stat
 
 #### `client_obj.register_callback(callback)`
-  Registers a function `callback` which will be called before collecting observations every time when `metrics.collect()` called.
+  Registers a function `callback` which will be called right
+  before metrics collection on plugin export.
   * `callback` Function which takes no parameters.
 
-  It may be used for calculation some metric right before collecting.
+  Most common usage is for gauge metrics updates.
 
 ### Creating and Using Collectors
 
