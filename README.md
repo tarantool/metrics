@@ -49,43 +49,11 @@ metrics = require('metrics')
    Enables default metrics collections. 
    Collects tarantool metrics, ported from https://github.com/tarantool/stat
 
-#### `metrics.collectors()`
-   Returns a list of created collectors.
-   Designed to be used in exporters in favor of `metrics.collect()`.
-
-#### `metrics.collect()`
-    **NOTE**: You'll probably want to use `metrics.collectors()` instead.
-    Equivalent to:
-    ```lua
-    for _, c in pairs(metrics.collectors()) do_
-        for _, obs in ipairs(c:collect()) do
-            ...  -- handle observation
-        end_
-    end
-    ```
-
-  Returns concatenation of `observation` objects across all collectors created.  
-
-  `observation` is a Lua table:
-  ```lua
-  {
-    label_pairs: table,          -- `label_pairs` key-value table
-    timestamp: ctype<uint64_t>,  -- current system time (in microseconds)
-    value: number,               -- current value
-    metric_name: string,         -- collector
-  }
-  ```
-
 #### `client_obj.register_callback(callback)`
   Registers a function `callback` which will be called before collecting observations every time when `metrics.collect()` called.
   * `callback` Function which takes no parameters.
 
   It may be used for calculation some metric right before collecting.
-
-#### `metrics.invoke_callbacks()`
-   Invokes function registered via `metrics.register_callback(<callback>)`
-   Used in exporters.
-
 
 ### Creating and Using Collectors
 
@@ -103,8 +71,16 @@ metrics = require('metrics')
   * `label_pairs` Table containing label names as keys, label values as values (table).
 
 #### `counter_obj:collect()`
-  Returns array of `observation` objects for given counter.  
-  For `observation` description see `metrics.collect()` section.
+  Returns array of `observation` objects for given counter.
+  `observation` is a Lua table:
+  ```lua
+  {
+    label_pairs: table,          -- `label_pairs` key-value table
+    timestamp: ctype<uint64_t>,  -- current system time (in microseconds)
+    value: number,               -- current value
+    metric_name: string,         -- collector
+  }
+  ```
 
 #### Gauge
 
@@ -125,7 +101,7 @@ metrics = require('metrics')
 
 #### `gauge_obj:collect()`
   Returns array of `observation` objects for given gauge.  
-  For `observation` description see `metrics.collect()` section.
+  For `observation` description see `counter_obj:collect()` section.
 
 #### Histogram
 
@@ -150,7 +126,7 @@ metrics = require('metrics')
 #### `histogram_obj:collect()`
   Returns concatenation of `counter_obj:collect()` across all internal counters
   of `histogram_obj`.  
-  See above `counter_obj:collect()` for details.
+  For `observation` description see `counter_obj:collect()` section.
 
 ## CONTRIBUTION
 
