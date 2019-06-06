@@ -42,9 +42,12 @@ http_requests_total_counter:inc(1, {method = 'GET'})
 
 Using gauges:
 ```lua
+local metrics = require('metrics')
+
+-- create gauge
 local cpu_usage_gauge = metrics.gauge('cpu_usage', 'CPU usage')
 
--- register a lazy the gauge value update
+-- register a lazy gauge value update
 -- this will be called whenever the export is invoked in any plugins.
 metrics.register_callback(function()
     local current_cpu_usage = math.random()
@@ -54,6 +57,9 @@ end)
 
 Using histograms:
 ```lua
+local metrics = require('metrics')
+
+-- create histogram
 local http_requests_latency_hist = metrics.histogram(
     'http_requests_latency', 'HTTP requests total', {2, 4, 6})
 
@@ -74,9 +80,24 @@ The application using `metrics` module has 3 primitives (called collectors) at i
 
 Collectors represent an observation or a few that are changing over time.
 
-Counter and Gauge collectors support `labels`, which are essentially a key-value pairs.  
-Labels allow collectors to store a separate observation per each label set added.  
-New label sets are added automatically when collector invokes modification function with this label set specified for the first time.
+### Labels
+
+All collectors support providing `label_pairs` on data modification.
+Labels are basically a metainfo you associate with a metric in format of key-value pairs.
+See tags in Graphite and labels in Prometheus.
+
+Labels are used to differentiate the characteristics of a thing being measured.
+For example, in metric associated with http total # of requests you can use methods and statuses label pairs:
+```lua
+    http_requests_total_counter:inc(1, {method = 'POST', status = '200'})
+```
+
+You don't have to predefine a set of labels in advance.
+
+Using labels on your metrics allows you to later derive new timeserieses (visualize their graphs)
+by specifying conditions on label values. In above example, we could derive a timeserieses:
+  1. total # of requests over time with method = "POST" (and any status).
+  2. total # of requests over time with status = 500 (and any method).
 
 ------------------------------------------------------------------------
 
