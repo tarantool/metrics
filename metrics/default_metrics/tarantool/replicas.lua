@@ -17,7 +17,7 @@ local function update_replicas_metrics()
         for k, v in ipairs(current_box_info.replication) do
             if v.downstream ~= nil and v.downstream.vclock ~= nil then
                 local lsn = v.downstream.vclock[current_box_info.id]
-                if lsn ~= nil and box_info.lsn ~= nil then
+                if lsn ~= nil and current_box_info.lsn ~= nil then
                     utils.set_gauge(
                             'replication_master_' .. k .. '_lsn',
                             'lsn for master ' .. k,
