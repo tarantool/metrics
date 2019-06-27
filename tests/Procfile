@@ -1,0 +1,2 @@
+test: ./test_default_metrics.lua
+replica: ./replica.lua > /dev/null 2>&1

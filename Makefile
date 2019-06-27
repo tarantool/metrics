@@ -4,4 +4,4 @@ rpm:
 
 .PHONY: test
 test:
-	./tests/collectors.lua
+	./run_tests.sh
