@@ -1,6 +1,6 @@
 #!/usr/bin/env tarantool
 
-local json_exporter = require('metrics.plugin.json')
+local json_exporter = require('metrics.plugins.json')
 local metrics = require('metrics')
 local json = require('json')
 local tap = require('tap')
