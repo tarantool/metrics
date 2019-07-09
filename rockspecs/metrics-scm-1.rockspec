@@ -15,7 +15,6 @@ description = {
 
 dependencies = {
     'lua >= 5.1',
-    'expirationd',
     'checks >= 2.0.0',
 }
 
@@ -24,7 +23,6 @@ build = {
 
     modules = {
         ['metrics']                                      = 'metrics/init.lua',
-        ['metrics.server']                               = 'metrics/server/init.lua',
         ['metrics.details']                              = 'metrics/details/init.lua',
         ['metrics.plugins.graphite']                     = 'metrics/plugins/graphite/init.lua',
         ['metrics.plugins.prometheus']                   = 'metrics/plugins/prometheus/init.lua',

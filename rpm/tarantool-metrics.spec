@@ -38,9 +38,6 @@ cp -rv metrics %{br_luapkgdir}
 %dir %{luapkgdir}/metrics/plugins/json
      %{luapkgdir}/metrics/plugins/json/init.lua
      %{luapkgdir}/metrics/plugins/json/README.md
-%dir %{luapkgdir}/metrics/server
-     %{luapkgdir}/metrics/server/init.lua
-     %{luapkgdir}/metrics/server/README.md
 %dir %{luapkgdir}/metrics/default_metrics
 %dir %{luapkgdir}/metrics/default_metrics/tarantool
      %{luapkgdir}/metrics/default_metrics/tarantool/fibers.lua
@@ -64,3 +61,5 @@ cp -rv metrics %{br_luapkgdir}
 %changelog
 * Thu Mar 07 2019 Elizaveta Dokshina <dokshina@tarantool.org> 1.0.0
 - Initial version of the RPM spec
+* Tue Jul 09 2019 Albert Sverdlov <sverdlov@tarantool.org> 1.0.0
+- Remove metrics.server

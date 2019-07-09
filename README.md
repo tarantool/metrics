@@ -1,9 +1,8 @@
 [![Build Status](https://travis-ci.org/tarantool/metrics.svg?branch=master)](https://travis-ci.org/tarantool/metrics)
 # Metrics
 
-Metrics is a tool to collect, store and manipulate metrics timeseriess.  
-Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can be exported to any TSDB or can be used to build complex metrics with server-side aggregation and filtering.
-
+Metrics is a tool to collect, manipulate metrics timeseriess.  
+Metrics uses a collection of primitives borrowed from Prometheus TSDB, which can be exported to any TSDB.
 
 ## Installation
 
