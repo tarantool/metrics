@@ -59,7 +59,7 @@ cp -rv metrics %{br_luapkgdir}
 
 
 %changelog
-* Thu Mar 07 2019 Elizaveta Dokshina <dokshina@tarantool.org> 1.0.0
-- Initial version of the RPM spec
 * Tue Jul 09 2019 Albert Sverdlov <sverdlov@tarantool.org> 1.0.0
 - Remove metrics.server
+* Thu Mar 07 2019 Elizaveta Dokshina <dokshina@tarantool.org> 1.0.0
+- Initial version of the RPM spec
