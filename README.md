@@ -17,6 +17,7 @@ In order to easily export metrics to any TSDB you can use one of supported expor
 - [Graphite](./metrics/plugins/graphite/README.md)
 - [Prometheus](./metrics/plugins/prometheus/README.md)
 - [Json](./metrics/plugins/json/README.md)
+- [InfluxDB](./metrics/plugins/influxdb/README.md)
 
 or you can write your [custom plugin](./metrics/plugins/README.md) and use it. 
 Hopefully, plugins for other TSDBs will be supported soon.

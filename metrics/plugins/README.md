@@ -9,6 +9,7 @@ If you want to use another DB to store metrics data, you can use appropriate exp
 - [Graphite](./graphite/README.md)
 - [Prometheus](./prometheus/README.md)
 - [Json](./json/README.md)
+- [InfluxDB](./influxdb/README.md)
 
 ## Plugin-Specific API
 
