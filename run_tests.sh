@@ -19,5 +19,9 @@ register_test 'json_plugin' <<-EOF
     ./test_json_plugin.lua
 EOF
 
+register_test 'prometheus_plugin' <<-EOF
+    ./test_prometheus_plugin.lua
+EOF
+
 set -e
 run_all_tests
