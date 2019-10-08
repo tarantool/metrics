@@ -22,7 +22,14 @@ local function serialize_value(value)
     elseif value ~= value then
         return 'Nan'
     else
-        return escape(tostring(value))
+        local strv = tostring(value)
+
+        -- Luajit cdata type inserts some postfix in the end of the number after tostring() operation
+        if type(value) == "cdata" then
+            return strv:gsub("U*LL", "")
+        end
+
+        return escape(strv)
     end
 end
 
@@ -40,18 +47,6 @@ local function serialize_label_pairs(label_pairs)
 
     local enumerated_via_comma = table.concat(parts, ',')
     return string.format('{%s}', enumerated_via_comma)
-end
-
-local function serialize_value(value)
-    if value == metrics.INF then
-        return '+Inf'
-    elseif value == -metrics.INF then
-        return '-Inf'
-    elseif value ~= value then
-        return 'Nan'
-    else
-        return escape(tostring(value))
-    end
 end
 
 local function collect_and_serialize()
