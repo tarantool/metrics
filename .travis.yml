@@ -76,18 +76,6 @@ jobs:
       env: OS=fedora DIST=28
     - <<: *packpack
       env: OS=fedora DIST=29
-    - <<: *packpack
-      env: OS=ubuntu DIST=trusty
-    - <<: *packpack
-      env: OS=ubuntu DIST=xenial
-    - <<: *packpack
-      env: OS=ubuntu DIST=bionic
-    - <<: *packpack
-      env: OS=ubuntu DIST=cosmic
-    - <<: *packpack
-      env: OS=debian DIST=jessie
-    - <<: *packpack
-      env: OS=debian DIST=stretch
 
 notifications:
   email:
