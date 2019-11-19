@@ -15,12 +15,15 @@ local DEFAULT_SEND_INTERVAL = 2
 -- Constants
 local LABELS_SEP = ';'
 
-local function format_observation(prefix, obs)
-    local metric_path = ('%s.%s'):format(prefix, obs.metric_name)
+local function format_observation(prefix, obs, extra_labels)
+    local metric_path = #prefix > 0 and ('%s.%s'):format(prefix, obs.metric_name) or obs.metric_name
 
     if next(obs.label_pairs) then
         local label_pairs_str_parts = {}
         for label, value in pairs(obs.label_pairs) do
+            table.insert(label_pairs_str_parts, ('%s=%s'):format(label, value))
+        end
+        for label, value in pairs(extra_labels) do
             table.insert(label_pairs_str_parts, ('%s=%s'):format(label, value))
         end
         local label_pairs_str = table.concat(label_pairs_str_parts, LABELS_SEP)
@@ -41,7 +44,7 @@ local function graphite_worker(opts)
         metrics.invoke_callbacks()
         for _, c in pairs(metrics.collectors()) do
             for _, obs in ipairs(c:collect()) do
-                local data = format_observation(opts.prefix, obs)
+                local data = format_observation(opts.prefix, obs, opts.extra_labels)
                 local numbytes = opts.sock:sendto(opts.host, opts.port, data)
                 if numbytes == nil then
                     log.error('Error while sending to host %s port %s data %s',
@@ -59,7 +62,8 @@ function graphite.init(opts)
         prefix = '?string',
         host = '?string',
         port = '?number',
-        send_interval = '?number'
+        send_interval = '?number',
+        extra_labels = '?table',
     }
 
     local sock = socket('AF_INET', 'SOCK_DGRAM', 'udp')
@@ -69,6 +73,7 @@ function graphite.init(opts)
     local host = opts.host or DEFAULT_HOST
     local port = opts.port or DEFAULT_PORT
     local send_interval = opts.send_interval or DEFAULT_SEND_INTERVAL
+    local extra_labels = opts.extra_labels or {}
 
     fiber.create(graphite_worker, {
         prefix = prefix,
@@ -76,6 +81,7 @@ function graphite.init(opts)
         host = host,
         port = port,
         send_interval = send_interval,
+        extra_labels = extra_labels,
     })
 end
 
