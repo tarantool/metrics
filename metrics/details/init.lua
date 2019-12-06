@@ -23,10 +23,19 @@ end
 function Registry:is_registered(collector)
     for _, c in ipairs(self.collectors) do
         if c.name == collector.name and c.kind == collector.kind then
-            return true, c
+            return true
         end
     end
     return false
+end
+
+function Registry:get_registered(collector)
+    for _, c in ipairs(self.collectors) do
+        if c.name == collector.name and c.kind == collector.kind then
+            return c
+        end
+    end
+    return nil
 end
 
 function Registry:register(collector)
@@ -73,8 +82,8 @@ function Registry:register_callback(callback)
 end
 
 function Registry:instanceof(obj, mt)
-    local found, metric = self:is_registered(obj)
-    if not found then
+    local metric = self:get_registered(obj)
+    if metric == nil then
         metric = setmetatable(obj, mt)
         self:register(metric)
     end
