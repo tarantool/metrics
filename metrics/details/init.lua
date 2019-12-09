@@ -29,6 +29,22 @@ function Registry:is_registered(collector)
     return false
 end
 
+local function is_empty(str)
+    return str == nil or str == ''
+end
+
+function Registry:get_registered(collector)
+    assert(collector ~= nil, 'Collector is empty')
+    assert(not is_empty(collector.name), "Collector''s name is empty")
+    assert(not is_empty(collector.kind), "Collector''s kind is empty")
+    for _, c in ipairs(self.collectors) do
+        if c.name == collector.name and c.kind == collector.kind then
+            return c
+        end
+    end
+    return nil
+end
+
 function Registry:register(collector)
     if self:is_registered(collector) then
         return
@@ -70,6 +86,15 @@ function Registry:register_callback(callback)
     if not found then
         table.insert(self.callbacks, callback)
     end
+end
+
+function Registry:instanceof(obj, mt)
+    local metric = self:get_registered(obj)
+    if metric == nil then
+        metric = setmetatable(obj, mt)
+        self:register(metric)
+    end
+    return metric
 end
 
 global_metrics_registry = Registry.new()
@@ -157,9 +182,8 @@ function Counter.new(name, help, opts)
 
     local obj = Shared.new(name, help, 'counter')
     if opts.do_register then
-        global_metrics_registry:register(obj)
+        return global_metrics_registry:instanceof(obj, Counter)
     end
-
     return setmetatable(obj, Counter)
 end
 
@@ -179,9 +203,7 @@ Gauge.__index = Gauge
 
 function Gauge.new(name, help)
     local obj = Shared.new(name, help, 'gauge')
-    global_metrics_registry:register(obj)
-
-    return setmetatable(obj, Gauge)
+    return global_metrics_registry:instanceof(obj, Gauge)
 end
 
 function Gauge:inc(num, label_pairs)
@@ -230,9 +252,7 @@ function Histogram.new(name, help, buckets)
     )
 
     -- register
-    global_metrics_registry:register(obj)
-
-    return setmetatable(obj, Histogram)
+    return global_metrics_registry:instanceof(obj, Histogram)
 end
 
 function Histogram:observe(num, label_pairs)

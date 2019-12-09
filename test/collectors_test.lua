@@ -140,3 +140,23 @@ g.test_histogram = function()
     t.assertEquals(obs_bucket_4.value, 1, 'bucket 4 has 1 value: 3')
     t.assertEquals(obs_bucket_inf.value, 1, 'bucket +inf has 1 value: 3')
 end
+
+g.test_counter_cache = function()
+    -- delete all previous collectors
+    metrics.clear()
+    local counter_1 = metrics.counter('cnt', 'test counter')
+    local counter_2 = metrics.counter('cnt', 'test counter')
+    local counter_3 = metrics.counter('cnt2', 'another test counter')
+
+    counter_1:inc(3)
+    counter_2:inc(5)
+    counter_3:inc(7)
+
+    local collectors = metrics.collectors()
+    local observations = metrics.collect()
+    local obs = utils.find_obs('cnt', {}, observations)
+    t.assertEquals(#collectors, 2, 'counter_1 and counter_2 refer to the same object')
+    t.assertEquals(obs.value, 8, '3 + 5 = 8')
+    obs = utils.find_obs('cnt2', {}, observations)
+    t.assertEquals(obs.value, 7, 'counter_3 is the only reference to cnt2')
+end
