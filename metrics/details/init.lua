@@ -29,7 +29,14 @@ function Registry:is_registered(collector)
     return false
 end
 
+local function is_empty(str)
+    return str == nil or str == ''
+end
+
 function Registry:get_registered(collector)
+    assert(collector ~= nil, 'Collector is empty')
+    assert(not is_empty(collector.name), "Collector''s name is empty")
+    assert(not is_empty(collector.kind), "Collector''s kind is empty")
     for _, c in ipairs(self.collectors) do
         if c.name == collector.name and c.kind == collector.kind then
             return c
