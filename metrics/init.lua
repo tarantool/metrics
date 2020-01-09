@@ -56,6 +56,22 @@ end
 local function clear()
     global_metrics_registry.collectors = {}
     global_metrics_registry.callbacks = {}
+    global_metrics_registry.label_pairs = {}
+end
+
+local function set_global_labels(label_pairs)
+    checks('?table')
+
+    label_pairs = label_pairs or {}
+
+    -- Verify label table
+    for k, _ in pairs(label_pairs) do
+        if type(k) ~= 'string' then
+            error(("bad label key (string expected, got %s)"):type(k))
+        end
+    end
+
+    global_metrics_registry:set_labels(label_pairs)
 end
 
 return {
@@ -70,6 +86,7 @@ return {
     collectors = collectors,
     register_callback = register_callback,
     invoke_callbacks = invoke_callbacks,
+    set_global_labels = set_global_labels,
     enable_default_metrics = function()
         return require('metrics.default_metrics.tarantool').enable()
     end,

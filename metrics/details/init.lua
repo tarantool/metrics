@@ -17,6 +17,7 @@ function Registry.new()
 
     obj.collectors = {}
     obj.callbacks = {}
+    obj.label_pairs = {}
     return obj
 end
 
@@ -97,7 +98,27 @@ function Registry:instanceof(obj, mt)
     return metric
 end
 
+function Registry:set_labels(label_pairs)
+    self.label_pairs = table.copy(label_pairs)
+end
+
 global_metrics_registry = Registry.new()
+
+local function append_global_labels(label_pairs)
+    if next(global_metrics_registry.label_pairs) == nil then
+        return label_pairs
+    end
+
+    local extended_label_pairs = table.copy(label_pairs)
+
+    for k, v in pairs(global_metrics_registry.label_pairs) do
+        if extended_label_pairs[k] == nil then
+            extended_label_pairs[k] = v
+        end
+    end
+
+    return extended_label_pairs
+end
 
 ------------------------------- Common Methods -------------------------------
 
@@ -160,7 +181,7 @@ function Shared:collect()
     for key, observation in pairs(self.observations) do
         local obs = {
             metric_name = self.name,
-            label_pairs = self.label_pairs[key],
+            label_pairs = append_global_labels(self.label_pairs[key]),
             value = observation,
             timestamp = fiber.time64(),
         }
