@@ -98,6 +98,12 @@ by specifying conditions on label values. In above example, we could derive a ti
   1. total # of requests over time with method = "POST" (and any status).
   2. total # of requests over time with status = 500 (and any method).
 
+You can also set global labels by calling `metrics.set_global_labels({ label = value, ...})`.
+It will add some labels to every observation.
+Labels table is validated before use: label key must be a string. (Throws error otherwise.)
+You can change global labels along the way.
+Global labels never overwrite local (passed as function argument) ones.
+
 ------------------------------------------------------------------------
 
 

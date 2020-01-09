@@ -2,7 +2,7 @@ local metrics = require('metrics')
 local json = require('json')
 local json_exporter = {}
 
-local function finite(value)  
+local function finite(value)
     if type(value) == "string" then
         value = tonumber(value)
         if value == nil then return nil end

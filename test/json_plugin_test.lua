@@ -16,9 +16,12 @@ g.before_all = function()
     )
 end
 
-g.test_infinite_value_serialization = function()
+g.setup = function()
+    -- Delete all previous collectors and global labels
     metrics.clear()
+end
 
+g.test_infinite_value_serialization = function()
     local test_nan = metrics.gauge('test_nan')
     local test_inf = metrics.gauge('test_inf')
 
@@ -42,8 +45,6 @@ g.test_infinite_value_serialization = function()
 end
 
 g.test_number_value_serialization = function()
-    metrics.clear()
-
     local test_num_float = metrics.gauge('number_float')
     local test_num_int = metrics.counter('number_int')
 
@@ -65,7 +66,6 @@ g.test_number_value_serialization = function()
 end
 
 g.test_histogram = function()
-    metrics.clear()
     local h = metrics.histogram('hist', 'some histogram', {2, 4})
 
     h:observe(3)
