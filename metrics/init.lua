@@ -67,7 +67,7 @@ local function set_global_labels(label_pairs)
     -- Verify label table
     for k, _ in pairs(label_pairs) do
         if type(k) ~= 'string' then
-            error(("bad label key (string expected, got %s)"):type(k))
+            error(("bad label key (string expected, got %s)"):format(type(k)))
         end
     end
 
