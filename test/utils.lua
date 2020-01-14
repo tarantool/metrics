@@ -1,3 +1,5 @@
+local t = require('luatest')
+
 local utils = {}
 
 -- a < b
@@ -22,7 +24,7 @@ function utils.find_obs(metric_name, label_pairs, observations)
             return obs
         end
     end
-    assert(false, 'haven\'t found observation')
+    t.fail("haven't found observation")
 end
 
 return utils
