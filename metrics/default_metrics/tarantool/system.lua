@@ -6,7 +6,6 @@ local function update_system_metrics()
         return
     end
 
-    utils.set_gauge('cfg_listen', 'Tarantool port', box.cfg.listen)
     utils.set_gauge('cfg_current_time', 'Tarantool cfg time', clock.time() + 0ULL)
 end
 
