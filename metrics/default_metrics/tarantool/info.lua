@@ -17,9 +17,10 @@ local function update_info_metrics()
         utils.set_gauge('info_vclock_' .. k, 'VClock for ' .. k, v)
     end
 
-    for k, v in ipairs(info.replication) do
-        if v.upstream ~= nil then
-            utils.set_gauge('replication_' .. k .. '_lag', 'Replication lag for instance ' .. k, v.upstream.lag)
+    for _, replica in ipairs(info.replication) do
+        if replica.upstream ~= nil then
+            utils.set_gauge('replication_lag', 'Replication lag for instance',
+                replica.upstream.lag, {uuid = replica.uuid})
         end
     end
 end

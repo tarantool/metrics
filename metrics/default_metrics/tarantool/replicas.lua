@@ -25,6 +25,12 @@ local function update_replicas_metrics()
                     )
                 end
             end
+
+            if v.upstream ~= nil then
+                utils.set_gauge('replication_lag_' .. k,
+                    'The time difference between the master and the replica ' .. k,
+                    v.upstream.lag)
+            end
         end
     end
 end
