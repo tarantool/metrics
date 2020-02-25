@@ -15,14 +15,11 @@ local function update_spaces_metrics()
 
             local labels = { name = sp.name };
 
-            for _, i in pairs(sp.index) do
-                if type(_) == 'number' then
-                    utils.set_gauge(
-                        'space_index_' .. i.name .. '_bsize',
-                        'Index ' .. i.name .. ' bsize',
-                        i:bsize(),
-                        labels
-                    )
+            for space_id, i in pairs(sp.index) do
+                if type(space_id) == 'number' then
+                    local l = table.copy(labels)
+                    l.index_name = i.name
+                    utils.set_gauge('space_index_bsize', 'Index bsize', i:bsize(), l)
                     total = total + i:bsize()
                 end
             end
@@ -36,8 +33,6 @@ local function update_spaces_metrics()
 
                 utils.set_gauge('space_bsize', 'Space bsize', sp_bsize, labels)
 
-                utils.set_gauge('space_index_bsize', 'Space index bsize', total, labels)
-
                 utils.set_gauge('space_total_bsize', 'Space total bsize', sp_bsize + total, labels)
 
             else
@@ -47,8 +42,6 @@ local function update_spaces_metrics()
                 if include_vinyl_count then
                     utils.set_gauge( 'space_count', 'Space count', sp:count(), labels)
                 end
-
-                utils.set_gauge('space_index_bsize', 'Space index bsize', total, labels)
             end
         end
     end
