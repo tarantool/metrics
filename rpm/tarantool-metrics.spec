@@ -25,8 +25,12 @@ cp -rv metrics %{br_luapkgdir}
 %files
 %dir %{luapkgdir}/metrics
      %{luapkgdir}/metrics/init.lua
-%dir %{luapkgdir}/metrics/details
-     %{luapkgdir}/metrics/details/init.lua
+     %{luapkgdir}/metrics/registry.lua
+%dir %{luapkgdir}/metrics/collectors
+     %{luapkgdir}/metrics/collectors/counter.lua
+     %{luapkgdir}/metrics/collectors/gauge.lua
+     %{luapkgdir}/metrics/collectors/histogram.lua
+     %{luapkgdir}/metrics/collectors/shared.lua
 %dir %{luapkgdir}/metrics/plugins
      %{luapkgdir}/metrics/plugins/README.md
 %dir %{luapkgdir}/metrics/plugins/prometheus

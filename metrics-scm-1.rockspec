@@ -23,7 +23,11 @@ build = {
 
     modules = {
         ['metrics']                                      = 'metrics/init.lua',
-        ['metrics.details']                              = 'metrics/details/init.lua',
+        ['metrics.registry']                             = 'metrics/registry.lua',
+        ['metrics.collectors.shared']                    = 'metrics/collectors/shared.lua',
+        ['metrics.collectors.counter']                   = 'metrics/collectors/counter.lua',
+        ['metrics.collectors.gauge']                     = 'metrics/collectors/gauge.lua',
+        ['metrics.collectors.histogram']                 = 'metrics/collectors/histogram.lua',
         ['metrics.plugins.graphite']                     = 'metrics/plugins/graphite/init.lua',
         ['metrics.plugins.prometheus']                   = 'metrics/plugins/prometheus/init.lua',
         ['metrics.plugins.json']                         = 'metrics/plugins/json/init.lua',
