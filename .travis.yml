@@ -23,9 +23,8 @@ _test: &test
       sudo tee /etc/apt/sources.list.d/tarantool.list
     - sudo apt-get -y update
     - sudo apt-get install -y tarantool tarantool-dev
-    - tarantoolctl rocks make
-    - tarantoolctl rocks install luatest 0.4.0
-  script: .rocks/bin/luatest
+    - make .rocks
+  script: make test
 
 _deploy: &deploy
   provider: packagecloud
