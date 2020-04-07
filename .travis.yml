@@ -14,6 +14,7 @@ git:
 env:
     global:
       - PRODUCT=tarantool-metrics
+      - ROCK_NAME=luatest
 
 _test: &test
   before_install:
@@ -63,6 +64,23 @@ jobs:
       env: TARANTOOL_VERSION=1.10
     - <<: *test
       env: TARANTOOL_VERSION=2x
+
+    - stage: deploy
+      name: Publish rockspecs
+      script: skip
+      deploy:
+        - provider: script
+          script: curl --fail -X PUT -F rockspec=@$ROCK_NAME-scm-1.rockspec
+            https://$ROCKS_USERNAME:$ROCKS_PASSWORD@rocks.tarantool.org
+        - on:
+            tags: true
+          provider: script
+          script: cat $ROCK_NAME-scm-1.rockspec |
+            sed -E
+              -e "s/branch = '.+'/tag = '$TRAVIS_TAG'/g"
+              -e "s/version = '.+'/version = '$TRAVIS_TAG-1'/g" |
+            curl --fail -X PUT -F "rockspec=@-;filename=$ROCK_NAME-$TRAVIS_TAG-1.rockspec"
+              https://$ROCKS_USERNAME:$ROCKS_PASSWORD@rocks.tarantool.org
 
     - <<: *packpack
       env: OS=el DIST=6
