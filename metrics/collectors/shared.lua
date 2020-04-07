@@ -2,19 +2,30 @@ local fiber = require('fiber')
 
 local Shared = {}
 
-function Shared.new(name, help, kind)
-    if not name then
-        error("Name should be set for %s", kind)
+-- Create collector class with the list of instance methods copied from
+-- this class (like an inheritance but with limited list of methods).
+function Shared:new_class(kind, method_names)
+    method_names = method_names or {}
+    -- essential methods
+    table.insert(method_names, 'new')
+    table.insert(method_names, 'collect')
+    local methods = {}
+    for _, name in pairs(method_names) do
+        methods[name] = self[name]
     end
+    return setmetatable({kind = kind}, {__index = methods})
+end
 
-    local obj = {}
-    obj.name = name
-    obj.help = help or ""
-    obj.observations = {}
-    obj.label_pairs = {}
-    obj.kind = kind
-
-    return obj
+function Shared:new(name, help)
+    if not name then
+        error("Name should be set for %s")
+    end
+    return setmetatable({
+        name = name,
+        help = help or "",
+        observations = {},
+        label_pairs = {},
+    }, self)
 end
 
 local function make_key(label_pairs)

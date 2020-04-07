@@ -29,31 +29,22 @@ end
 local function counter(name, help)
     checks('string', '?string')
 
-    return Counter.new(name, help)
+    return global_metrics_registry:find_or_create(Counter, name, help)
 end
 
 local function gauge(name, help)
     checks('string', '?string')
 
-    return Gauge.new(name, help)
-end
-
-function checkers.buckets(buckets)
-    local prev = -math.huge
-    for k, v in pairs(buckets) do
-        if type(k) ~= 'number' then return false end
-        if type(v) ~= 'number' then return false end
-        if v <= 0 then return false end
-        if prev > v then return false end
-        prev = v
-    end
-    return true
+    return global_metrics_registry:find_or_create(Gauge, name, help)
 end
 
 local function histogram(name, help, buckets)
-    checks('string', '?string', '?buckets')
+    checks('string', '?string', '?table')
+    if buckets ~= nil and not Histogram.check_buckets(buckets) then
+        error('Invalid value for buckets')
+    end
 
-    return Histogram.new(name, help, buckets)
+    return global_metrics_registry:find_or_create(Histogram, name, help, buckets)
 end
 
 local function clear()

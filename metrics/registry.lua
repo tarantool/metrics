@@ -11,36 +11,31 @@ function Registry.new()
     return obj
 end
 
-function Registry:is_registered(collector)
+function Registry:find(kind, name)
     for _, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.kind == collector.kind then
-            return true
+        if c.name == name and c.kind == kind then
+            return c
         end
     end
-    return false
+end
+
+function Registry:find_or_create(class, name, ...)
+    return self:find(class.kind, name) or self:register(class:new(name, ...))
 end
 
 local function is_empty(str)
     return str == nil or str == ''
 end
 
-function Registry:get_registered(collector)
+function Registry:register(collector)
     assert(collector ~= nil, 'Collector is empty')
     assert(not is_empty(collector.name), "Collector''s name is empty")
     assert(not is_empty(collector.kind), "Collector''s kind is empty")
-    for _, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.kind == collector.kind then
-            return c
-        end
-    end
-    return nil
-end
-
-function Registry:register(collector)
-    if self:is_registered(collector) then
-        return
+    if self:find(collector.kind, collector.name) then
+        error('Already registered')
     end
     table.insert(self.collectors, collector)
+    return collector
 end
 
 function Registry:unregister(collector)
@@ -77,15 +72,6 @@ function Registry:register_callback(callback)
     if not found then
         table.insert(self.callbacks, callback)
     end
-end
-
-function Registry:instanceof(obj, mt)
-    local metric = self:get_registered(obj)
-    if metric == nil then
-        metric = setmetatable(obj, mt)
-        self:register(metric)
-    end
-    return metric
 end
 
 function Registry:set_labels(label_pairs)
