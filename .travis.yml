@@ -14,7 +14,7 @@ git:
 env:
     global:
       - PRODUCT=tarantool-metrics
-      - ROCK_NAME=luatest
+      - ROCK_NAME=metrics
 
 _test: &test
   before_install:
