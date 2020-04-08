@@ -1,11 +1,14 @@
 -- vim: ts=4:sw=4:sts=4:expandtab
 
-require('checks')
+local checks = require('checks')
 
-local net_box = require('net.box')
-local fiber = require('fiber')
+local Registry = require('metrics.registry')
 
-local details = require('metrics.details')
+local Counter = require('metrics.collectors.counter')
+local Gauge = require('metrics.collectors.gauge')
+local Histogram = require('metrics.collectors.histogram')
+
+global_metrics_registry = Registry.new()
 
 local function collectors()
     return global_metrics_registry.collectors
@@ -26,13 +29,13 @@ end
 local function counter(name, help)
     checks('string', '?string')
 
-    return details.Counter.new(name, help)
+    return Counter.new(name, help)
 end
 
 local function gauge(name, help)
     checks('string', '?string')
 
-    return details.Gauge.new(name, help)
+    return Gauge.new(name, help)
 end
 
 function checkers.buckets(buckets)
@@ -50,7 +53,7 @@ end
 local function histogram(name, help, buckets)
     checks('string', '?string', '?buckets')
 
-    return details.Histogram.new(name, help, buckets)
+    return Histogram.new(name, help, buckets)
 end
 
 local function clear()
@@ -75,12 +78,14 @@ local function set_global_labels(label_pairs)
 end
 
 return {
+    global_registry = global_metrics_registry,
+
     counter = counter,
     gauge = gauge,
     histogram = histogram,
 
-    INF = details.INF,
-    NAN = details.NAN,
+    INF = math.huge,
+    NAN = math.huge * 0,
 
     clear = clear,
     collectors = collectors,
