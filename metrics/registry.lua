@@ -34,6 +34,7 @@ function Registry:register(collector)
     if self:find(collector.kind, collector.name) then
         error('Already registered')
     end
+    collector:set_registry(self)
     table.insert(self.collectors, collector)
     return collector
 end

@@ -8,6 +8,7 @@ function Shared:new_class(kind, method_names)
     method_names = method_names or {}
     -- essential methods
     table.insert(method_names, 'new')
+    table.insert(method_names, 'set_registry')
     table.insert(method_names, 'collect')
     local methods = {}
     for _, name in pairs(method_names) do
@@ -26,6 +27,10 @@ function Shared:new(name, help)
         observations = {},
         label_pairs = {},
     }, self)
+end
+
+function Shared:set_registry(registry)
+    self.registry = registry
 end
 
 local function make_key(label_pairs)
@@ -62,14 +67,14 @@ function Shared:dec(num, label_pairs)
     self.label_pairs[key] = label_pairs
 end
 
-local function append_global_labels(label_pairs)
-    if next(global_metrics_registry.label_pairs) == nil then
+local function append_global_labels(registry, label_pairs)
+    if registry == nil or next(registry.label_pairs) == nil then
         return label_pairs
     end
 
     local extended_label_pairs = table.copy(label_pairs)
 
-    for k, v in pairs(global_metrics_registry.label_pairs) do
+    for k, v in pairs(registry.label_pairs) do
         if extended_label_pairs[k] == nil then
             extended_label_pairs[k] = v
         end
@@ -86,7 +91,7 @@ function Shared:collect()
     for key, observation in pairs(self.observations) do
         local obs = {
             metric_name = self.name,
-            label_pairs = append_global_labels(self.label_pairs[key]),
+            label_pairs = append_global_labels(self.registry, self.label_pairs[key]),
             value = observation,
             timestamp = fiber.time64(),
         }

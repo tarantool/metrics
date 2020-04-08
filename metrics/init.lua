@@ -8,34 +8,34 @@ local Counter = require('metrics.collectors.counter')
 local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
 
-global_metrics_registry = Registry.new()
+local registry = Registry.new()
 
 local function collectors()
-    return global_metrics_registry.collectors
+    return registry.collectors
 end
 
 local function register_callback(...)
-    return global_metrics_registry:register_callback(...)
+    return registry:register_callback(...)
 end
 
 local function invoke_callbacks()
-    return global_metrics_registry:invoke_callbacks()
+    return registry:invoke_callbacks()
 end
 
 local function collect()
-    return global_metrics_registry:collect()
+    return registry:collect()
 end
 
 local function counter(name, help)
     checks('string', '?string')
 
-    return global_metrics_registry:find_or_create(Counter, name, help)
+    return registry:find_or_create(Counter, name, help)
 end
 
 local function gauge(name, help)
     checks('string', '?string')
 
-    return global_metrics_registry:find_or_create(Gauge, name, help)
+    return registry:find_or_create(Gauge, name, help)
 end
 
 local function histogram(name, help, buckets)
@@ -44,13 +44,13 @@ local function histogram(name, help, buckets)
         error('Invalid value for buckets')
     end
 
-    return global_metrics_registry:find_or_create(Histogram, name, help, buckets)
+    return registry:find_or_create(Histogram, name, help, buckets)
 end
 
 local function clear()
-    global_metrics_registry.collectors = {}
-    global_metrics_registry.callbacks = {}
-    global_metrics_registry.label_pairs = {}
+    registry.collectors = {}
+    registry.callbacks = {}
+    registry.label_pairs = {}
 end
 
 local function set_global_labels(label_pairs)
@@ -65,11 +65,11 @@ local function set_global_labels(label_pairs)
         end
     end
 
-    global_metrics_registry:set_labels(label_pairs)
+    registry:set_labels(label_pairs)
 end
 
 return {
-    global_registry = global_metrics_registry,
+    registry = registry,
 
     counter = counter,
     gauge = gauge,

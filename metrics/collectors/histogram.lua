@@ -36,6 +36,13 @@ function Histogram:new(name, help, buckets)
     return obj
 end
 
+function Histogram:set_registry(registry)
+    Shared.set_registry(self, registry)
+    self.count_collector:set_registry(registry)
+    self.sum_collector:set_registry(registry)
+    self.bucket_collector:set_registry(registry)
+end
+
 function Histogram:observe(num, label_pairs)
     label_pairs = label_pairs or {}
 

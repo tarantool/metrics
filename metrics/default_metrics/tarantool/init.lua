@@ -1,4 +1,6 @@
-local metrics = {
+local metrics = require('metrics')
+
+local default_metrics = {
     require('metrics.default_metrics.tarantool.network'),
     require('metrics.default_metrics.tarantool.operations'),
     require('metrics.default_metrics.tarantool.system'),
@@ -12,8 +14,8 @@ local metrics = {
 }
 
 local function enable()
-    for _, metric in ipairs(metrics) do
-        global_metrics_registry:register_callback(metric.update)
+    for _, metric in ipairs(default_metrics) do
+        metrics.register_callback(metric.update)
     end
 end
 
