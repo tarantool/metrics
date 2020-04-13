@@ -26,6 +26,10 @@ local function collect()
     return registry:collect()
 end
 
+local function clear()
+    registry:clear()
+end
+
 local function counter(name, help)
     checks('string', '?string')
 
@@ -45,12 +49,6 @@ local function histogram(name, help, buckets)
     end
 
     return registry:find_or_create(Histogram, name, help, buckets)
-end
-
-local function clear()
-    registry.collectors = {}
-    registry.callbacks = {}
-    registry.label_pairs = {}
 end
 
 local function set_global_labels(label_pairs)

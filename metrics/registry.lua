@@ -4,11 +4,14 @@ Registry.__index = Registry
 function Registry.new()
     local obj = {}
     setmetatable(obj, Registry)
-
-    obj.collectors = {}
-    obj.callbacks = {}
-    obj.label_pairs = {}
+    obj:clear()
     return obj
+end
+
+function Registry:clear()
+    self.collectors = {}
+    self.callbacks = {}
+    self.label_pairs = {}
 end
 
 function Registry:find(kind, name)
