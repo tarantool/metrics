@@ -8,7 +8,7 @@ local function update_fibers_metrics()
     local falloc = 0
     local fused = 0
 
-    for id, f in pairs(fibers_info) do
+    for _, f in pairs(fibers_info) do
         fibers = fibers + 1
         csws = csws + f.csw
         falloc = falloc + f.memory.total

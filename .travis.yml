@@ -34,7 +34,7 @@ _test: &test
     - sudo apt-get -y update
     - sudo apt-get install -y tarantool tarantool-dev
     - make .rocks
-  script: make test
+  script: make lint test
 
 _deploy: &deploy
   provider: packagecloud
