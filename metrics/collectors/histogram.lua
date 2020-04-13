@@ -1,40 +1,46 @@
+local Shared = require('metrics.collectors.shared')
 local Counter = require('metrics.collectors.counter')
 
 local INF = math.huge
 local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
-local Histogram = {}
+local Histogram = Shared:new_class('histogram')
 Histogram.__index = Histogram
 
-function Histogram.new(name, help, buckets)
-    local obj = {}
+function Histogram.check_buckets(buckets)
+    local prev = -math.huge
+    for k, v in pairs(buckets) do
+        if type(k) ~= 'number' then return false end
+        if type(v) ~= 'number' then return false end
+        if v <= 0 then return false end
+        if prev > v then return false end
+        prev = v
+    end
+    return true
+end
 
-    -- for registry
-    obj.name = name
-    obj.help = help or ''
-    obj.kind = 'histogram'
+function Histogram:new(name, help, buckets)
+    local obj = Shared.new(self, name, help)
 
-    -- introduce buckets
     obj.buckets = buckets or DEFAULT_BUCKETS
     table.sort(obj.buckets)
     if obj.buckets[#obj.buckets] ~= INF then
         obj.buckets[#obj.buckets+1] = INF
     end
 
-    -- create counters
-    obj.count_collector = Counter.new(
-        name .. '_count', help, {do_register = false}
-    )
-    obj.sum_collector = Counter.new(
-        name .. '_sum', help, {do_register = false}
-    )
-    obj.bucket_collector = Counter.new(
-        name .. '_bucket', help, {do_register = false}
-    )
+    obj.count_collector = Counter:new(name .. '_count', help)
+    obj.sum_collector = Counter:new(name .. '_sum', help)
+    obj.bucket_collector = Counter:new(name .. '_bucket', help)
 
-    -- register
-    return global_metrics_registry:instanceof(obj, Histogram)
+    return obj
+end
+
+function Histogram:set_registry(registry)
+    Shared.set_registry(self, registry)
+    self.count_collector:set_registry(registry)
+    self.sum_collector:set_registry(registry)
+    self.bucket_collector:set_registry(registry)
 end
 
 function Histogram:observe(num, label_pairs)
@@ -44,7 +50,7 @@ function Histogram:observe(num, label_pairs)
     self.sum_collector:inc(num, label_pairs)
 
     for _, bucket in pairs(self.buckets) do
-        local bkt_label_pairs = table.deepcopy(label_pairs) -- luacheck: ignore
+        local bkt_label_pairs = table.deepcopy(label_pairs)
         bkt_label_pairs.le = bucket
 
         if num <= bucket then
