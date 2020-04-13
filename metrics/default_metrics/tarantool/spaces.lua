@@ -17,7 +17,12 @@ local function update_spaces_metrics()
 
             for _, i in pairs(sp.index) do
                 if type(_) == 'number' then
-                    utils.set_gauge('space_index_' .. i.name .. '_bsize', 'Index ' .. i.name .. ' bsize', i:bsize(), labels)
+                    utils.set_gauge(
+                        'space_index_' .. i.name .. '_bsize',
+                        'Index ' .. i.name .. ' bsize',
+                        i:bsize(),
+                        labels
+                    )
                     total = total + i:bsize()
                 end
             end
