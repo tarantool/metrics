@@ -1,7 +1,6 @@
 local Shared = require('metrics.collectors.shared')
 
 local Counter = Shared:new_class('counter')
-Counter.__index = Counter
 
 function Counter:inc(num, label_pairs)
     if num and num < 0 then

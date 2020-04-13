@@ -6,7 +6,6 @@ local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
 local Histogram = Shared:new_class('histogram')
-Histogram.__index = Histogram
 
 function Histogram.check_buckets(buckets)
     local prev = -math.huge

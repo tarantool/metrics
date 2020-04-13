@@ -14,7 +14,9 @@ function Shared:new_class(kind, method_names)
     for _, name in pairs(method_names) do
         methods[name] = self[name]
     end
-    return setmetatable({kind = kind}, {__index = methods})
+    local class = {kind = kind}
+    class.__index = class
+    return setmetatable(class, {__index = methods})
 end
 
 function Shared:new(name, help)
