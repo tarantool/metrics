@@ -27,7 +27,6 @@ function Shared:new(name, help)
         name = name,
         help = help or "",
         observations = {},
-        label_pairs = {},
     }, self)
 end
 
@@ -47,26 +46,31 @@ function Shared:set(num, label_pairs)
     num = num or 0
     label_pairs = label_pairs or {}
     local key = make_key(label_pairs)
-    self.observations[key] = num
-    self.label_pairs[key] = label_pairs
+    self.observations[key] = {num, label_pairs}
 end
 
 function Shared:inc(num, label_pairs)
     num = num or 1
     label_pairs = label_pairs or {}
     local key = make_key(label_pairs)
-    local old_value = self.observations[key] or 0
-    self.observations[key] = old_value + num
-    self.label_pairs[key] = label_pairs
+    local old_value = self.observations[key]
+    if old_value then
+        old_value[1] = old_value[1] + num
+    else
+        self.observations[key] = {num, label_pairs}
+    end
 end
 
 function Shared:dec(num, label_pairs)
     num = num or 1
     label_pairs = label_pairs or {}
     local key = make_key(label_pairs)
-    local old_value = self.observations[key] or 0
-    self.observations[key] = old_value - num
-    self.label_pairs[key] = label_pairs
+    local old_value = self.observations[key] or {0, label_pairs}
+    if old_value then
+        old_value[1] = old_value[1] - num
+    else
+        self.observations[key] = {-num, label_pairs}
+    end
 end
 
 local function append_global_labels(registry, label_pairs)
@@ -86,15 +90,12 @@ local function append_global_labels(registry, label_pairs)
 end
 
 function Shared:collect()
-    if next(self.observations) == nil then
-        return {}
-    end
     local result = {}
-    for key, observation in pairs(self.observations) do
+    for _, observation in pairs(self.observations) do
         local obs = {
             metric_name = self.name,
-            label_pairs = append_global_labels(self.registry, self.label_pairs[key]),
-            value = observation,
+            label_pairs = append_global_labels(self.registry, observation[2]),
+            value = observation[1],
             timestamp = fiber.time64(),
         }
         table.insert(result, obs)
