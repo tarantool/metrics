@@ -36,11 +36,12 @@ function Shared:set_registry(registry)
 end
 
 local function make_key(label_pairs)
-    local key = ''
+    local parts = {}
     for k, v in pairs(label_pairs) do
-        key = key .. k .. '\t' .. v .. '\t'
+        table.insert(parts, k .. '\t' .. v)
     end
-    return key
+    table.sort(parts)
+    return table.concat(parts, '\t')
 end
 
 function Shared:set(num, label_pairs)
