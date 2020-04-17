@@ -9,6 +9,8 @@ function Shared:new_class(kind, method_names)
     -- essential methods
     table.insert(method_names, 'new')
     table.insert(method_names, 'set_registry')
+    table.insert(method_names, 'make_key')
+    table.insert(method_names, 'append_global_labels')
     table.insert(method_names, 'collect')
     local methods = {}
     for _, name in pairs(method_names) do
@@ -35,7 +37,7 @@ function Shared:set_registry(registry)
     self.registry = registry
 end
 
-local function make_key(label_pairs)
+function Shared.make_key(label_pairs)
     local parts = {}
     for k, v in pairs(label_pairs) do
         table.insert(parts, k .. '\t' .. v)
@@ -47,7 +49,7 @@ end
 function Shared:set(num, label_pairs)
     num = num or 0
     label_pairs = label_pairs or {}
-    local key = make_key(label_pairs)
+    local key = self.make_key(label_pairs)
     self.observations[key] = num
     self.label_pairs[key] = label_pairs
 end
@@ -55,7 +57,7 @@ end
 function Shared:inc(num, label_pairs)
     num = num or 1
     label_pairs = label_pairs or {}
-    local key = make_key(label_pairs)
+    local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value + num
     self.label_pairs[key] = label_pairs
@@ -64,20 +66,21 @@ end
 function Shared:dec(num, label_pairs)
     num = num or 1
     label_pairs = label_pairs or {}
-    local key = make_key(label_pairs)
+    local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
     self.label_pairs[key] = label_pairs
 end
 
-local function append_global_labels(registry, label_pairs)
-    if registry == nil or next(registry.label_pairs) == nil then
+function Shared:append_global_labels(label_pairs)
+    local global_labels = self.registry and self.registry.label_pairs
+    if global_labels == nil or next(global_labels) == nil then
         return label_pairs
     end
 
     local extended_label_pairs = table.copy(label_pairs)
 
-    for k, v in pairs(registry.label_pairs) do
+    for k, v in pairs(global_labels) do
         if extended_label_pairs[k] == nil then
             extended_label_pairs[k] = v
         end
@@ -94,7 +97,7 @@ function Shared:collect()
     for key, observation in pairs(self.observations) do
         local obs = {
             metric_name = self.name,
-            label_pairs = append_global_labels(self.registry, self.label_pairs[key]),
+            label_pairs = self:append_global_labels(self.label_pairs[key]),
             value = observation,
             timestamp = fiber.time64(),
         }
