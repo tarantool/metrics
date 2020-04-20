@@ -12,7 +12,8 @@ function utils.find_obs(metric_name, label_pairs, observations)
             return obs
         end
     end
-    t.fail("haven't found observation")
+    t.assert_items_include(observations, {metric_name = metric_name, label_pairs = label_pairs},
+        'Missing observation')
 end
 
 function utils.observations_without_timestamps(observations)

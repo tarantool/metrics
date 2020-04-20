@@ -84,5 +84,6 @@ return {
     enable_default_metrics = function()
         return require('metrics.default_metrics.tarantool').enable()
     end,
+    http_middleware = require('metrics.http_middleware'),
     collect = collect,
 }
