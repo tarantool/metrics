@@ -4,6 +4,7 @@ local checks = require('checks')
 
 local Registry = require('metrics.registry')
 
+local Average = require('metrics.collectors.average')
 local Counter = require('metrics.collectors.counter')
 local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
@@ -28,6 +29,11 @@ end
 
 local function clear()
     registry:clear()
+end
+
+local function average(name, help)
+    checks('string', '?string')
+    return registry:find_or_create(Average, name, help)
 end
 
 local function counter(name, help)
@@ -69,6 +75,7 @@ end
 return {
     registry = registry,
 
+    average = average,
     counter = counter,
     gauge = gauge,
     histogram = histogram,
