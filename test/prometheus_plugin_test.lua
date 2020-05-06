@@ -4,6 +4,7 @@ local t = require('luatest')
 local g = t.group('prometheus_plugin')
 
 local metrics = require('metrics')
+local http_handler = require('metrics.plugins.prometheus').collect_http
 
 g.before_all(function()
     box.cfg{}
@@ -17,6 +18,11 @@ g.before_all(function()
 
     -- Delete all previous collectors and global labels
     metrics.clear()
+
+    -- Enable default metrics collections
+    metrics.enable_default_metrics();
+
+    g.prometheus_metrics = http_handler().body
 end)
 
 g.after_each(function()
@@ -24,14 +30,13 @@ g.after_each(function()
     metrics.clear()
 end)
 
--- Enable default metrics collections
-metrics.enable_default_metrics();
-
-local http_handler = require('metrics.plugins.prometheus').collect_http
-
 g.test_ll_ull_postfixes = function()
-    local resp = http_handler().body
-
+    local resp = g.prometheus_metrics
     t.assert_not(resp:match("ULL") ~= nil or resp:match("LL") ~= nil,
                   "Plugin output contains cdata postfixes")
+end
+
+g.test_cdata_handling = function()
+    t.assert_str_contains(g.prometheus_metrics, 'tnt_space_bsize{name="random_space_for_prometheus",engine="memtx"} 0',
+        'Plugin output serialize 0ULL as +Inf')
 end

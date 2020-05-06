@@ -15,22 +15,21 @@ local function serialize_name(name)
 end
 
 local function serialize_value(value)
-    if value == metrics.INF then
-        return '+Inf'
-    elseif value == -metrics.INF then
-        return '-Inf'
-    elseif value ~= value then
-        return 'Nan'
-    else
-        local strv = tostring(value)
-
+    local result
+    if type(value) == 'cdata' then
+        result = tostring(value)
         -- Luajit cdata type inserts some postfix in the end of the number after tostring() operation
-        if type(value) == "cdata" then
-            return strv:gsub("U*LL", "")
-        end
-
-        return escape(strv)
+        result = result:gsub("U*LL", "")
+    elseif value == metrics.INF then
+        result = '+Inf'
+    elseif value == -metrics.INF then
+        result = '-Inf'
+    elseif value ~= value then
+        result = 'Nan'
+    else
+        result = tostring(value)
     end
+    return escape(result)
 end
 
 local function serialize_label_pairs(label_pairs)
