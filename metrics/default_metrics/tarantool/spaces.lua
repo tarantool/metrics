@@ -38,7 +38,7 @@ local function update_spaces_metrics()
             else
                 labels.engine = 'vinyl'
 
-                local include_vinyl_count = _G.include_vinyl_count or false
+                local include_vinyl_count = rawget(_G, 'include_vinyl_count') or false
                 if include_vinyl_count then
                     utils.set_gauge( 'space_count', 'Space count', sp:count(), labels)
                 end

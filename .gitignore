@@ -1,7 +1,9 @@
 build
+513
 .rocks
 *.snap
 *.xlog
+*.vylog
 
 /tmp/*
 !/tmp/.keep
