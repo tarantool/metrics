@@ -1,5 +1,7 @@
 #!/usr/bin/env tarantool
 
+require('strict').on()
+
 local t = require('luatest')
 local g = t.group('prometheus_plugin')
 
@@ -15,6 +17,11 @@ g.before_all(function()
         'random_space_for_prometheus',
         {if_not_exists = true})
     s:create_index('pk', {if_not_exists = true})
+
+    local s_vinyl = box.schema.space.create(
+        'random_vinyl_space_for_prometheus',
+        {if_not_exists = true, engine = 'vinyl'})
+    s_vinyl:create_index('pk', {if_not_exists = true})
 
     -- Delete all previous collectors and global labels
     metrics.clear()
