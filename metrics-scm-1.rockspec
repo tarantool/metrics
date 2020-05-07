@@ -24,6 +24,7 @@ build = {
     modules = {
         ['metrics']                                      = 'metrics/init.lua',
         ['metrics.registry']                             = 'metrics/registry.lua',
+        ['metrics.http_middleware']                      = 'metrics/http_middleware.lua',
         ['metrics.collectors.shared']                    = 'metrics/collectors/shared.lua',
         ['metrics.collectors.counter']                   = 'metrics/collectors/counter.lua',
         ['metrics.collectors.gauge']                     = 'metrics/collectors/gauge.lua',
