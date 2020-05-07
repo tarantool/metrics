@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tarantool/metrics.svg?branch=master)](https://travis-ci.org/tarantool/metrics)
+[![Build Status](https://travis-ci.com/tarantool/metrics.svg?branch=master)](https://travis-ci.com/tarantool/metrics)
 # Metrics
 
 Metrics is a tool to collect, manipulate metrics timeseriess.  

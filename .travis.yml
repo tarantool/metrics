@@ -1,7 +1,7 @@
-sudo: false
-language: C
+language: c
 services:
   - docker
+os: linux
 dist: xenial
 
 cache:
