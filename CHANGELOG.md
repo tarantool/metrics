@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.2.0] - 2020-05-07
+### Added
+- [tarantool/http server](https://github.com/tarantool/http) middleware to collect http server metrics
+### Fixed
+- `collect` failure for vinyl metrics in strict mode
+- prometheus exporter: render 0 for 0ULL value instead of +Inf
+- Travis CI build failures
 ### Changed
 - Renamed `info_vclock_{ID}` metric to `info_vclock`, moved `{ID}` to tags
 - Renamed `stat_op_{OP_TYPE}_total` metric to `stat_op_total`, moved `{OP_TYPE}` to tags
