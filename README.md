@@ -99,10 +99,6 @@ by specifying conditions on label values. In above example, we could derive a ti
   2. total # of requests over time with status = 500 (and any method).
 
 You can also set global labels by calling `metrics.set_global_labels({ label = value, ...})`.
-It will add some labels to every observation.
-Labels table is validated before use: label key must be a string. (Throws error otherwise.)
-You can change global labels along the way.
-Global labels never overwrite local (passed as function argument) ones.
 
 ------------------------------------------------------------------------
 
@@ -113,8 +109,15 @@ metrics = require('metrics')
 ```
 
 #### `metrics.enable_default_metrics()`
-   Enables default metrics collections. 
-   Collects tarantool metrics, ported from https://github.com/tarantool/stat
+  Enables default metrics collections. 
+  Collects tarantool metrics, ported from https://github.com/tarantool/stat
+
+#### `metrics.set_global_labels(label_pairs)`
+  Set global labels that will be added to every observation.
+  Global labels applied only on metrics collect and have no effect on observations' storage.
+  Global labels can be changed along the way.
+  Observation `label_pairs` are prior to global labels: if you pass `label_pairs` to observation method with the same key as some global label, the method argument value will be used.
+  * `label_pairs` Table containing label names as string keys, label values as values (table).
 
 #### `client_obj.register_callback(callback)`
   Registers a function `callback` which will be called right
