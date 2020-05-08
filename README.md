@@ -18,7 +18,7 @@ In order to easily export metrics to any TSDB you can use one of supported expor
 - [Prometheus](./metrics/plugins/prometheus/README.md)
 - [Json](./metrics/plugins/json/README.md)
 
-or you can write your [custom plugin](./metrics/plugins/README.md) and use it. 
+or you can write your [custom plugin](./metrics/plugins/README.md) and use it.
 Hopefully, plugins for other TSDBs will be supported soon.
 
 ## Examples
@@ -114,10 +114,11 @@ metrics = require('metrics')
 
 #### `metrics.set_global_labels(label_pairs)`
   Set global labels that will be added to every observation.
+  * `label_pairs` Table containing label names as string keys, label values as values (table).
+
   Global labels applied only on metrics collect and have no effect on observations' storage.
   Global labels can be changed along the way.
   Observation `label_pairs` are prior to global labels: if you pass `label_pairs` to observation method with the same key as some global label, the method argument value will be used.
-  * `label_pairs` Table containing label names as string keys, label values as values (table).
 
 #### `client_obj.register_callback(callback)`
   Registers a function `callback` which will be called right
@@ -171,7 +172,7 @@ metrics = require('metrics')
   Same as `inc()`, but sets the observation.
 
 #### `gauge_obj:collect()`
-  Returns array of `observation` objects for given gauge.  
+  Returns array of `observation` objects for given gauge.
   For `observation` description see `counter_obj:collect()` section.
 
 #### Histogram
@@ -192,16 +193,84 @@ metrics = require('metrics')
 #### `histogram_obj:observe(num, label_pairs)`
   Records a new value in histogram. This increments all buckets sizes under labels `le` >= `num` and labels matching `label_pairs`.
   * `num` Value to put in histogram (number).
-  * `label_pairs` Table containing label names as keys, label values as values (table). New value is observed by all internal counters with these labels specified 
+  * `label_pairs` Table containing label names as keys, label values as values (table). New value is observed by all internal counters with these labels specified.
 
 #### `histogram_obj:collect()`
   Returns concatenation of `counter_obj:collect()` across all internal counters
   of `histogram_obj`.  
   For `observation` description see `counter_obj:collect()` section.
 
+#### Average
+  Can be used only as HTTP statistics collector (described below) and cannot be built explicitly.
+
+#### `average_obj:collect()`
+  Returns list of two observations: 
+  * `name .. "_avg"` - average value of observations for the observing period (time from previous collect call to now),
+  * `name .. "_count"` - observation count for the same period.
+  For `observation` description see `counter_obj:collect()` section.
+
+### Collecting HTTP requests latency statistics
+
+`metrics` also provides a middleware for monitoring HTTP (set by [http](https://github.com/tarantool/http) module) latency statistics.
+
+```
+-- importing submodule
+http_middleware = metrics.http_middleware
+```
+
+#### `http_middleware.configure_default_collector(type_name, name, help)`
+  Registers collector for middleware and sets it as default.
+  * `type_name` Collector type (string): "histogram" or "average". Default is "histogram".
+  * `name` Collector name (string). Default is "http_server_request_latency".
+  * `help` (optional) Help description (string). Default is "HTTP Server Request Latency".
+
+  If collector with the same type and name already exists in registry, throws an error.
+
+#### `http_middleware.build_default_collector(type_name, name, help)`
+  Registers collector for middleware and returns it.
+  * `type_name` Collector type (string): "histogram" or "average". Default is "histogram".
+  * `name` Collector name (string). Default is "http_server_request_latency".
+  * `help` (optional) Help description (string). Default is "HTTP Server Request Latency".
+
+  If collector with the same type and name already exists in registry, throws an error.
+
+#### `http_middleware.set_default_collector(collector)`
+  Sets default collector.
+  * `collector` Middleware collector object.
+
+#### `http_middleware.get_default_collector()`
+  Returns default collector.
+  If default collector hasn't been set yet, registers it (with default `http_middleware.build_default_collector(...)` parameters) and sets it as default.
+
+#### `http_middleware.v1(handler, collector)`
+  Latency measure wrap-up for HTTP ver. 1.x.x handler. Returns wrapped handler.
+  * `handler` Handler function.
+  * `collector` Middleware collector object. If not set, uses default collector (like in `http_middleware.get_default_collector()`).
+
+  Usage:
+  ```
+  httpd:route(route, http_middleware.v1(request_handler, collector))
+  ```
+
+  For more detailed example see [example/HTTP/latency_v1.lua](./example/HTTP/latency_v1.lua).
+
+#### `http_middleware.v2(collector)`
+  Returns latency measure middleware for HTTP ver. 2.x.x.
+  * `collector` Middleware collector object. If not set, uses default collector (like in `http_middleware.get_default_collector()`).
+
+  Usage:
+  ```
+  router = require('http.router').new()
+
+  router:route(route, request_handler)
+  router:use(http_middleware.v2(collector), {name = 'http_instrumentation'}) -- Second argument is optional, see HTTP docs
+  ```
+
+  For more detailed example see [example/HTTP/latency_v2.lua](./example/HTTP/latency_v2.lua).
+
 ## CONTRIBUTION
 
-Feel free to send Pull Requests. E.g. you can support new timeseriess aggregation / manipulation functions (but be sure to check if there are any Prometheus analogues to borrow API from).
+Feel free to send Pull Requests. E.g. you can support new timeseries aggregation / manipulation functions (but be sure to check if there are any Prometheus analogues to borrow API from).
 
 ## CREDIT
 
