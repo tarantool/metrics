@@ -28,7 +28,7 @@ function export.build_default_collector(type_name, name, help)
         error('Unknown collector type_name: ' .. tostring(type_name))
     end
     local class = require('metrics.collectors.' .. type_name)
-    return require('metrics').registry:find_or_create(class, name, help, unpack(extra))
+    return require('metrics').registry:register(class:new(name, help, unpack(extra)))
 end
 
 function export.get_default_collector()

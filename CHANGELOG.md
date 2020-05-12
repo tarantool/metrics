@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+###Fixed
+- Throw exception when `http_middleware.build_default_collector` is called with same name
+
 ## [0.2.0] - 2020-05-07
 ### Added
 - [tarantool/http server](https://github.com/tarantool/http) middleware to collect http server metrics
