@@ -52,6 +52,14 @@ g.test_build_default_collector_invalid = function()
     end)
 end
 
+g.test_build_default_collector_with_same_name = function()
+    http_middleware.build_default_collector('histogram', 'name1', 'help1')
+    t.assert_error_msg_contains('Already registered', function()
+        http_middleware.build_default_collector('histogram', 'name1', 'help2')
+    end)
+    http_middleware.build_default_collector('histogram', 'name2', 'help2')
+end
+
 g.test_observe = function()
     local result = {value = 'result'}
     local observed
