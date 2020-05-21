@@ -26,3 +26,18 @@ local httpd = require('http.server').new(...)
 ...
 httpd:route( { path = '/metrics' }, prometheus.collect_http)
 ```
+
+### Settings
+
+An example:
+```lua
+metrics = require('metrics')
+metrics.enable_default_metrics()
+
+prometheus = require('metrics.plugins.prometheus')
+metrics = require('http.server').new('0.0.0.0', 8080)
+router = require('http.router').new({charset = "utf8"})
+metrics:set_router(router)
+router:route( { path = '/metrics' }, prometheus.collect_http)
+metrics:start()
+```
