@@ -23,8 +23,10 @@ Returns:
 To be used in Tarantool `http.server` as follows:
 ```lua
 local httpd = require('http.server').new(...)
+local router = require('http.router').new(...)
+httpd:set_router(router)
 ...
-httpd:route( { path = '/metrics' }, prometheus.collect_http)
+router:route( { path = '/metrics' }, prometheus.collect_http)
 ```
 
 ### Settings
@@ -35,9 +37,9 @@ metrics = require('metrics')
 metrics.enable_default_metrics()
 
 prometheus = require('metrics.plugins.prometheus')
-metrics = require('http.server').new('0.0.0.0', 8080)
+httpd = require('http.server').new('0.0.0.0', 8080)
 router = require('http.router').new({charset = "utf8"})
-metrics:set_router(router)
+httpd:set_router(router)
 router:route( { path = '/metrics' }, prometheus.collect_http)
-metrics:start()
+httpd:start()
 ```
