@@ -1,11 +1,11 @@
 ## Prometheus
 
-Plugin to collect metrics and send them to Prometheus server.
+This is a Lua library that makes it easy to collect metrics from your
+Tarantool apps and databases and expose them via the Prometheus protocol.
 
 ### Usage
 
 Import the Prometheus plugin:
-
 ```lua
 local prometheus = require('metrics.plugins.prometheus')
 ```
@@ -19,7 +19,7 @@ Further, use the `prometheus.collect_http()` function, which returns:
 }
 ```
 
-See the [Prometheus Exposition Format](https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md)
+See the [Prometheus exposition format](https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md)
 for details on `<body>` and `<headers>`.
 
 Use in Tarantool [http.server](https://github.com/tarantool/http/) as follows:
