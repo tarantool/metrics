@@ -1,0 +1,34 @@
+-- Linux is the only supported platform
+if require('ffi').os ~= 'Linux' then
+    return nil
+end
+
+local utils = require('metrics.default_metrics.tarantool.utils')
+local psutils = require('metrics.default_metrics.tarantool.psutils_linux')
+
+local instance_file = arg[0]
+utils.set_gauge('cpu_count', 'The number of processors', psutils.get_cpu_count())
+
+local function update_cpu_metrics()
+    utils.set_gauge('cpu_total', 'Host CPU time', psutils.get_cpu_time())
+
+    for _, thread_info in ipairs(psutils.get_process_cpu_time()) do
+        utils.set_gauge('cpu_thread', 'Tarantool thread cpu time', thread_info.utime, {
+            kind = 'user',
+            thread_name = thread_info.comm,
+            thread_pid = thread_info.pid,
+            file_name = instance_file,
+        })
+
+        utils.set_gauge('cpu_thread', 'Tarantool thread cpu time', thread_info.stime, {
+            kind = 'system',
+            thread_name = thread_info.comm,
+            thread_pid = thread_info.pid,
+            file_name = instance_file,
+        })
+    end
+end
+
+return {
+    update = update_cpu_metrics,
+}

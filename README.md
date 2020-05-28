@@ -268,6 +268,12 @@ http_middleware = metrics.http_middleware
 
   For more detailed example see [example/HTTP/latency_v2.lua](./example/HTTP/latency_v2.lua).
 
+## CPU usage by threads query example
+```promql
+sum by (thread_name) (idelta(tnt_cpu_thread[$__interval]))
+  / scalar(idelta(tnt_cpu_total[$__interval]) / tnt_cpu_count)
+```
+
 ## CONTRIBUTION
 
 Feel free to send Pull Requests. E.g. you can support new timeseries aggregation / manipulation functions (but be sure to check if there are any Prometheus analogues to borrow API from).
