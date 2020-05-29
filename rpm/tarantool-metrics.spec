@@ -46,12 +46,14 @@ cp -rv metrics %{br_luapkgdir}
      %{luapkgdir}/metrics/plugins/json/README.md
 %dir %{luapkgdir}/metrics/default_metrics
 %dir %{luapkgdir}/metrics/default_metrics/tarantool
+     %{luapkgdir}/metrics/default_metrics/tarantool/cpu.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/fibers.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/info.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/init.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/memory.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/network.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/operations.lua
+     %{luapkgdir}/metrics/default_metrics/tarantool/psutils_linux.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/replicas.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/runtime.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/slab.lua
