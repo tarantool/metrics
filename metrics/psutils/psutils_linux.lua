@@ -1,7 +1,6 @@
 local fio = require('fio')
 local string = require('string')
 local ffi = require('ffi')
-local log = require('log')
 
 ffi.cdef[[
     int get_nprocs_conf(void);
@@ -10,14 +9,12 @@ ffi.cdef[[
 local function get_cpu_time()
     local cpu_stat_file = fio.open('/proc/stat', 'O_RDONLY')
     if cpu_stat_file == nil then
-        log.error('/proc/stat open error')
         return nil
     end
 
     local stats_raw = cpu_stat_file:read(512)
     cpu_stat_file:close()
     if #stats_raw == 0 then
-        log.error('/proc/stat read error')
         return nil
     end
 
