@@ -34,19 +34,19 @@ build = {
         ['metrics.plugins.prometheus']                      = 'metrics/plugins/prometheus/init.lua',
         ['metrics.plugins.json']                            = 'metrics/plugins/json/init.lua',
         ['metrics.default_metrics.tarantool']               = 'metrics/default_metrics/tarantool/init.lua',
-        ['metrics.default_metrics.tarantool.cpu']           = 'metrics/default_metrics/tarantool/cpu.lua',
         ['metrics.default_metrics.tarantool.fibers']        = 'metrics/default_metrics/tarantool/fibers.lua',
         ['metrics.default_metrics.tarantool.info']          = 'metrics/default_metrics/tarantool/info.lua',
         ['metrics.default_metrics.tarantool.memory']        = 'metrics/default_metrics/tarantool/memory.lua',
         ['metrics.default_metrics.tarantool.network']       = 'metrics/default_metrics/tarantool/network.lua',
         ['metrics.default_metrics.tarantool.operations']    = 'metrics/default_metrics/tarantool/operations.lua',
-        ['metrics.default_metrics.tarantool.psutils_linux'] = 'metrics/default_metrics/tarantool/psutils_linux.lua',
         ['metrics.default_metrics.tarantool.replicas']      = 'metrics/default_metrics/tarantool/replicas.lua',
         ['metrics.default_metrics.tarantool.runtime']       = 'metrics/default_metrics/tarantool/runtime.lua',
         ['metrics.default_metrics.tarantool.slab']          = 'metrics/default_metrics/tarantool/slab.lua',
         ['metrics.default_metrics.tarantool.spaces']        = 'metrics/default_metrics/tarantool/spaces.lua',
         ['metrics.default_metrics.tarantool.system']        = 'metrics/default_metrics/tarantool/system.lua',
         ['metrics.default_metrics.tarantool.utils']         = 'metrics/default_metrics/tarantool/utils.lua',
+        ['metrics.psutils.cpu']                             = 'metrics/psutils/cpu.lua',
+        ['metrics.psutils.psutils_linux']                   = 'metrics/psutils/psutils_linux.lua',
     }
 }
 

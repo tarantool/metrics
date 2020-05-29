@@ -4,7 +4,7 @@ if require('ffi').os ~= 'Linux' then
 end
 
 local utils = require('metrics.default_metrics.tarantool.utils')
-local psutils = require('metrics.default_metrics.tarantool.psutils_linux')
+local psutils = require('metrics.psutils.psutils_linux')
 
 local instance_file = arg[0]
 utils.set_gauge('cpu_count', 'The number of processors', psutils.get_cpu_count())
