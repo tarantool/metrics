@@ -6,8 +6,9 @@ ffi.cdef[[
     int get_nprocs_conf(void);
 ]]
 
+local stat_file_path = os.getenv('TEST_STAT_FILE_PATH') or '/proc/stat'
 local function get_cpu_time()
-    local cpu_stat_file = fio.open('/proc/stat', 'O_RDONLY')
+    local cpu_stat_file = fio.open(stat_file_path, 'O_RDONLY')
     if cpu_stat_file == nil then
         return nil
     end
@@ -50,11 +51,12 @@ local function parse_process_stat(path)
     }
 end
 
+local task_path = os.getenv('TEST_TASK_PATH') or '/proc/self/task'
 local function get_process_cpu_time()
-    local threads = fio.listdir('/proc/self/task')
+    local threads = fio.listdir(task_path)
     local thread_time = {}
     for i, thread_pid in ipairs(threads) do
-        thread_time[i] = parse_process_stat('/proc/self/task/' .. thread_pid .. '/stat')
+        thread_time[i] = parse_process_stat(task_path .. '/' .. thread_pid .. '/stat')
     end
 
     return thread_time
