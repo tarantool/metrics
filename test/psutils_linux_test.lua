@@ -4,8 +4,6 @@
 local t = require('luatest')
 local g = t.group('psutils_linux')
 
-local utils = require('test.utils')
-
 local payload_dir = os.getenv('PWD') .. '/test/psutils_linux_test_payload'
 local stat_file_path = payload_dir .. '/proc_stat'
 local task_dir_path = payload_dir .. '/proc_self_task'
