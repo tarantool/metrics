@@ -10,7 +10,7 @@ local task_dir_path = payload_dir .. '/proc_self_task'
 
 local psutils_linux
 g.before_all(function()
-    t.skip_if(require('ffi').os ~= 'Linux', 'Linux is the only supported platform')
+    t.skip_if(jit.os ~= 'Linux', 'Linux is the only supported platform')
 
     os.setenv('TEST_STAT_FILE_PATH', stat_file_path)
     os.setenv('TEST_TASK_PATH', task_dir_path)

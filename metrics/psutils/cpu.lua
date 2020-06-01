@@ -1,5 +1,5 @@
 -- Linux is the only supported platform
-if require('ffi').os ~= 'Linux' then
+if jit.os ~= 'Linux' then
     return nil
 end
 
