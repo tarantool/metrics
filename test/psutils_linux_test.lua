@@ -29,5 +29,5 @@ g.test_get_process_cpu_time = function()
         {pid = 13, comm = 'iproto', utime = 118, stime = 534},
         {pid = 14, comm = 'wal', utime = 0, stime = 0},
     }
-    t.assert_equals(psutils_linux.get_process_cpu_time(), expected)
+    t.assert_items_equals(psutils_linux.get_process_cpu_time(), expected)
 end
