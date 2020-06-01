@@ -1,6 +1,6 @@
 -- Linux is the only supported platform
 if jit.os ~= 'Linux' then
-    return nil
+    return { update = function() end }
 end
 
 local utils = require('metrics.default_metrics.tarantool.utils')
