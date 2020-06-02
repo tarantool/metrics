@@ -10,8 +10,11 @@ local function update_replicas_metrics()
 
     if box.cfg.read_only then
         for k, v in ipairs(current_box_info.vclock) do
-            local lsn = current_box_info.replication[k].lsn
-            utils.set_gauge('replication_replica_' .. k .. '_lsn', 'lsn for replica ' .. k, lsn - v)
+            local replication_info = current_box_info.replication[k]
+            if replication_info then
+                local lsn = replication_info.lsn
+                utils.set_gauge('replication_replica_' .. k .. '_lsn', 'lsn for replica ' .. k, lsn - v)
+            end
         end
     else
         for k, v in ipairs(current_box_info.replication) do
