@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Throw exception when `http_middleware.build_default_collector` is called with same name
+- Attempt to index non-existent master vclock on a replica after the death of the master
 
 ## [0.2.0] - 2020-05-07
 ### Added
