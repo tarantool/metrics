@@ -142,6 +142,7 @@ end
 
 g.test_v2_middleware = function()
     local httpd = require('http.server').new('127.0.0.1', 12345)
+    t.skip_if(httpd.set_router == nil, 'Skip http 2.x test')
     local router = require('http.router').new()
     router:route(route, function() return {body = 'test-response', status = 200} end)
     router:use(http_middleware.v2(), {name = 'http_instrumentation'})
