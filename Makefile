@@ -7,7 +7,11 @@ rpm:
 	tarantoolctl rocks install luatest 0.5.0
 	tarantoolctl rocks install luacov 0.13.0
 	tarantoolctl rocks install luacheck 0.25.0
-	tarantoolctl rocks install http 2.1.0
+	if [ -z $(CARTRIDGE_VERSION) ]; then \
+		tarantoolctl rocks install http 2.1.0; \
+	else \
+		tarantoolctl rocks install cartridge $(CARTRIDGE_VERSION); \
+	fi
 
 .PHONY: lint
 lint: .rocks
