@@ -14,20 +14,16 @@ local handlers = {
     end,
 }
 
-local collectors = {
-    ['tarantool'] = function()
-        metrics.enable_default_metrics()
-    end
-}
-
 local function init()
-    assert(argparse.parse())
+    local params, err = argparse.parse()
+    assert(params, err)
+    metrics.set_global_labels({alias = params.alias})
+    metrics.enable_default_metrics()
 end
 
 local function check_config(_)
     checks({
         export = 'table',
-        collect = 'table',
     })
 end
 
@@ -61,9 +57,6 @@ local function validate_config(conf_new)
         assert(paths[v.path] == nil, 'paths must be unique')
         paths[v.path] = true
     end
-    for k, _ in pairs(conf_new.collect) do
-        assert(collectors[k], 'collector must be "tarantool"')
-    end
     return true
 end
 
@@ -79,12 +72,6 @@ local function apply_config(conf)
         end
         metrics_conf = { collect = {}, export = {} }
     end
-    for name, opts in pairs(metrics_conf.collect) do
-        collectors[name](opts)
-    end
-
-    local params = argparse.parse()
-    metrics.set_global_labels({alias = params.alias})
 
     local httpd = cartridge.service_get('httpd')
     for _, exporter in ipairs(metrics_conf.export) do

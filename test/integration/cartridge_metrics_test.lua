@@ -39,8 +39,8 @@ end
 
 g.test_role_enabled = function()
     local resp = g.cluster.main_server.net_box:eval([[
-      local cartridge = require('cartridge')
-      return cartridge.service_get('metrics') == nil
+        local cartridge = require('cartridge')
+        return cartridge.service_get('metrics') == nil
     ]])
     t.assert_equals(resp, false)
 end
@@ -55,16 +55,13 @@ g.test_role_add_metrics_http_endpoint = function()
                     format = 'json'
                 },
             },
-            collect = {
-                tarantool = {},
-            }
         }
     })
     t.assert_equals(resp.status, 200)
     g.cluster.main_server.net_box:eval([[
-      local cartridge = require('cartridge')
-      local metrics = cartridge.service_get('metrics')
-      metrics.counter('test-counter'):inc(1)
+        local cartridge = require('cartridge')
+        local metrics = cartridge.service_get('metrics')
+        metrics.counter('test-counter'):inc(1)
     ]])
 
     local counter_present = false
@@ -72,14 +69,14 @@ g.test_role_add_metrics_http_endpoint = function()
     resp = server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
     for _, obs in pairs(resp.json) do
-      t.assert_equals(
-          g.cluster.main_server.alias, obs.label_pairs['alias'],
-          ('Alias label is present in metric %s'):format(obs.metric_name)
-      )
-      if obs.metric_name == 'test-counter' then
-          counter_present = true
-          t.assert_equals(obs.value, 1)
-      end
+        t.assert_equals(
+            g.cluster.main_server.alias, obs.label_pairs['alias'],
+            ('Alias label is present in metric %s'):format(obs.metric_name)
+        )
+        if obs.metric_name == 'test-counter' then
+            counter_present = true
+            t.assert_equals(obs.value, 1)
+        end
     end
     t.assert_equals(counter_present, true)
 
@@ -91,9 +88,6 @@ g.test_role_add_metrics_http_endpoint = function()
                     format = 'json'
                 },
             },
-            collect = {
-                tarantool = {},
-            }
         }
     })
     t.assert_equals(resp.status, 200)
@@ -113,9 +107,6 @@ g.test_validate_config_invalid_export_section = function()
     assert_bad_config({
         metrics = {
             export = '/metrics',
-            collect = {
-                tarantool = {},
-            }
         },
     }, 'bad argument')
 end
@@ -129,9 +120,6 @@ g.test_validate_config_invalid_export_format = function()
                     format = 'invalid-format'
                 },
             },
-            collect = {
-                tarantool = {},
-            }
         }
     }, 'format must be "json" or "prometheus"')
 end
@@ -149,9 +137,6 @@ g.test_validate_config_duplicate_paths = function()
                     format = 'prometheus'
                 },
             },
-            collect = {
-                tarantool = {},
-            }
         }
     }, 'paths must be unique')
 
@@ -167,9 +152,6 @@ g.test_validate_config_duplicate_paths = function()
                     format = 'prometheus'
                 },
             },
-            collect = {
-                tarantool = {},
-            }
         }
     }, 'paths must be unique')
 
@@ -185,40 +167,6 @@ g.test_validate_config_duplicate_paths = function()
                     format = 'prometheus'
                 },
             },
-            collect = {
-                tarantool = {},
-            }
         }
     }, 'paths must be unique')
-end
-
-g.test_validate_config_invalid_collect_section = function()
-    assert_bad_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-            },
-            collect = 'tarantool'
-        }
-    }, 'bad argument')
-end
-
-g.test_validate_config_invalid_collector = function()
-    assert_bad_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-          },
-          collect = {
-                tarantool = {},
-                invalid_collector = {},
-            }
-        }
-    }, 'collector must be "tarantool"')
 end
