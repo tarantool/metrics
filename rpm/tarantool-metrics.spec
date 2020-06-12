@@ -21,6 +21,7 @@ Easy collecting, storing and manipulating metrics timeseriess.
 %install
 mkdir -p %{br_luapkgdir}
 cp -rv metrics %{br_luapkgdir}
+cp -rv cartridge %{br_luapkgdir}
 
 %files
 %dir %{luapkgdir}/metrics
@@ -58,8 +59,12 @@ cp -rv metrics %{br_luapkgdir}
      %{luapkgdir}/metrics/default_metrics/tarantool/spaces.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/system.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/utils.lua
+%dir %{luapkgdir}/metrics/psutils
      %{luapkgdir}/metrics/psutils/cpu.lua
      %{luapkgdir}/metrics/psutils/psutils_linux.lua
+%dir %{luapkgdir}/cartridge
+%dir %{luapkgdir}/cartridge/roles
+     %{luapkgdir}/cartridge/roles/metrics.lua
 
 %doc README.md
 %{!?_licensedir:%global license %doc}

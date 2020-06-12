@@ -73,6 +73,10 @@ jobs:
       env: TARANTOOL_VERSION=1.10
     - <<: *test
       env: TARANTOOL_VERSION=2x
+    - <<: *test
+      env: TARANTOOL_VERSION=2x CARTRIDGE_VERSION=1.2.0
+    - <<: *test
+      env: TARANTOOL_VERSION=2x CARTRIDGE_VERSION=2.1.2
 
     - stage: deploy
       name: Publish rockspecs
