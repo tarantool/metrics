@@ -1,4 +1,4 @@
-local utils = require('metrics.default_metrics.tarantool.utils');
+local utils = require('metrics.utils');
 local clock = require('clock')
 
 local function update_system_metrics()
