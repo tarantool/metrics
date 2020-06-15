@@ -1,4 +1,4 @@
-local utils = require('metrics.default_metrics.tarantool.utils');
+local utils = require('metrics.utils');
 
 
 local function update_network_metrics()

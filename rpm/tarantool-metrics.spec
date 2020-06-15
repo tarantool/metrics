@@ -58,10 +58,10 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/default_metrics/tarantool/slab.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/spaces.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/system.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/utils.lua
 %dir %{luapkgdir}/metrics/psutils
      %{luapkgdir}/metrics/psutils/cpu.lua
      %{luapkgdir}/metrics/psutils/psutils_linux.lua
+     %{luapkgdir}/metrics/utils.lua
 %dir %{luapkgdir}/cartridge
 %dir %{luapkgdir}/cartridge/roles
      %{luapkgdir}/cartridge/roles/metrics.lua

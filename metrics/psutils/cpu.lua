@@ -3,7 +3,7 @@ if jit.os ~= 'Linux' then
     return { update = function() end }
 end
 
-local utils = require('metrics.default_metrics.tarantool.utils')
+local utils = require('metrics.utils')
 local psutils = require('metrics.psutils.psutils_linux')
 
 local instance_file = arg[0]
