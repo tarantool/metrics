@@ -20,5 +20,5 @@ local function enable()
 end
 
 return {
-    enable = enable
+    enable = enable,
 }

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Role for [tarantool/cartridge](https://github.com/tarantool/cartridge)
 - Documentaion and examples on [tarantool/http server](https://github.com/tarantool/http) middleware
+- New default metrics: cpu_total, cpu_thread
 
 ### Fixed
 - Throw exception when `http_middleware.build_default_collector` is called with same name

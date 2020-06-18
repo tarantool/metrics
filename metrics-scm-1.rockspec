@@ -45,6 +45,8 @@ build = {
         ['metrics.default_metrics.tarantool.spaces']     = 'metrics/default_metrics/tarantool/spaces.lua',
         ['metrics.default_metrics.tarantool.system']     = 'metrics/default_metrics/tarantool/system.lua',
         ['metrics.default_metrics.tarantool.utils']      = 'metrics/default_metrics/tarantool/utils.lua',
+        ['metrics.psutils.cpu']                          = 'metrics/psutils/cpu.lua',
+        ['metrics.psutils.psutils_linux']                = 'metrics/psutils/psutils_linux.lua',
         ['cartridge.roles.metrics']                      = 'cartridge/roles/metrics.lua',
     }
 }

@@ -268,6 +268,29 @@ http_middleware = metrics.http_middleware
 
   For more detailed example see [example/HTTP/latency_v2.lua](./example/HTTP/latency_v2.lua).
 
+## CPU usage metrics
+
+### Collected metrics example
+```
+# HELP tnt_cpu_total Host CPU time
+# TYPE tnt_cpu_total gauge
+tnt_cpu_total 15006759
+# HELP tnt_cpu_thread Tarantool thread cpu time
+# TYPE tnt_cpu_thread gauge
+tnt_cpu_thread{thread_name="coio",file_name="init.lua",thread_pid="699",kind="system"} 160
+tnt_cpu_thread{thread_name="tarantool",file_name="init.lua",thread_pid="1",kind="user"} 949
+tnt_cpu_thread{thread_name="tarantool",file_name="init.lua",thread_pid="1",kind="system"} 920
+tnt_cpu_thread{thread_name="coio",file_name="init.lua",thread_pid="11",kind="user"} 79
+tnt_cpu_thread{thread_name="coio",file_name="init.lua",thread_pid="699",kind="user"} 44
+tnt_cpu_thread{thread_name="coio",file_name="init.lua",thread_pid="11",kind="system"} 294
+```
+
+### Prometheus query aggregated by thread name
+```promql
+sum by (thread_name) (idelta(tnt_cpu_thread[$__interval]))
+  / scalar(idelta(tnt_cpu_total[$__interval]) / tnt_cpu_count)
+```
+
 ## CONTRIBUTION
 
 Feel free to send Pull Requests. E.g. you can support new timeseries aggregation / manipulation functions (but be sure to check if there are any Prometheus analogues to borrow API from).
