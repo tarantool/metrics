@@ -102,7 +102,7 @@ end
 
 return setmetatable({
     role_name = 'metrics',
-
+    permanent = true,
     init = init,
     validate_config = validate_config,
     apply_config = apply_config
