@@ -22,7 +22,7 @@ g.before_all = function()
         replicasets = {
             {
                 uuid = helpers.uuid('a'),
-                roles = { 'metrics' },
+                roles = {},
                 servers = {
                     {instance_uuid = helpers.uuid('a', 1), alias = 'main'},
                 },
