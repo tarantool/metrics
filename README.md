@@ -195,6 +195,14 @@ metrics = require('metrics')
   * `num` Value to put in histogram (number).
   * `label_pairs` Table containing label names as keys, label values as values (table). New value is observed by all internal counters with these labels specified.
 
+#### `histogram_obj:observe_latency(label_pairs, fn, ...)`
+  Measure latency of function call
+  * `label_pairs` either table with labels or function to generate labels
+  * `fn` function for pcall to instrument
+  * `...` args for function `fn`
+
+  Return results of fn call or reraise error
+
 #### `histogram_obj:collect()`
   Returns concatenation of `counter_obj:collect()` across all internal counters
   of `histogram_obj`.  

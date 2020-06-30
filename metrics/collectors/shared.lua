@@ -1,4 +1,6 @@
+local clock = require('clock')
 local fiber = require('fiber')
+local log = require('log')
 
 local Shared = {}
 
@@ -70,6 +72,32 @@ function Shared:dec(num, label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
     self.label_pairs[key] = label_pairs
+end
+
+local function observe_latency_tail(collector, label_pairs, start_time, ok, result, ...)
+    local latency = clock.monotonic() - start_time
+    if type(label_pairs) == 'function' then
+        label_pairs = label_pairs(ok, result, ...)
+    end
+    xpcall(function()
+        collector:observe(latency, label_pairs) end,
+    function(err)
+        log.error(debug.traceback('Saving metrics failed: ' .. tostring(err)))
+    end)
+    if not ok then
+        error(result)
+    end
+    return result, ...
+end
+
+--- Measure latency of function call
+--
+-- @param label_pairs either table with labels or function to generate labels.
+--      If function is given its called with the results of pcall.
+-- @param fn function for pcall to instrument
+-- ... - args for function fn
+function Shared:observe_latency(label_pairs, fn, ...)
+    return observe_latency_tail(self, label_pairs, clock.monotonic(), pcall(fn, ...))
 end
 
 function Shared:append_global_labels(label_pairs)

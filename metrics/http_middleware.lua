@@ -1,6 +1,3 @@
-local clock = require('clock')
-local log = require('log')
-
 local export = {}
 
 export.DEFAULT_HISTOGRAM_BUCKETS = {
@@ -60,21 +57,13 @@ end
 -- @string route.method
 -- ... arguments for pcall to instrument
 function export.observe(collector, route, ...)
-    local start_time = clock.monotonic()
-    local ok, result = pcall(...)
-    local latency = clock.monotonic() - start_time
-
-    xpcall(function()
-        local status = (not ok and 500) or result.status or 200
-        collector:observe(latency, {path = route.path, method = route.method, status = status})
-    end, function(err)
-        log.error(debug.traceback('Saving metrics failed: ' .. tostring(err)))
-    end)
-
-    if not ok then
-        error(result)
-    end
-    return result
+    return collector:observe_latency(function(ok, result)
+        return {
+            path = route.path,
+            method = route.method,
+            status = (not ok and 500) or result.status or 200,
+        }
+    end, ...)
 end
 
 --- Apply instrumentation middleware for http request handler
