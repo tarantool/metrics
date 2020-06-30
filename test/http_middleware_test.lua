@@ -20,6 +20,13 @@ local function merge(...)
     return fun.chain(...):tomap()
 end
 
+local function stub_observer(observe)
+    return {
+        observe = observe,
+        observe_latency = require('metrics.collectors.shared').observe_latency,
+    }
+end
+
 local route = {path = '/some/path', method = 'POST'}
 
 g.test_build_default_collector_histogram = function()
@@ -65,7 +72,7 @@ g.test_observe = function()
     local observed
     local function subject()
         return http_middleware.observe(
-            {observe = function(_, ...) observed = {...} return {'observer result'} end},
+            stub_observer(function(_, ...) observed = {...} return {'observer result'} end),
             merge(route, {other = 'value'}),
             function(arg1, arg2)
                 t.assert_equals({arg1, arg2}, {'value1', 'value2'})
@@ -90,7 +97,7 @@ g.test_observe_handler_failure = function()
     local observed
     t.assert_equals(t.assert_error(function()
         http_middleware.observe(
-            {observe = function(_, ...) observed = {...} return {'observer result'} end},
+            stub_observer(function(_, ...) observed = {...} return {'observer result'} end),
             route,
             function() error(err) end
         )
@@ -104,7 +111,7 @@ g.test_observe_observer_failure = function()
     local capture = require('luatest.capture'):new()
     capture:wrap(true, function()
         t.assert_is(http_middleware.observe(
-            {observe = function() error({custom = 'error'}) end},
+            stub_observer(function() error({custom = 'error'}) end),
             route,
             function() return result end
         ), result)
@@ -116,7 +123,7 @@ g.test_v1_middleware = function()
     local request = {endpoint = table.copy(route)}
     local result = {value = 'result'}
     local observed
-    local observer = {observe = function(_, ...) observed = {...} end}
+    local observer = stub_observer(function(_, ...) observed = {...} end)
     local handler = function(arg)
         t.assert_is(arg, request)
         return result

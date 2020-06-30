@@ -4,7 +4,7 @@ local Shared = require('metrics.collectors.shared')
 
 --- Collector to produce count and average value metrics.
 -- Average value is is calculated between two subsequent `:collect` calls.
-local Average = Shared:new_class('average')
+local Average = Shared:new_class('average', {'observe_latency'})
 
 function Average:new(name, help)
     local obj = Shared.new(self, name, help)
