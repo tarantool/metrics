@@ -1,4 +1,4 @@
-local utils = require('metrics.utils');
+local utils = require('metrics.utils')
 
 local function update_runtime_metrics()
     local runtime_info = box.runtime.info()
