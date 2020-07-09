@@ -13,7 +13,7 @@ local function update_spaces_metrics()
         if not flags.temporary and not space_name:match('^_') then
             local sp = box.space[space_name]
 
-            local labels = { name = sp.name };
+            local labels = { name = sp.name }
 
             for space_id, i in pairs(sp.index) do
                 if type(space_id) == 'number' then

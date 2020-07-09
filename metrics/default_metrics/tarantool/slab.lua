@@ -1,11 +1,11 @@
-local utils = require('metrics.utils');
+local utils = require('metrics.utils')
 
 local function update_slab_metrics()
     if not utils.box_is_configured() then
         return
     end
 
-    local slab_info = box.slab.info();
+    local slab_info = box.slab.info()
 
     for k, v in pairs(slab_info) do
         if not k:match('_ratio$') then

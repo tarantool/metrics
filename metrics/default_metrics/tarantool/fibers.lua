@@ -1,5 +1,5 @@
 local fiber = require('fiber')
-local utils = require('metrics.utils');
+local utils = require('metrics.utils')
 
 local function update_fibers_metrics()
     local fibers_info = fiber.info()

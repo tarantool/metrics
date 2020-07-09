@@ -1,4 +1,4 @@
-local utils = require('metrics.utils');
+local utils = require('metrics.utils')
 
 local function update_memory_metrics()
     if not utils.box_is_configured() then

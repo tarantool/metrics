@@ -9,8 +9,6 @@ local function update_info_metrics()
 
     utils.set_gauge('info_lsn', 'Tarantool lsn', info.lsn)
     utils.set_gauge('info_uptime', 'Tarantool uptime', info.uptime)
-    utils.set_gauge('info_lsn', 'Tarantool lsn', info.lsn)
-    utils.set_gauge('info_uptime', 'Tarantool uptime', info.uptime)
 
     for k, v in ipairs(info.vclock) do
         utils.set_gauge('info_vclock', 'VClock', v, {id = k})
