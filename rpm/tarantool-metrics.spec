@@ -35,16 +35,12 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/collectors/histogram.lua
      %{luapkgdir}/metrics/collectors/shared.lua
 %dir %{luapkgdir}/metrics/plugins
-     %{luapkgdir}/metrics/plugins/README.md
 %dir %{luapkgdir}/metrics/plugins/prometheus
      %{luapkgdir}/metrics/plugins/prometheus/init.lua
-     %{luapkgdir}/metrics/plugins/prometheus/README.md
 %dir %{luapkgdir}/metrics/plugins/graphite
      %{luapkgdir}/metrics/plugins/graphite/init.lua
-     %{luapkgdir}/metrics/plugins/graphite/README.md
 %dir %{luapkgdir}/metrics/plugins/json
      %{luapkgdir}/metrics/plugins/json/init.lua
-     %{luapkgdir}/metrics/plugins/json/README.md
 %dir %{luapkgdir}/metrics/default_metrics
 %dir %{luapkgdir}/metrics/default_metrics/tarantool
      %{luapkgdir}/metrics/default_metrics/tarantool/fibers.lua
@@ -65,6 +61,12 @@ cp -rv cartridge %{br_luapkgdir}
 %dir %{luapkgdir}/cartridge
 %dir %{luapkgdir}/cartridge/roles
      %{luapkgdir}/cartridge/roles/metrics.lua
+%dir %{luapkgdir}/doc
+%dir %{luapkgdir}/doc/monitoring
+     %{luapkgdir}/doc/monitoring/getting_started.rst
+     %{luapkgdir}/doc/monitoring/api_reference.rst
+     %{luapkgdir}/doc/monitoring/index.rst
+     %{luapkgdir}/doc/monitoring/plugins.rst
 
 %doc README.md
 %{!?_licensedir:%global license %doc}
