@@ -16,7 +16,7 @@ local DEFAULT_SEND_INTERVAL = 2
 -- Constants
 local LABELS_SEP = ';'
 
-local function format_observation(prefix, obs)
+function graphite.format_observation(prefix, obs)
     local metric_path = #prefix > 0 and ('%s.%s'):format(prefix, obs.metric_name) or obs.metric_name
 
     if next(obs.label_pairs) then
@@ -28,9 +28,10 @@ local function format_observation(prefix, obs)
         metric_path = metric_path .. LABELS_SEP .. label_pairs_str
     end
     metric_path = metric_path:gsub(' ', '_') -- remove spaces (e.g. in values)
+    local string_val = tostring(obs.value):match('%d*') -- removes ULL/LL suffixes
 
-    local ts = tostring(obs.timestamp):sub(1, -4) -- remove ULL suffix
-    local graph = ('%s %s %s\n'):format(metric_path, obs.value, ts)
+    local ts = tostring(obs.timestamp):sub(1, -10) -- Graphite takes time in seconds
+    local graph = ('%s %s %s\n'):format(metric_path, string_val, ts)
 
     return graph
 end
