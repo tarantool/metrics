@@ -123,9 +123,6 @@ To start automatically exporting the current values of all
 
 .. function:: init(options)
 
-    Create and start a ``my_fiber`` object. The object is created and begins to
-    run immediately.
-
     :param table options: Possible options:
 
                           *  ``prefix`` (string) - metrics prefix (default is ``'tarantool'``);
