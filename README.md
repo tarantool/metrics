@@ -123,7 +123,7 @@ via configuration.
 
 4. To view metrics via API endpoints, use the following configuration
    (to learn more about Cartridge configuration, see
-   [this](https://www.tarantool.io/en/doc/2.3/book/cartridge/topics/clusterwide-config/#managing-role-specific-data)):
+   [this](https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data)):
    ```yaml
    metrics:
      export:
@@ -149,7 +149,6 @@ See:
 
 - A more detailed [getting started guide](https://www.tarantool.io/en/doc/latest/book/monitoring/monitoring-getting-started)
 - Metrics [API reference](https://www.tarantool.io/en/doc/latest/book/monitoring/metrics-api-reference)
-- How to use the [Grafana dashboard](https://www.tarantool.io/en/doc/latest/book/monitoring/monitoring-getting-started/#grafana-dashboard) with `tarantool/metrics`
 - Detailed information on [plugins](https://www.tarantool.io/en/doc/latest/book/monitoring/plugins)
 
 ## Contribution
