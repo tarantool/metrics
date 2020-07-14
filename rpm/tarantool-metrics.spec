@@ -61,14 +61,13 @@ cp -rv cartridge %{br_luapkgdir}
 %dir %{luapkgdir}/cartridge
 %dir %{luapkgdir}/cartridge/roles
      %{luapkgdir}/cartridge/roles/metrics.lua
-%dir %{luapkgdir}/doc
-%dir %{luapkgdir}/doc/monitoring
-     %{luapkgdir}/doc/monitoring/getting_started.rst
-     %{luapkgdir}/doc/monitoring/api_reference.rst
-     %{luapkgdir}/doc/monitoring/index.rst
-     %{luapkgdir}/doc/monitoring/plugins.rst
 
 %doc README.md
+%doc doc/monitoring/getting_started.rst
+%doc doc/monitoring/api_reference.rst
+%doc doc/monitoring/index.rst
+%doc doc/monitoring/plugins.rst
+
 %{!?_licensedir:%global license %doc}
 %license LICENSE
 
