@@ -1,18 +1,18 @@
-.. _plugins:
+.. _metrics-plugins:
 
 ===============================================================================
-Metrics Plugins
+Metrics plugins
 ===============================================================================
 
-Plugins allow to use an unified interface to collect metrics without
-worrying about the way metrics export performed.
-If you want to use another DB to store metrics data, you can use
-appropriate export plugin just by changing one line of code-block.
+Plugins allow using a unified interface to collect metrics without
+worrying about the way metrics export is performed.
+If you want to use another DB to store metrics data, you can use an
+appropriate export plugin just by changing one line of code.
 
 .. _avaliable-plugins:
 
 -------------------------------------------------------------------------------
-Avaliable Plugins
+Available plugins
 -------------------------------------------------------------------------------
 
 .. _prometheus:
@@ -39,66 +39,68 @@ Further, use the ``prometheus.collect_http()`` function, which returns:
         body = <body>,
     }
 
-See the `Prometheus exposition format <https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md>`__
+See the
+`Prometheus exposition format <https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md>`_
 for details on ``<body>`` and ``<headers>``.
 
-Use in Tarantool `http.server <https://github.com/tarantool/http/>`__ as follows:
+Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 
--  in Tarantool `http.server v1 <https://github.com/tarantool/http/tree/tarantool-1.6>`__
-   (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`__):
+* In Tarantool `http.server v1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
+  (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`_):
 
-    .. code-block:: lua
+  .. code-block:: lua
 
-        local httpd = require('http.server').new(...)
-        ...
-        httpd:route( { path = '/metrics' }, prometheus.collect_http)
+      local httpd = require('http.server').new(...)
+      ...
+      httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
--  in Tarantool `http.server v2 <https://github.com/tarantool/http/>`__ (the latest version):
+* In Tarantool `http.server v2 <https://github.com/tarantool/http/>`_
+  (the latest version):
 
-    .. code-block:: lua
+  .. code-block:: lua
 
-        local httpd = require('http.server').new(...)
-        local router = require('http.router').new(...)
-        httpd:set_router(router)
-        ...
-        router:route( { path = '/metrics' }, prometheus.collect_http)
+      local httpd = require('http.server').new(...)
+      local router = require('http.router').new(...)
+      httpd:set_router(router)
+      ...
+      router:route( { path = '/metrics' }, prometheus.collect_http)
 
 **Sample settings**
 
--  for Tarantool ``http.server`` v1:
+* For Tarantool ``http.server`` v1:
 
-    .. code-block:: lua
+  .. code-block:: lua
 
-        metrics = require('metrics')
-        metrics.enable_default_metrics()
-        prometheus = require('metrics.plugins.prometheus')
-        httpd = require('http.server').new('0.0.0.0', 8080)
-        httpd:route( { path = '/metrics' }, prometheus.collect_http)
-        httpd:start()
+      metrics = require('metrics')
+      metrics.enable_default_metrics()
+      prometheus = require('metrics.plugins.prometheus')
+      httpd = require('http.server').new('0.0.0.0', 8080)
+      httpd:route( { path = '/metrics' }, prometheus.collect_http)
+      httpd:start()
 
--  for Tarantool Cartridge (with ``http.server`` v1):
+* For Tarantool Cartridge (with ``http.server`` v1):
 
-    .. code-block:: lua
+  .. code-block:: lua
 
-        cartridge = require('cartridge')
-        httpd = cartridge.service_get('httpd')
-        metrics = require('metrics')
-        metrics.enable_default_metrics()
-        prometheus = require('metrics.plugins.prometheus')
-        httpd:route( { path = '/metrics' }, prometheus.collect_http)
+      cartridge = require('cartridge')
+      httpd = cartridge.service_get('httpd')
+      metrics = require('metrics')
+      metrics.enable_default_metrics()
+      prometheus = require('metrics.plugins.prometheus')
+      httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
--  for Tarantool ``http.server`` v2:
+* For Tarantool ``http.server`` v2:
 
-    .. code-block:: lua
+  .. code-block:: lua
 
-        metrics = require('metrics')
-        metrics.enable_default_metrics()
-        prometheus = require('metrics.plugins.prometheus')
-        httpd = require('http.server').new('0.0.0.0', 8080)
-        router = require('http.router').new({charset = "utf8"})
-        httpd:set_router(router) router:route( { path = '/metrics' },
-        prometheus.collect_http)
-        httpd:start()
+      metrics = require('metrics')
+      metrics.enable_default_metrics()
+      prometheus = require('metrics.plugins.prometheus')
+      httpd = require('http.server').new('0.0.0.0', 8080)
+      router = require('http.router').new({charset = "utf8"})
+      httpd:set_router(router) router:route( { path = '/metrics' },
+      prometheus.collect_http)
+      httpd:start()
 
 .. _graphite:
 
@@ -108,13 +110,14 @@ Graphite
 
 **Usage**
 
-Import graphite plugin module:
+Import the Graphite plugin:
 
 .. code-block:: lua
 
     local graphite = require('metrics.plugins.graphite')
 
-To start automatically exporting current values of all ``metrics.{counter,gauge,histogram}`` just call:
+To start automatically exporting the current values of all
+``metrics.{counter,gauge,histogram}``, just call:
 
 .. module:: metrics.plugins.graphite
 
@@ -123,18 +126,18 @@ To start automatically exporting current values of all ``metrics.{counter,gauge,
     Create and start a ``my_fiber`` object. The object is created and begins to
     run immediately.
 
-    :param table options:
-        Possible options:
-        -  ``prefix`` (string) - metrics prefix (default is ``'tarantool'``);
-        -  ``host`` (string) - graphite server host (default is ``'127.0.0.1'``);
-        -  ``port`` (number) - graphite server port (default is ``2003``);
-        -  ``send_interval`` (number) - metrics collect interval in seconds
-        (default is ``2``);
+    :param table options: Possible options:
 
-    This creates a background fiber, that periodically sends all metrics to
-    remote Graphite server.
+                          *  ``prefix`` (string) - metrics prefix (default is ``'tarantool'``);
+                          *  ``host`` (string) - graphite server host (default is ``'127.0.0.1'``);
+                          *  ``port`` (number) - graphite server port (default is ``2003``);
+                          *  ``send_interval`` (number) - metrics collect interval in seconds
+                             (default is ``2``);
 
-    Exported metric name is sent in format ``<prefix>.<metric_name>``.
+    This creates a background fiber that periodically sends all metrics to
+    a remote Graphite server.
+
+    Exported metric name is sent in the format ``<prefix>.<metric_name>``.
 
 .. _json:
 
@@ -144,7 +147,7 @@ JSON
 
 **Usage**
 
-Import json plugin:
+Import the JSON plugin:
 
 .. code-block:: lua
 
@@ -169,13 +172,16 @@ Import json plugin:
                 },
                 ...
             ]
+
     :rtype: string
 
-    **Important** - values can be ``+-math.huge``, ``math.huge * 0``
-    Then:
-    ``math.inf`` serialized to ``"inf"``
-    ``-math.inf`` serialized to ``"-inf"``
-    ``nan`` serialized to ``"nan"``
+    .. IMPORTANT::
+
+        Values can be ``+-math.huge``, ``math.huge * 0``. Then:
+
+        * ``math.inf`` is serialized to ``"inf"``
+        * ``-math.inf`` is serialized to ``"-inf"``
+        * ``nan`` is serialized to ``"nan"``
 
     **Example**
 
@@ -208,7 +214,6 @@ Import json plugin:
             }
         ]
 
-
 To be used in Tarantool ``http.server`` as follows:
 
 .. code-block:: lua
@@ -230,37 +235,47 @@ To be used in Tarantool ``http.server`` as follows:
 .. _plugin-specific-api:
 
 -------------------------------------------------------------------------------
-Plugin-Specific API
+Plugin-specific API
 -------------------------------------------------------------------------------
 
-We encourage you to use following methods **only when developing new
-plugin**.
+We encourage you to use the following methods **only when developing a new plugin**.
 
 .. module:: metrics
 
     .. function:: invoke_callbacks()
-        Invokes function registered via ``metrics.register_callback(<callback>)``. Used in exporters.
+
+        Invokes the function registered via
+        ``metrics.register_callback(<callback>)``.
+        Used in exporters.
 
     .. function:: collectors()
 
         Designed to be used in exporters in favor of ``metrics.collect()``.
+
         :return: a list of created collectors.
 
     .. class:: collector_object
         .. method:: collect()
 
-            **NOTE**: You'll probably want to use `metrics.collectors()` instead.
+            .. NOTE::
+
+                You'll probably want to use ``metrics.collectors()`` instead.
+
             Equivalent to:
+
             .. code-block:: lua
+
                 for _, c in pairs(metrics.collectors()) do
                     for _, obs in ipairs(c:collect()) do
                         ...  -- handle observation
                     end
                 end
-            :return:
-                Concatenation of ``observation`` objects across all collectors created.
+
+            :return: Concatenation of ``observation`` objects across all
+                     created collectors.
 
                 .. code-block:: lua
+
                     {
                         label_pairs: table,         -- `label_pairs` key-value table
                         timestamp: ctype<uint64_t>, -- current system time (in microseconds)
@@ -287,7 +302,7 @@ Inside your main export function:
     for _, c in pairs(metrics.collectors()) do
         ...
 
-        -- Loop over instant observations in collector.
+        -- Loop over instant observations in the collector.
         for _, obs in pairs(c:collect()) do
             -- Export observation `obs`
             ...

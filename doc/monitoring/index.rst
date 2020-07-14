@@ -4,7 +4,9 @@
 Monitoring
 ********************************************************************************
 
-Monitoring is the process of measuring and tracking Tarantool performance according to key metrics influencing it. These metrics are typically monitored in real time, allowing you to identify or predict issues.
+Monitoring is the process of measuring and tracking Tarantool performance
+according to key metrics influencing it. These metrics are typically monitored
+in real time, allowing you to identify or predict issues.
 
 This chapter includes the following sections:
 
@@ -14,4 +16,4 @@ This chapter includes the following sections:
 
    getting_started
    api_reference
-   pluguns
+   plugins

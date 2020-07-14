@@ -149,8 +149,8 @@ See:
 
 - A more detailed [getting started guide](https://www.tarantool.io/en/doc/latest/book/monitoring/monitoring-getting-started)
 - Metrics [API reference](https://www.tarantool.io/en/doc/latest/book/monitoring/metrics-api-reference)
-- How to use [Grafana dashboard](https://www.tarantool.io/en/doc/latest/book/monitoring/monitoring-getting-started/#grafana-dashboard) with tarantool/metrics
-- [Plugins detailed info](https://www.tarantool.io/en/doc/latest/book/monitoring/plugins)
+- How to use the [Grafana dashboard](https://www.tarantool.io/en/doc/latest/book/monitoring/monitoring-getting-started/#grafana-dashboard) with `tarantool/metrics`
+- Detailed information on [plugins](https://www.tarantool.io/en/doc/latest/book/monitoring/plugins)
 
 ## Contribution
 
