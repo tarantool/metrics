@@ -145,16 +145,16 @@ Histogram
         counters of ``histogram_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
 
-.. _average:
+.. _summary:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Average
+Summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Can be used only as a collector for HTTP statistics (described below)
 and cannot be built explicitly.
 
-.. class:: histogram_obj
+.. class:: summary_obj
 
     .. method: collect()
 
@@ -269,7 +269,7 @@ latency statistics.
 
     Registers a collector for the middleware and sets it as default.
 
-    :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
+    :param string type_name: Collector type: "histogram" or "summary". Default is "histogram".
     :param string name: Collector name. Default is "http_server_request_latency".
     :param string help: Help description. Default is "HTTP Server Request Latency".
 
@@ -280,7 +280,7 @@ latency statistics.
 
     Registers a collector for the middleware and returns it.
 
-    :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
+    :param string type_name: Collector type: "histogram" or "summary". Default is "histogram".
     :param string name: Collector name. Default is "http_server_request_latency".
     :param string help: Help description. Default is "HTTP Server Request Latency".
 

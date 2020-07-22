@@ -23,13 +23,13 @@ local handler = function(req)
 end
 router:route(route, handler)
 
--- Configure average latency collector
+-- Configure latency summary collector
 local collector = http_middleware.build_default_collector(
-    'average', 'path_latency',
+    'summary', 'path_latency',
     'My collector for /path requests latency'
 )
 
--- Set router average latency collection middleware
+-- Set router latency summary collection middleware
 router:use(http_middleware.v2(collector), { name = 'latency_instrumentation' })
 
 -- Start HTTP routing using configured router

@@ -10,7 +10,7 @@ export.DEFAULT_HISTOGRAM_BUCKETS = {
 
 --- Build default histogram collector
 --
--- @string[opt='histogram'] type_name `histogram` or `average`
+-- @string[opt='histogram'] type_name `histogram` or `summary`
 -- @string[opt='http_server_requests'] name
 -- @string[opt='HTTP Server Requests'] help
 -- @return collector
@@ -21,7 +21,7 @@ function export.build_default_collector(type_name, name, help)
     local extra = {}
     if type_name == 'histogram' then
         extra = {export.DEFAULT_HISTOGRAM_BUCKETS}
-    elseif type_name ~= 'average' then
+    elseif type_name ~= 'summary' then
         error('Unknown collector type_name: ' .. tostring(type_name))
     end
     local class = require('metrics.collectors.' .. type_name)

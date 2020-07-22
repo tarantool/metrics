@@ -21,13 +21,13 @@ local handler = function(req)
     return { status = 200, body = req.body }
 end
 
--- Configure average latency collector
+-- Configure latency summary collector
 local collector = http_middleware.build_default_collector(
-    'average', 'path_latency',
+    'summary', 'path_latency',
     'My collector for /path requests latency'
 )
 
--- Set route handler with average latency collection
+-- Set route handler with latency summary collection
 httpd:route(route, http_middleware.v1(handler, collector))
 -- Start HTTP routing
 httpd:start()

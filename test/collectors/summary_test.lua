@@ -3,10 +3,10 @@ local g = t.group()
 
 local utils = require('test.utils')
 
-local Average = require('metrics.collectors.average')
+local Summary = require('metrics.collectors.summary')
 
 g.test_collect = function()
-    local instance = Average:new('latency')
+    local instance = Summary:new('latency')
     instance:observe(1)
     instance:observe(2)
     instance:observe(3, {tag = 'a'})

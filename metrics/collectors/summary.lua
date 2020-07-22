@@ -2,18 +2,19 @@ local fiber = require('fiber')
 
 local Shared = require('metrics.collectors.shared')
 
---- Collector to produce count and average value metrics.
--- Average value is is calculated between two subsequent `:collect` calls.
-local Average = Shared:new_class('average', {'observe_latency'})
+--- Collector to produce count and Summary value metrics.
+-- Summary value is is calculated between two subsequent `:collect` calls.
+local Summary = Shared:new_class('summary', {'observe_latency'})
 
-function Average:new(name, help)
+function Summary:new(name, help)
     local obj = Shared.new(self, name, help)
     obj.count_name = name .. '_count'
     obj.avg_name = name .. '_avg'
+    obj.sum_name = name .. '_aum'
     return obj
 end
 
-function Average:observe(value, label_pairs)
+function Summary:observe(value, label_pairs)
     label_pairs = label_pairs or {}
     local key = self.make_key(label_pairs)
     local observation = self.observations[key]
@@ -31,7 +32,7 @@ function Average:observe(value, label_pairs)
     end
 end
 
-function Average:collect()
+function Summary:collect()
     local now = fiber.time64()
     local result = {}
     for _, observation in pairs(self.observations) do
@@ -56,4 +57,4 @@ function Average:collect()
     return result
 end
 
-return Average
+return Summary
