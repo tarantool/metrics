@@ -2,15 +2,14 @@ local fiber = require('fiber')
 
 local Shared = require('metrics.collectors.shared')
 
---- Collector to produce count and Summary value metrics.
--- Summary value is is calculated between two subsequent `:collect` calls.
+--- Collector to produce count and summary value metrics.
 local Summary = Shared:new_class('summary', {'observe_latency'})
 
 function Summary:new(name, help)
     local obj = Shared.new(self, name, help)
     obj.count_name = name .. '_count'
-    obj.avg_name = name .. '_avg'
-    obj.sum_name = name .. '_aum'
+    -- obj.avg_name = name .. '_avg'
+    obj.sum_name = name .. '_sum'
     return obj
 end
 
@@ -43,12 +42,12 @@ function Summary:collect()
             value = observation.count,
             timestamp = now,
         })
-        local diff = observation.count - observation.last_count
-        local average = diff > 0 and ((observation.sum - observation.last_sum) / diff) or 0
+        -- local diff = observation.count - observation.last_count
+        -- local average = diff > 0 and ((observation.sum - observation.last_sum) / diff) or 0
         table.insert(result, {
-            metric_name = self.avg_name,
+            metric_name = self.sum_name,
             label_pairs = label_pairs,
-            value = average,
+            value = observation.sum,
             timestamp = now,
         })
         observation.last_count = observation.count
