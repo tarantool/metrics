@@ -58,7 +58,7 @@ metrics.collect()
     status: 200
   timestamp: 1588951616500768
   value: 1.0038734949776
-  metric_name: path_latency_avg
+  metric_name: path_latency_sum
 
 --]]
 

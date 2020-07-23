@@ -15,19 +15,10 @@ g.test_collect = function()
 
     utils.assert_observations(instance:collect(), {
         {'latency_count', 2, {}},
-        {'latency_avg', 1.5, {}},
+        {'latency_sum', 3, {}},
         {'latency_count', 2, {tag = 'a'}},
-        {'latency_avg', 3.5, {tag = 'a'}},
+        {'latency_sum', 7, {tag = 'a'}},
         {'latency_count', 1, {tag = 'b'}},
-        {'latency_avg', 5, {tag = 'b'}},
-    })
-
-    utils.assert_observations(instance:collect(), {
-        {'latency_count', 2, {}},
-        {'latency_avg', 0, {}},
-        {'latency_count', 2, {tag = 'a'}},
-        {'latency_avg', 0, {tag = 'a'}},
-        {'latency_count', 1, {tag = 'b'}},
-        {'latency_avg', 0, {tag = 'b'}},
+        {'latency_sum', 5, {tag = 'b'}},
     })
 end
