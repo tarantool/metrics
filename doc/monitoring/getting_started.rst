@@ -100,10 +100,10 @@ via configuration.
    metrics package, you may get it as a Cartridge service and use it like
    a regular package after ``require``:
 
-    .. code-block:: lua
+   .. code-block:: lua
 
-        local cartridge = require('cartridge')
-        local metrics = cartridge.service_get('metrics')
+       local cartridge = require('cartridge')
+       local metrics = cartridge.service_get('metrics')
 
 #. To view metrics via API endpoints, use the following configuration
    (to learn more about Cartridge configuration, see

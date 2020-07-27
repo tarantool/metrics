@@ -27,7 +27,7 @@ Counter
 
 .. module:: metrics
 
-.. function:: counter(name [, help])``
+.. function:: counter(name [, help])
 
     Registers a new counter.
 
@@ -37,12 +37,13 @@ Counter
     :rtype: counter_obj
 
 .. class:: counter_obj
+
     .. method:: inc(num, label_pairs)
 
         Increments an observation under ``label_pairs``.
         If ``label_pairs`` didn't exist before, this creates it.
 
-        :param number num: Increase value.
+        :param number        num: Increase value.
         :param table label_pairs: Table containing label names as keys,
                                   label values as values.
 
@@ -60,6 +61,7 @@ Counter
                 value: number,               -- current value
                 metric_name: string,         -- collector
             }
+
         :rtype: table
 
 .. _gauge:
@@ -70,26 +72,33 @@ Gauge
 
 .. module:: metrics
 
-.. function:: gauge(name [, help])``
+.. function:: gauge(name [, help])
 
     Registers a new gauge. Returns a Counter object.
 
     :param string name: Collector name. Must be unique.
     :param string help: Help description.
+
     :return: Gauge object
+
     :rtype: gauge_obj
 
 .. class:: gauge_obj
+
     .. method:: inc(num, label_pairs)
+
         Same as Counter ``inc()``.
 
     .. method:: inc(num, label_pairs)
+
         Same as ``inc()``, but decreases the observation.
 
     .. method:: set(num, label_pairs)
+
         Same as ``inc()``, but sets the observation.
 
     .. method:: collect()
+
         Returns an array of ``observation`` objects for the given gauge.
         For ``observation`` description, see
         :ref:`counter_obj:collect() <counter-collect>`.
@@ -106,12 +115,14 @@ Histogram
 
     Registers a new histogram.
 
-    :param string name: Collector name. Must be unique.
-    :param string help: Help description.
+    :param string   name: Collector name. Must be unique.
+    :param string   help: Help description.
     :param table buckets: Histogram buckets (an array of sorted positive numbers).
                           Infinity bucket (``INF``) is appended automatically.
                           Default is ``{.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}``.
-    :return: Histogram object.
+
+    :return: Histogram object
+
     :rtype: histogram_obj
 
     .. NOTE::
@@ -134,13 +145,14 @@ Histogram
         This increments all buckets sizes under labels ``le`` >= ``num``
         and labels matching ``label_pairs``.
 
-        :param number num: Value to put in the histogram.
+        :param number        num: Value to put in the histogram.
         :param table label_pairs: Table containing label names as keys,
                                   label values as values (table).
                                   A new value is observed by all internal counters
                                   with these labels specified.
 
     .. method: collect()
+
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``histogram_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
@@ -198,8 +210,10 @@ You can also set global labels by calling
 .. module:: metrics
 
 .. function:: enable_default_metrics()
+
     Enables default metrics collections.
-    Collects Tarantool metrics ported from https://github.com/tarantool/stat .
+    Collects Tarantool metrics ported from https://github.com/tarantool/stat
+
     Default metrics are:
 
     * ``fiber_count`` - Amount of fibers
@@ -233,13 +247,17 @@ You can also set global labels by calling
     * ``cfg_current_time`` - Tarantool cfg time
 
 .. function:: metrics.set_global_labels(label_pairs)
+
     Set global labels that will be added to every observation.
 
     :param table label_pairs: Table containing label names as string keys,
                               label values as values (table).
 
     Global labels are applied only on metrics collection and have no effect
-    on how observations are stored. Global labels can be changed on the fly.
+    on how observations are stored.
+
+    Global labels can be changed on the fly.
+
     Observation ``label_pairs`` has priority over global labels:
     if you pass ``label_pairs`` to an observation method with the same key as
     some global label, the method argument value will be used.
@@ -270,8 +288,8 @@ latency statistics.
     Registers a collector for the middleware and sets it as default.
 
     :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
-    :param string name: Collector name. Default is "http_server_request_latency".
-    :param string help: Help description. Default is "HTTP Server Request Latency".
+    :param string      name: Collector name. Default is "http_server_request_latency".
+    :param string      help: Help description. Default is "HTTP Server Request Latency".
 
     If a collector with the same type and name already exists in the registry,
     throws an error.
@@ -281,8 +299,8 @@ latency statistics.
     Registers a collector for the middleware and returns it.
 
     :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
-    :param string name: Collector name. Default is "http_server_request_latency".
-    :param string help: Help description. Default is "HTTP Server Request Latency".
+    :param string      name: Collector name. Default is "http_server_request_latency".
+    :param string      help: Help description. Default is "HTTP Server Request Latency".
 
     If a collector with the same type and name already exists in the registry,
     throws an error.

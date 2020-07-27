@@ -154,21 +154,21 @@ Import the JSON plugin:
 
 .. function:: export()
 
-    :return:
+    :return: the following structure
 
-        .. code-block:: json
-            [
-                {
-                    "name":<name>,
-                    "label_pairs": {
-                        <name>:<value>,
-                        ...
-                    },
-                    "timestamp":<number>,
-                    "value":<value>
-                },
-                ...
-            ]
+             .. code-block:: json
+                 [
+                     {
+                         "name":<name>,
+                         "label_pairs": {
+                             <name>:<value>,
+                             ...
+                         },
+                         "timestamp":<number>,
+                         "value":<value>
+                     },
+                     ...
+                 ]
 
     :rtype: string
 
@@ -239,48 +239,49 @@ We encourage you to use the following methods **only when developing a new plugi
 
 .. module:: metrics
 
-    .. function:: invoke_callbacks()
+.. function:: invoke_callbacks()
 
-        Invokes the function registered via
-        ``metrics.register_callback(<callback>)``.
-        Used in exporters.
+    Invokes the function registered via
+    ``metrics.register_callback(<callback>)``.
+    Used in exporters.
 
-    .. function:: collectors()
+.. function:: collectors()
 
-        Designed to be used in exporters in favor of ``metrics.collect()``.
+    Designed to be used in exporters in favor of ``metrics.collect()``.
 
-        :return: a list of created collectors.
+    :return: a list of created collectors
 
-    .. class:: collector_object
-        .. method:: collect()
+.. class:: collector_object
 
-            .. NOTE::
+    .. method:: collect()
 
-                You'll probably want to use ``metrics.collectors()`` instead.
+        .. NOTE::
 
-            Equivalent to:
+            You'll probably want to use ``metrics.collectors()`` instead.
+
+        Equivalent to:
+
+        .. code-block:: lua
+
+            for _, c in pairs(metrics.collectors()) do
+                for _, obs in ipairs(c:collect()) do
+                    ...  -- handle observation
+                end
+            end
+
+        :return: Concatenation of ``observation`` objects across all
+                 created collectors.
 
             .. code-block:: lua
 
-                for _, c in pairs(metrics.collectors()) do
-                    for _, obs in ipairs(c:collect()) do
-                        ...  -- handle observation
-                    end
-                end
+                {
+                    label_pairs: table,         -- `label_pairs` key-value table
+                    timestamp: ctype<uint64_t>, -- current system time (in microseconds)
+                    value: number,              -- current value
+                    metric_name: string,        -- collector
+                }
 
-            :return: Concatenation of ``observation`` objects across all
-                     created collectors.
-
-                .. code-block:: lua
-
-                    {
-                        label_pairs: table,         -- `label_pairs` key-value table
-                        timestamp: ctype<uint64_t>, -- current system time (in microseconds)
-                        value: number,              -- current value
-                        metric_name: string,        -- collector
-                    }
-
-            :rtype: table
+        :rtype: table
 
 .. _writing-custom-plugins:
 
