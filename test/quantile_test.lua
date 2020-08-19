@@ -10,7 +10,7 @@ local function getPerc(x, p)
 end
 
 local x = {}
-for i = 1,10^6 do
+for _ = 1,10^6 do
     local m = math.random()
     table.insert(x, m)
     quantile.Insert(q, m)

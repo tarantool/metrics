@@ -12,6 +12,8 @@ rpm:
 	else \
 		tarantoolctl rocks install cartridge $(CARTRIDGE_VERSION); \
 	fi
+	gcc -c -o metrics/quantile.o metrics/quantile.c
+	gcc -shared -o metrics/libquantile.so metrics/quantile.o
 
 .PHONY: lint
 lint: .rocks
