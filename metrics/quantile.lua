@@ -21,6 +21,8 @@ local function make_sample(value, width, delta)
 	return sample(delta or 0, width or 0, value)
 end
 
+local inf_obj = make_sample(math.huge)
+
 local function insert_sample(sample, value, width, delta)
 	sample.Value = value
 	sample.Width = width
@@ -50,12 +52,15 @@ function stream:flush()
 	self:maybeSort()
 	self:merge(self.b, self.b_len)
 	self.b_len = 0
+	-- for i = 0, self.__max_samples - 1 do
+	-- 	self.b[i] = math.huge
+	-- end
 end
 
 function stream:maybeSort()
-	if not self.sorted then
+	if not self.sorted and self.b_len> 1 then
 		self.sorted = true
-		sort_samples(self.b, self.__max_samples)
+		sort_samples(self.b, self.b_len)
     end
 end
 
@@ -70,11 +75,32 @@ local function sample_copy(dst, src)
 end
 
 local ins_cnt = 0
-local function sample_insert(arr, value, width, delta, len, pos)
+function stream:sample_insert(value, width, delta, pos)
+	local arr = self.stream.l
+	local len = self.stream.l_len
+	local cap = self.stream.l_cap
 	local do_shift = true
 	if not pos then
 		pos = len + 1
 		do_shift = false
+	end
+	if len == cap then
+		cap = math.modf(cap * 1.5)
+		local new_arr = ffi.new('sample[?]',  cap + 2)
+
+		for i = 0, pos - 1 do
+			sample_copy(new_arr[i], arr[i])
+		end
+		insert_sample(new_arr[pos], value, width, delta )
+		for i = pos + 1, len do
+			sample_copy(new_arr[i], arr[i-1])
+		end
+		for i = len + 1, cap + 1 do
+			new_arr[i] = inf_obj
+		end
+		self.stream.l_cap = cap
+		self.stream.l = new_arr
+		return
 	end
 	if do_shift  then
 		for i = len + 1, pos + 1, -1 do
@@ -104,7 +130,7 @@ function stream:merge(samples, len)
 		for j = i, s.l_len do
             local c = s.l[j]
 			if c.Value > sample then
-                sample_insert(s.l, sample, 1, s.f(s, r) - 1, s.l_len, j)
+                self:sample_insert(sample, 1, s.f(s, r) - 1, j)
 				s.l_len = s.l_len + 1
 
 				i = j + 1
@@ -112,7 +138,7 @@ function stream:merge(samples, len)
             end
 			r = r + c.Width
 		end
-		sample_insert(s.l, sample, 1, 0, s.l_len)
+		self:sample_insert(sample, 1, 0)
 		s.l_len = s.l_len + 1
 		i = i + 1
 	::inserted::
@@ -170,6 +196,7 @@ function stream:compress()
         end
 		r = r - c.Width
 	end
+	self.compress_cnt = 0
 end
 
 function quantile.NewTargeted(quantiles, max_samples)
@@ -198,13 +225,14 @@ function quantile.NewTargeted(quantiles, max_samples)
 		return math.max(m, 1)
 	end
 	local s = stream.new(f, max_samples)
-	local inf_obj = make_sample(math.huge)
-	local minf_obj = make_sample(-math.huge)
 	s.b = ffi.new('double[?]', s.__max_samples)
 
 	for i = 0, s.__max_samples - 1 do
         s.b[i] = math.huge
 	end
+
+	local minf_obj = make_sample(-math.huge)
+
 	s.stream.l = ffi.new('sample[?]', s.__max_samples * 2 + 2)
 	s.stream.l[0] = minf_obj
 	for i = 1, s.__max_samples * 2 + 1 do
@@ -212,6 +240,8 @@ function quantile.NewTargeted(quantiles, max_samples)
 	end
 	s.b_len = 0
 	s.stream.l_len = 0
+	s.stream.l_cap = s.__max_samples * 2
+	s.compress_cnt = 0
 	return s
 end
 
@@ -219,8 +249,10 @@ end
 function quantile.Insert(stream, v)
 	stream.b[stream.b_len] = v
 	stream.b_len = stream.b_len + 1
+	stream.compress_cnt = stream.compress_cnt + 1
 	stream.sorted = false
-	if stream.b_len == stream.__max_samples then
+	if stream.b_len == stream.__max_samples or
+		stream.compress_cnt == stream.__max_samples then
 		stream:flush()
 		stream:compress()
     end
@@ -234,10 +266,7 @@ function quantile.Query(stream, q)
 		-- Fast path when there hasn't been enough data for a flush;
 		-- this also yields better accuracy for small sets of data.
 		local l = stream.b_len
-		if l == 0 then
-			return 0
-        end
-		local i = math.modf(l * q + 1)
+		local i = math.modf(l * q)
 		stream:maybeSort()
 		return stream.b[i]
 	end
