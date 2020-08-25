@@ -7,6 +7,7 @@ local Registry = require('metrics.registry')
 local Counter = require('metrics.collectors.counter')
 local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
+local Summary = require('metrics.collectors.summary')
 
 local registry = Registry.new()
 
@@ -51,6 +52,15 @@ local function histogram(name, help, buckets)
     return registry:find_or_create(Histogram, name, help, buckets)
 end
 
+local function summary(name, help, objectives)
+    checks('string', '?string', '?table')
+    if objectives ~= nil and not Summary.check_quantiles(objectives) then
+        error('Invalid value for objectives')
+    end
+
+    return registry:find_or_create(Summary, name, help, objectives)
+end
+
 local function set_global_labels(label_pairs)
     checks('?table')
 
@@ -72,6 +82,7 @@ return {
     counter = counter,
     gauge = gauge,
     histogram = histogram,
+    summary = summary,
 
     INF = math.huge,
     NAN = math.huge * 0,

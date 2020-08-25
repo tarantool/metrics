@@ -20,8 +20,8 @@ table.sort(x)
 
 local function assert_quantile(quan)
     local w = getPerc(x, quan)
-    local g = quantile.Query(q, quan)
-    t.assert(math.abs(w-g)/w < 0.05)
+    local d = quantile.Query(q, quan)
+    t.assert(math.abs(w-d)/w < 0.05)
 end
 
 g.test_query_05 = function()

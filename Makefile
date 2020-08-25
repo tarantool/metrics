@@ -14,6 +14,7 @@ rpm:
 	fi
 	gcc -c -o metrics/quantile.o metrics/quantile.c
 	gcc -shared -o metrics/libquantile.so metrics/quantile.o
+	rm metrics/quantile.o
 
 .PHONY: lint
 lint: .rocks
@@ -34,3 +35,4 @@ test_with_coverage_report: .rocks
 .PHONY: clean
 clean:
 	rm -rf .rocks
+	rm metrics/quantile.so

@@ -28,11 +28,14 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/init.lua
      %{luapkgdir}/metrics/http_middleware.lua
      %{luapkgdir}/metrics/registry.lua
+     %{luapkgdir}/metrics/quantile.lua
+     %{luapkgdir}/metrics/quantile.c
 %dir %{luapkgdir}/metrics/collectors
      %{luapkgdir}/metrics/collectors/counter.lua
      %{luapkgdir}/metrics/collectors/average.lua
      %{luapkgdir}/metrics/collectors/gauge.lua
      %{luapkgdir}/metrics/collectors/histogram.lua
+     %{luapkgdir}/metrics/collectors/summary.lua
      %{luapkgdir}/metrics/collectors/shared.lua
 %dir %{luapkgdir}/metrics/plugins
 %dir %{luapkgdir}/metrics/plugins/prometheus

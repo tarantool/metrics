@@ -1,6 +1,5 @@
 local Shared = require('metrics.collectors.shared')
 local Counter = require('metrics.collectors.counter')
-local Gauge = require('metrics.collectors.gauge')
 local Quantile = require('metrics.quantile')
 
 local fiber = require('fiber')
@@ -17,13 +16,19 @@ function Summary:new(name, help, objectives)
     return obj
 end
 
+function Summary.check_quantiles(objectives)
+    for k, v in pairs(objectives) do
+        if type(k) ~= 'number' then return false end
+        if k >= 1 or k < 0 then return false end
+        if type(v) ~= 'number' then return false end
+    end
+    return true
+end
+
 function Summary:set_registry(registry)
     Shared.set_registry(self, registry)
     self.count_collector:set_registry(registry)
     self.sum_collector:set_registry(registry)
-    if self.objectives then
-        self.quantile_collector:set_registry(registry)
-    end
 end
 
 function Summary:observe(num, label_pairs)

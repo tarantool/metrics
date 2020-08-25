@@ -9,7 +9,7 @@ ffi.cdef[[
 ]]
 local y = ffi.load('metrics/libquantile.so')
 
-local sample = ffi.metatype('sample', {})
+local sample_constructor = ffi.metatype('sample', {})
 
 local DOUBLE_SIZE = ffi.sizeof('double')
 
@@ -18,15 +18,15 @@ local function sort_samples(samples, len)
 end
 
 local function make_sample(value, width, delta)
-	return sample(delta or 0, width or 0, value)
+	return sample_constructor(delta or 0, width or 0, value)
 end
 
 local inf_obj = make_sample(math.huge)
 
-local function insert_sample(sample, value, width, delta)
-	sample.Value = value
-	sample.Width = width
-	sample.Delta = delta
+local function insert_sample(sample_obj, value, width, delta)
+	sample_obj.Value = value
+	sample_obj.Width = width
+	sample_obj.Delta = delta
 end
 
 local stream = {}
@@ -74,7 +74,6 @@ local function sample_copy(dst, src)
 	dst.Delta = src.Delta or 0
 end
 
-local ins_cnt = 0
 function stream:sample_insert(value, width, delta, pos)
 	local arr = self.stream.l
 	local len = self.stream.l_len
@@ -207,7 +206,7 @@ function quantile.NewTargeted(quantiles, max_samples)
 		table.insert(epss, eps)
 	end
 	local len = #qs
-	local function f(s, r)
+	local function fun(s, r)
         local m = math.huge
         local f
 		for i = 1, len do
@@ -224,7 +223,7 @@ function quantile.NewTargeted(quantiles, max_samples)
 		end
 		return math.max(m, 1)
 	end
-	local s = stream.new(f, max_samples)
+	local s = stream.new(fun, max_samples)
 	s.b = ffi.new('double[?]', s.__max_samples)
 
 	for i = 0, s.__max_samples - 1 do
@@ -246,40 +245,40 @@ function quantile.NewTargeted(quantiles, max_samples)
 end
 
 -- Insert inserts v into the stream.
-function quantile.Insert(stream, v)
-	stream.b[stream.b_len] = v
-	stream.b_len = stream.b_len + 1
-	stream.compress_cnt = stream.compress_cnt + 1
-	stream.sorted = false
-	if stream.b_len == stream.__max_samples or
-		stream.compress_cnt == stream.__max_samples then
-		stream:flush()
-		stream:compress()
+function quantile.Insert(stream_obj, v)
+	stream_obj.b[stream_obj.b_len] = v
+	stream_obj.b_len = stream_obj.b_len + 1
+	stream_obj.compress_cnt = stream_obj.compress_cnt + 1
+	stream_obj.sorted = false
+	if stream_obj.b_len == stream_obj.__max_samples or
+		stream_obj.compress_cnt == stream_obj.__max_samples then
+		stream_obj:flush()
+		stream_obj:compress()
     end
 end
 
 -- Query returns the computed qth percentiles value. If s was created with
 -- NewTargeted, and q is not in the set of quantiles provided a priori, Query
 -- will return an unspecified result.
-function quantile.Query(stream, q)
-	if not stream:flushed() then
+function quantile.Query(stream_obj, q)
+	if not stream_obj:flushed() then
 		-- Fast path when there hasn't been enough data for a flush;
 		-- this also yields better accuracy for small sets of data.
-		local l = stream.b_len
+		local l = stream_obj.b_len
 		local i = math.modf(l * q)
-		stream:maybeSort()
-		return stream.b[i]
+		stream_obj:maybeSort()
+		return stream_obj.b[i]
 	end
-	stream:flush()
-	return stream:query(q)
+	stream_obj:flush()
+	return stream_obj:query(q)
 end
 
 
 -- Reset reinitializes and clears the list reusing the samples buffer memory.
-function quantile.Reset(stream)
-    stream.stream.n = 0
-	stream.b_len = 0
-	stream.stream.l_len = 0
+function quantile.Reset(stream_obj)
+    stream_obj.stream.n = 0
+	stream_obj.b_len = 0
+	stream_obj.stream.l_len = 0
 end
 
 return quantile
