@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.0] - 2020-07-14
 ### Added
+- Summary collector
+
+## [0.4.0] - 2020-07-14
+### Added
 - New default metrics: cpu_total, cpu_thread
 - histogram:observe_latency for measure latency of function call with example
 

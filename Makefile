@@ -35,4 +35,4 @@ test_with_coverage_report: .rocks
 .PHONY: clean
 clean:
 	rm -rf .rocks
-	rm metrics/quantile.so
+	rm metrics/libquantile.so
