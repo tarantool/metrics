@@ -206,27 +206,6 @@ Summary
         counters of ``summary_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
 
-.. _average:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Average
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Can be used only as a collector for HTTP statistics (described below)
-and cannot be built explicitly.
-
-.. class:: histogram_obj
-
-    .. method: collect()
-
-        :return: A list of two observations:
-
-                 *  ``name .. "_avg"`` - An average value of observations for
-                    the observing period (time from the previous collect call till now),
-                 *  ``name .. "_count"`` - The observation count for the same period.
-                     For ``observation`` description, see
-                     :ref:`counter_obj:collect() <counter-collect>`.
-
 .. _labels:
 
 -------------------------------------------------------------------------------
@@ -336,7 +315,7 @@ latency statistics.
 
     Registers a collector for the middleware and sets it as default.
 
-    :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
+    :param string type_name: Collector type: "histogram" or "summary". Default is "histogram".
     :param string      name: Collector name. Default is "http_server_request_latency".
     :param string      help: Help description. Default is "HTTP Server Request Latency".
 
@@ -347,7 +326,7 @@ latency statistics.
 
     Registers a collector for the middleware and returns it.
 
-    :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
+    :param string type_name: Collector type: "histogram" or "summary". Default is "histogram".
     :param string      name: Collector name. Default is "http_server_request_latency".
     :param string      help: Help description. Default is "HTTP Server Request Latency".
 

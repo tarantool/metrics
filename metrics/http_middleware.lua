@@ -1,3 +1,4 @@
+local log = require('log')
 local export = {}
 
 export.DEFAULT_HISTOGRAM_BUCKETS = {
@@ -6,6 +7,12 @@ export.DEFAULT_HISTOGRAM_BUCKETS = {
     0.1,    0.25,   0.5,    0.75,
     1.0,    2.5,    5.0,    7.5,
     10.0,
+}
+
+export.DEFAULT_QUANTILES = {
+    [0.5] = 0.01,
+    [0.9] = 0.01,
+    [0.99] = 0.01,
 }
 
 --- Build default histogram collector
@@ -21,7 +28,11 @@ function export.build_default_collector(type_name, name, help)
     local extra = {}
     if type_name == 'histogram' then
         extra = {export.DEFAULT_HISTOGRAM_BUCKETS}
-    elseif type_name ~= 'average' then
+    elseif type_name == 'summary' then
+        extra = {export.DEFAULT_QUANTILES}
+    elseif type_name == 'average' then
+        log.warn('Average collector is deprecated. Use summary collector instead.')
+    else
         error('Unknown collector type_name: ' .. tostring(type_name))
     end
     local class = require('metrics.collectors.' .. type_name)
