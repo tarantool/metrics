@@ -1,5 +1,6 @@
 local fiber = require('fiber')
 local ffi = require('ffi')
+local fio = require('fio')
 
 local quantile = {}
 ffi.cdef[[
@@ -7,14 +8,28 @@ ffi.cdef[[
 	void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*));
 	int cmpfunc (const void * a, const void * b);
 ]]
-local y = ffi.load('metrics/libquantile.so')
+
+local dylib_search_paths = {
+	'metrics/libquantile.so',
+	'libquantile.so',
+	fio.cwd() .. '/.rocks/lib/tarantool/metrics/libquantile.so',
+}
+
+local ok, dlib
+for _, i in pairs(dylib_search_paths) do
+	ok, dlib = pcall(ffi.load, i)
+	if ok then break end
+end
+if not dlib then
+	error('image libquantile.so not found')
+end
 
 local sample_constructor = ffi.metatype('sample', {})
 
 local DOUBLE_SIZE = ffi.sizeof('double')
 
 local function sort_samples(samples, len)
-	ffi.C.qsort(samples, len, DOUBLE_SIZE, y.cmpfunc)
+	ffi.C.qsort(samples, len, DOUBLE_SIZE, dlib.cmpfunc)
 end
 
 local function make_sample(value, width, delta)
@@ -52,9 +67,6 @@ function stream:flush()
 	self:maybeSort()
 	self:merge(self.b, self.b_len)
 	self.b_len = 0
-	-- for i = 0, self.__max_samples - 1 do
-	-- 	self.b[i] = math.huge
-	-- end
 end
 
 function stream:maybeSort()
