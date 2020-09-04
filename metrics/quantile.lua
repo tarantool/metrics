@@ -1,6 +1,5 @@
 local fiber = require('fiber')
 local ffi = require('ffi')
-local fio = require('fio')
 
 local quantile = {}
 ffi.cdef[[
@@ -9,20 +8,8 @@ ffi.cdef[[
 	int cmpfunc (const void * a, const void * b);
 ]]
 
-local dylib_search_paths = {
-	'metrics/libquantile.so',
-	'libquantile.so',
-	fio.cwd() .. '/.rocks/lib/tarantool/metrics/libquantile.so',
-}
-
-local ok, dlib
-for _, i in pairs(dylib_search_paths) do
-	ok, dlib = pcall(ffi.load, i)
-	if ok then break end
-end
-if not dlib then
-	error('image libquantile.so not found')
-end
+local dlib_path = package.search('libquantile', package.cpath)
+local dlib = ffi.load(dlib_path)
 
 local sample_constructor = ffi.metatype('sample', {})
 
