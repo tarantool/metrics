@@ -6,22 +6,28 @@ Group: Applications/Databases
 License: MIT
 URL: https://github.com/tarantool/metrics
 Source0: https://github.com/tarantool/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
-BuildArch: noarch
+BuildRequires: gcc
 Requires: tarantool >= 1.7.5.0
 Requires: tarantool-checks >= 2.1.0.0
 %description
 Easy collecting, storing and manipulating metrics timeseriess.
 
 %define luapkgdir %{_datadir}/tarantool
+%define lualibdir %{_libdir}/tarantool
 %define br_luapkgdir %{buildroot}%{luapkgdir}
+%define br_lualibdir %{buildroot}%{lualibdir}
 
 %prep
 %setup -q -n %{name}-%{version}
 
 %install
 mkdir -p %{br_luapkgdir}
+mkdir -p %{br_lualibdir}
 cp -rv metrics %{br_luapkgdir}
 cp -rv cartridge %{br_luapkgdir}
+gcc -c -o %{br_luapkgdir}/metrics/quantile.o %{br_luapkgdir}/metrics/quantile.c
+gcc -shared -o %{br_lualibdir}/libquantile.so %{br_luapkgdir}/metrics/quantile.o
+rm %{br_luapkgdir}/metrics/quantile.o
 
 %files
 %dir %{luapkgdir}/metrics
@@ -64,6 +70,7 @@ cp -rv cartridge %{br_luapkgdir}
 %dir %{luapkgdir}/cartridge
 %dir %{luapkgdir}/cartridge/roles
      %{luapkgdir}/cartridge/roles/metrics.lua
+     %{lualibdir}/libquantile.so
 
 %doc README.md
 %doc doc/monitoring/getting_started.rst
