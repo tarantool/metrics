@@ -53,6 +53,17 @@ g.test_build_default_collector_average = function()
     t.assert_equals(collector.help, 'custom_help')
 end
 
+g.test_build_default_collector_summary = function()
+    local collector = http_middleware.build_default_collector('summary')
+    t.assert_equals(collector.kind, 'summary')
+    t.assert_equals(collector.name, 'http_server_request_latency')
+    t.assert_equals(collector.help, 'HTTP Server Request Latency')
+    collector = http_middleware.build_default_collector('summary', 'custom_name', 'custom_help')
+    t.assert_equals(collector.kind, 'summary')
+    t.assert_equals(collector.name, 'custom_name')
+    t.assert_equals(collector.help, 'custom_help')
+end
+
 g.test_build_default_collector_invalid = function()
     t.assert_error_msg_contains('Unknown collector type_name: some_type', function()
         http_middleware.build_default_collector('some_type')

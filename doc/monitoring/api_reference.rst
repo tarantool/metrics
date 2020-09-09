@@ -131,7 +131,7 @@ Histogram
 
         *  ``name .. "_sum"`` - A counter holding the sum of added observations.
            Contains only an empty label set.
-        *  ``name .. "_count"`` - A counter holding number of added observations.
+        *  ``name .. "_count"`` - A counter holding the number of added observations.
            Contains only an empty label set.
         *  ``name .. "_bucket"`` - A counter holding all bucket sizes under the label
            ``le`` (low or equal). So to access a specific bucket ``x`` (``x`` is a number),
@@ -157,26 +157,54 @@ Histogram
         counters of ``histogram_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
 
-.. _average:
+.. _summary:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Average
+Summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Can be used only as a collector for HTTP statistics (described below)
-and cannot be built explicitly.
+.. module:: metrics
 
-.. class:: histogram_obj
+.. function:: summary(name [, help, objectives])
+
+    Registers a new summary. Quantile computation is based on the algorithm `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
+
+    :param string   name: Collector name. Must be unique.
+    :param string   help: Help description.
+    :param table objectives: Quantiles to observe in the form ``{quantile = error, ... }``.
+                          For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``
+
+    :return: Summary object
+
+    :rtype: summary_obj
+
+    .. NOTE::
+
+        The summary is just a set of collectors:
+
+        *  ``name .. "_sum"`` - A counter holding the sum of added observations.
+        *  ``name .. "_count"`` - A counter holding the number of added observations.
+        *  ``name`` - It's holding all quantiles under observation under the label
+           ``quantile`` (low or equal). So to access a specific quantile ``x`` (``x`` is a number),
+           you should specify the value ``x`` for the label ``quantile``.
+
+.. class:: summary_obj
+
+    .. method: observe(num, label_pairs)
+
+        Records a new value in a summary.
+
+        :param number        num: Value to put in the data stream.
+        :param table label_pairs: Table containing label names as keys,
+                                  label values as values (table).
+                                  A new value is observed by all internal counters
+                                  with these labels specified.
 
     .. method: collect()
 
-        :return: A list of two observations:
-
-                 *  ``name .. "_avg"`` - An average value of observations for
-                    the observing period (time from the previous collect call till now),
-                 *  ``name .. "_count"`` - The observation count for the same period.
-                     For ``observation`` description, see
-                     :ref:`counter_obj:collect() <counter-collect>`.
+        Returns a concatenation of ``counter_obj:collect()`` across all internal
+        counters of ``summary_obj``. For ``observation`` description,
+        see :ref:`counter_obj:collect() <counter-collect>`.
 
 .. _labels:
 
@@ -287,7 +315,7 @@ latency statistics.
 
     Registers a collector for the middleware and sets it as default.
 
-    :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
+    :param string type_name: Collector type: "histogram" or "summary". Default is "histogram".
     :param string      name: Collector name. Default is "http_server_request_latency".
     :param string      help: Help description. Default is "HTTP Server Request Latency".
 
@@ -298,7 +326,7 @@ latency statistics.
 
     Registers a collector for the middleware and returns it.
 
-    :param string type_name: Collector type: "histogram" or "average". Default is "histogram".
+    :param string type_name: Collector type: "histogram" or "summary". Default is "histogram".
     :param string      name: Collector name. Default is "http_server_request_latency".
     :param string      help: Help description. Default is "HTTP Server Request Latency".
 

@@ -4,6 +4,7 @@ package.path = package.path .. ";../?.lua"
 local json = require('json')
 local fiber = require('fiber')
 local metrics = require('metrics')
+local log = require('log')
 local http_middleware = metrics.http_middleware
 
 -- Configure HTTP routing
@@ -23,13 +24,13 @@ local handler = function(req)
 end
 router:route(route, handler)
 
--- Configure average latency collector
+-- Configure summary latency collector
 local collector = http_middleware.build_default_collector(
-    'average', 'path_latency',
+    'summary', 'path_latency',
     'My collector for /path requests latency'
 )
 
--- Set router average latency collection middleware
+-- Set router summary latency collection middleware
 router:use(http_middleware.v2(collector), { name = 'latency_instrumentation' })
 
 -- Start HTTP routing using configured router
@@ -41,7 +42,7 @@ local http_client = require("http.client").new() -- HTTP ver. 2.x.x
 http_client:request(route.method, 'http://' .. ip .. ':' .. port .. route.path, json.encode({ body = 'text' }))
 
 -- Collect the metrics
-metrics.collect()
+log.info(metrics.collect())
 --[[
 
 - label_pairs:
@@ -57,8 +58,36 @@ metrics.collect()
     method: POST
     status: 200
   timestamp: 1588951616500768
-  value: 1.0038734949776
-  metric_name: path_latency_avg
+  value: 1.0240110000595
+   metric_name: path_latency_sum
+
+ - label_pairs:
+     path: /path
+     method: POST
+     status: 200
+     quantile: 0.5
+   timestamp: 1588951616500768
+   value: 1.0240110000595
+   metric_name: path_latency
+
+ - label_pairs:
+     path: /path
+     method: POST
+     status: 200
+     quantile: 0.9
+   timestamp: 1588951616500768
+   value: 1.0240110000595
+   metric_name: path_latency
+
+ - label_pairs:
+     path: /path
+     method: POST
+     status: 200
+     quantile: 0.99
+   timestamp: 1588951616500768
+   value: 1.0240110000595
+   metric_name: path_latency
+
 
 --]]
 
