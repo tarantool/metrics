@@ -10,12 +10,13 @@ API reference
 Collectors
 -------------------------------------------------------------------------------
 
-An application using the ``metrics`` module has 3 primitives (called "collectors")
+An application using the ``metrics`` module has 4 primitives (called "collectors")
 at its disposal:
 
-*  Counter
-*  Gauge
-*  Histogram
+*  :ref:`Counter <counter>`
+*  :ref:`Gauge <gauge>`
+*  :ref:`Histogram <histogram>`
+*  :ref:`Summary <summary>`
 
 A collector represents one or more observations that are changing over time.
 
@@ -235,6 +236,12 @@ In the example above, we could derive these time series:
 You can also set global labels by calling
 ``metrics.set_global_labels({ label = value, ...})``.
 
+.. _metrics-functions:
+
+-------------------------------------------------------------------------------
+Metrics functions
+-------------------------------------------------------------------------------
+
 .. module:: metrics
 
 .. function:: enable_default_metrics()
@@ -250,7 +257,7 @@ You can also set global labels by calling
     * ``fiber_memused`` - Fibers memory used
     * ``info_lsn`` - Tarantool log sequence number
     * ``info_uptime`` - Tarantool uptime
-    * ``info_memory_k`` - memory information from ``box.info.memory()``
+    * ``info_memory_*`` - memory information from `box.info.memory() <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_info/#lua-function.box.info.memory>`_
     * ``net_sent_total`` - Totally sent in bytes
     * ``net_received_total`` - Totally received in bytes
     * ``net_sent_rps`` - Sending RPS
@@ -265,8 +272,8 @@ You can also set global labels by calling
     * ``stats_op_rps`` - Total RPS
     * ``replication_replica_i_lsn`` - lsn for replica i
     * ``replication_master_i_lsn`` - lsn for master i
-    * ``runtime_k`` - runtime information from ``box.runtime.info()``
-    * ``slab_k`` - slab information from ``box.slab.info()``
+    * ``runtime_*`` - runtime information from `box.runtime.info() <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_slab/#box-runtime-info>`_
+    * ``slab_*`` - slab information from `box.slab.info() <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_slab/#box-slab-info>`_
     * ``space_index_bsize`` - Index bsize
     * ``space_len`` - Space length (for memtx)
     * ``space_bsize`` - Space bsize (for memtx)
@@ -461,3 +468,19 @@ Using histograms:
     -- somewhere in the HTTP requests middleware:
     local latency = math.random(1, 10)
     http_requests_latency_hist:observe(latency)
+
+Using summaries:
+
+.. code-block:: lua
+
+    local metrics = require('metrics')
+
+    -- create a summary
+    local http_requests_latency = metrics.summary(
+        'http_requests_latency', 'HTTP requests total',
+        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}
+    )
+
+    -- somewhere in the HTTP requests middleware:
+    local latency = math.random(1, 10)
+    http_requests_latency:observe(latency)
