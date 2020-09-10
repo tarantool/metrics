@@ -81,6 +81,21 @@ local latency = math.random(1, 10)
 http_requests_latency_hist:observe(latency)
 ```
 
+Using summaries:
+```lua
+local metrics = require('metrics')
+
+-- create a summary
+local http_requests_latency = metrics.summary(
+    'http_requests_latency', 'HTTP requests total',
+    {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}
+)
+
+-- somewhere in the HTTP requests middleware:
+local latency = math.random(1, 10)
+http_requests_latency:observe(latency)
+```
+
 ## Cartridge role
 
 `cartridge.roles.metrics` is a role for
