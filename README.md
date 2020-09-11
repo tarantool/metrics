@@ -17,6 +17,9 @@ Contents:
 
 ## Installation
 
+Prerequisites:
+- `gcc` (since metrics 0.5.0)
+
 ```bash
 cd ${PROJECT_ROOT}
 tarantoolctl rocks install metrics

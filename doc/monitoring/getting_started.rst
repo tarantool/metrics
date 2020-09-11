@@ -12,6 +12,10 @@ Tarantool
 
 First, you need to install the ``metrics`` package:
 
+.. NOTE::
+
+    ``metrics`` depends on ``gcc`` since 0.5.0
+
 .. code-block:: console
 
     $ cd ${PROJECT_ROOT}
