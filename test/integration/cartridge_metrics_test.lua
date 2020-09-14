@@ -1,20 +1,11 @@
 local fio = require('fio')
 local t = require('luatest')
-local yaml = require('yaml')
 local g = t.group()
 
+local utils = require('test.utils')
 local helpers = require('test.helper')
 
-local function assert_bad_config(config, error)
-    local server = g.cluster.main_server
-    local resp = server:http_request('put', '/admin/config', {
-        body = yaml.encode(config),
-        raise = false
-    })
-    t.assert_str_icontains(resp.json.err, error)
-end
-
-g.before_all = function()
+g.before_each( function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     g.cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
@@ -24,30 +15,29 @@ g.before_all = function()
                 uuid = helpers.uuid('a'),
                 roles = {},
                 servers = {
-                    {instance_uuid = helpers.uuid('a', 1), alias = 'main'},
+                    { instance_uuid = helpers.uuid('a', 1), alias = 'main' },
+                    { instance_uuid = helpers.uuid('b', 1), alias = 'replica' },
                 },
             },
         },
     })
     g.cluster:start()
-end
+end )
 
-g.after_all = function()
+g.after_each( function()
     g.cluster:stop()
     fio.rmtree(g.cluster.datadir)
-end
+end )
 
-g.test_role_enabled = function()
-    local resp = g.cluster.main_server.net_box:eval([[
-        local cartridge = require('cartridge')
-        return cartridge.service_get('metrics') == nil
-    ]])
-    t.assert_equals(resp, false)
-end
+g.test_cartridge_issues_metric = function()
+    -- Issues introduced in Cartridge 2.0.2
+    local cartridge_version = require('cartridge.VERSION')
+    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.0.2 or greater')
+    t.skip_if(utils.is_version_less(cartridge_version, '2.0.2'), 'Cartridge version is must be v2.0.2 or greater')
 
-g.test_role_add_metrics_http_endpoint = function()
-    local server = g.cluster.main_server
-    local resp = server:upload_config({
+    local main_server = g.cluster:server('main')
+    local replica_server = g.cluster:server('replica')
+    main_server:upload_config({
         metrics = {
             export = {
                 {
@@ -57,116 +47,39 @@ g.test_role_add_metrics_http_endpoint = function()
             },
         }
     })
-    t.assert_equals(resp.status, 200)
-    g.cluster.main_server.net_box:eval([[
-        local cartridge = require('cartridge')
-        local metrics = cartridge.service_get('metrics')
-        metrics.counter('test-counter'):inc(1)
+
+    local resp = main_server:http_request('get', '/metrics')
+    local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
+    t.assert_is_not(issues_metric, nil, 'Cartridge issues metric presents in /metrics response')
+
+    t.helpers.retrying({}, function()
+        resp = main_server:http_request('get', '/metrics')
+        issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
+        t.assert_equals(issues_metric.value, 0, 'Issues count is zero cause new-built cluster should be healthy')
+    end)
+
+    -- Stage replication issue "Duplicate key exists in unique index 'primary' in space '_space'"
+    main_server.net_box:eval([[
+        __replication = box.cfg.replication
+        box.cfg{replication = box.NULL}
+    ]])
+    replica_server.net_box:eval([[
+        box.cfg{read_only = false}
+        box.schema.space.create('test')
+    ]])
+    main_server.net_box:eval([[
+        box.schema.space.create('test')
+        pcall(box.cfg, {replication = __replication})
+        __replication = nil
     ]])
 
-    local counter_present = false
-
-    resp = server:http_request('get', '/metrics', {raise = false})
-    t.assert_equals(resp.status, 200)
-    for _, obs in pairs(resp.json) do
-        t.assert_equals(
-            g.cluster.main_server.alias, obs.label_pairs['alias'],
-            ('Alias label is present in metric %s'):format(obs.metric_name)
-        )
-        if obs.metric_name == 'test-counter' then
-            counter_present = true
-            t.assert_equals(obs.value, 1)
-        end
-    end
-    t.assert_equals(counter_present, true)
-
-    resp = server:upload_config({
-        metrics = {
-            export = {
-                {
-                    path = '/new-metrics',
-                    format = 'json'
-                },
-            },
-        }
-    })
-    t.assert_equals(resp.status, 200)
-    resp = server:http_request('get', '/metrics', {raise = false})
-    t.assert_equals(resp.status, 404)
-    resp = server:http_request('get', '/new-metrics', {raise = false})
-    t.assert_equals(resp.status, 200)
-
-    resp = server:upload_config({})
-    t.assert_equals(resp.status, 200)
-    resp = server:http_request('get', '/new-metrics', {raise = false})
-    t.assert_equals(resp.status, 404)
-
-end
-
-g.test_validate_config_invalid_export_section = function()
-    assert_bad_config({
-        metrics = {
-            export = '/metrics',
-        },
-    }, 'bad argument')
-end
-
-g.test_validate_config_invalid_export_format = function()
-    assert_bad_config({
-        metrics = {
-            export = {
-                {
-                    path = '/valid-path',
-                    format = 'invalid-format'
-                },
-            },
-        }
-    }, 'format must be "json" or "prometheus"')
-end
-
-g.test_validate_config_duplicate_paths = function()
-    assert_bad_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-                {
-                    path = '/metrics',
-                    format = 'prometheus'
-                },
-            },
-        }
-    }, 'paths must be unique')
-
-    assert_bad_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-                {
-                    path = 'metrics/',
-                    format = 'prometheus'
-                },
-            },
-        }
-    }, 'paths must be unique')
-
-    assert_bad_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics/',
-                    format = 'json'
-                },
-                {
-                    path = 'metrics',
-                    format = 'prometheus'
-                },
-            },
-        }
-    }, 'paths must be unique')
+    t.helpers.retrying({}, function()
+        resp = main_server:http_request('get', '/metrics')
+        issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
+        t.assert_equals(issues_metric.value, 2, [[
+          Issues count is two cause cluster should has two replication issues:
+          replication from main to replica is stopped and
+          replication from replica to main is stopped.
+        ]])
+    end)
 end

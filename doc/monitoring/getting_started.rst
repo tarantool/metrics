@@ -35,6 +35,12 @@ Enable default Tarantool metrics such as network, memory, operations, etc:
 
     metrics.enable_default_metrics()
 
+If you use Cartridge, enable Cartridge metrics:
+
+.. code-block:: lua
+
+    metrics.enable_cartridge_metrics()
+
 Initialize the Prometheus Exporter, or export metrics in any other format:
 
 .. code-block:: lua

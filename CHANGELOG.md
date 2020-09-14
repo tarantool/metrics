@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Luajit platform metrics
+- `enable_cartridge_metrics` function
+- Cartridge issues gauge
 
 ## [0.5.0] - 2020-09-18
 ### Added

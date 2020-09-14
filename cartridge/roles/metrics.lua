@@ -19,6 +19,7 @@ local function init()
     assert(params, err)
     metrics.set_global_labels({alias = params.alias})
     metrics.enable_default_metrics()
+    metrics.enable_cartridge_metrics()
 end
 
 local function check_config(_)
