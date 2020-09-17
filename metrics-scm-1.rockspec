@@ -50,7 +50,6 @@ build = {
         ['metrics.psutils.psutils_linux']                = 'metrics/psutils/psutils_linux.lua',
         ['metrics.utils']                                = 'metrics/utils.lua',
         ['cartridge.roles.metrics']                      = 'cartridge/roles/metrics.lua',
-        ['libquantile']                                  = 'metrics/quantile.c',
     }
 }
 

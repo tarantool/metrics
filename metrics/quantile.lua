@@ -2,22 +2,34 @@ local fiber = require('fiber')
 local ffi = require('ffi')
 
 local quantile = {}
+
 ffi.cdef[[
 	typedef struct {int Delta, Width; double Value; } sample;
-	void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*));
-	int cmpfunc (const void * a, const void * b);
 ]]
-
-local dlib_path = package.search('libquantile', package.cpath)
-local dlib = ffi.load(dlib_path)
 
 local sample_constructor = ffi.metatype('sample', {})
 
-local DOUBLE_SIZE = ffi.sizeof('double')
-
-local function sort_samples(samples, len)
-	ffi.C.qsort(samples, len, DOUBLE_SIZE, dlib.cmpfunc)
+local function quicksort(array, low, high)
+	assert(low >= 0, 'Low bound must be non-negative')
+	if high - low < 1 then
+		return array
+	end
+	local pivot = low
+	for i = low + 1, high do
+		if array[i] <= array[pivot] then
+			if i == pivot + 1 then
+				array[pivot], array[pivot + 1] = array[pivot + 1], array[pivot]
+			else
+				array[pivot], array[pivot + 1], array[i] = array[i], array[pivot], array[pivot + 1]
+			end
+			pivot = pivot + 1
+	  end
+	end
+	array = quicksort(array, low, pivot - 1)
+	return quicksort(array, pivot + 1, high)
 end
+
+quantile.quicksort = quicksort
 
 local function make_sample(value, width, delta)
 	return sample_constructor(delta or 0, width or 0, value)
@@ -36,8 +48,9 @@ local stream = {}
 -- Stream computes quantiles for a stream of float64s.
 function stream.new(f, max_samples)
     if not max_samples then
-        max_samples = 200
-    end
+        max_samples = 500
+	end
+	assert(max_samples > 0, 'max_samples must be positive')
 	return setmetatable({
         stream = {
 			f = f,
@@ -51,15 +64,15 @@ function stream.new(f, max_samples)
 end
 
 function stream:flush()
-	self:maybeSort()
+	self:maybe_sort()
 	self:merge(self.b, self.b_len)
 	self.b_len = 0
 end
 
-function stream:maybeSort()
-	if not self.sorted and self.b_len> 1 then
+function stream:maybe_sort()
+	if not self.sorted and self.b_len > 1 then
 		self.sorted = true
-		sort_samples(self.b, self.b_len)
+		quicksort(self.b, 0, self.b_len - 1)
     end
 end
 
@@ -201,6 +214,7 @@ function quantile.NewTargeted(quantiles, max_samples)
 	local qs={}
 	local epss = {}
 	for q, eps in pairs(quantiles) do
+		assert(q >= 0 and q <= 1, 'Quantile must be in [0; 1]')
 		table.insert(qs, q)
 		table.insert(epss, eps)
 	end
@@ -265,7 +279,7 @@ function quantile.Query(stream_obj, q)
 		-- this also yields better accuracy for small sets of data.
 		local l = stream_obj.b_len
 		local i = math.modf(l * q)
-		stream_obj:maybeSort()
+		stream_obj:maybe_sort()
 		return stream_obj.b[i]
 	end
 	stream_obj:flush()
