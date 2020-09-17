@@ -35,10 +35,10 @@ g.test_collect = function()
     })
 end
 
-g.test_collect_1mln = function()
+g.test_collect_10k = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
     local sum = 0
-    for i = 1, 10^6 do
+    for i = 1, 10^4 do
         instance:observe(i)
         sum = sum + i
     end
@@ -46,7 +46,7 @@ g.test_collect_1mln = function()
     t.assert_items_equals(res[1], {
         label_pairs = {},
         metric_name = "latency_count",
-        value = 10^6,
+        value = 10^4,
     })
     t.assert_items_equals(res[2], {
         label_pairs = {},
