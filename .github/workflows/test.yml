@@ -45,3 +45,22 @@ jobs:
           git clone https://github.com/packpack/packpack.git packpack
           OS=el DIST=7 packpack/packpack
           ls -l build/
+
+  promtool:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install Taranool
+        run: |
+          curl -L https://tarantool.io/aYJZbH/release/2.3/installer.sh | bash
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.13'
+
+      - name: promtool test
+        run: |
+          go get github.com/prometheus/prometheus/cmd/promtool
+          make test_promtool

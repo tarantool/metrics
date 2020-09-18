@@ -29,6 +29,11 @@ test_with_coverage_report: .rocks
 	echo
 	grep -A999 '^Summary' tmp/luacov.report.out
 
+.PHONY: test_promtool
+test_promtool: .rocks
+	tarantool test/promtool_test.lua
+	cat prometheus-input | promtool check metrics
+
 .PHONY: clean
 clean:
 	rm -rf .rocks
