@@ -45,12 +45,12 @@ Hopefully, plugins for other TSDBs will be supported soon.
 
 ## Metric types
 
-Four types of metrics are offered: Counter, Gauge, Summary and Histogram. 
+There are four basic metric collectors available: Counter, Gauge, Summary and Histogram.
 The exact semantics of each metric follows the [prometheus metric types](https://prometheus.io/docs/concepts/metric_types/).
 
 ### Counter
 
-Counter is a cummulative metric whose value could only be incremented or reset to zero on restart. 
+Counter is a cummulative metric which value can only be incremented or reset to zero on restart.
 Counters are useful for accumulating number of events e.g. requests processed, orders in eshop. 
 Counter is exposed as a single numerical value.
 
@@ -66,8 +66,8 @@ http_requests_total_counter:inc(1, {method = 'GET'})
 
 ### Gauge
 
-Gauge is a metric that represents a single numerical value that could change arbitrarily.
-Gauges are useful for capturing the snapshot of current state, e.g. CPU utilization, number of open connections.
+Gauge is a metric that represents a single numerical value that can be changed arbitrarily.
+Gauges are useful for capturing a snapshot of the current state, e.g. CPU utilization, number of open connections.
 Gauge is exposed as a single numerical value.
 
 ```lua
@@ -86,12 +86,12 @@ end)
 
 ### Histogram
 
-Histogram samples observations and counts them into configurable buckets.
+Histogram counts observed values into configurable buckets.
 Histograms are useful for tracking request latencies, processing time.
 Histogram is exposed as multiple numerical values: 
 - the total count of observed events
 - the total sum of observed values
-- per bucket counters of observed events
+- counters of observed events per bucket
 
 ```lua
 local metrics = require('metrics')
@@ -107,12 +107,12 @@ http_requests_latency_hist:observe(latency)
 
 ### Summary
 
-Summary samples observations and aggregates them into configurable quantiles.
+Summary aggregates observed values into configurable quantiles.
 Summaries are useful as a service level indicator (e.g. SLAs, SLOs).
 Summary exposed as multiple numerical values:
 - the total count of observed events
 - the total sum of observed values
-- per quantile number of observed events 
+- number of observed event per quantile
 
 ```lua
 local metrics = require('metrics')
