@@ -1,15 +1,24 @@
 [![Build Status](https://travis-ci.com/tarantool/metrics.svg?branch=master)](https://travis-ci.com/tarantool/metrics)
+
 # Metrics
 
-Metrics is a tool to collect and manipulate metrics time series.
-Metrics uses a collection of primitives borrowed from the Prometheus TSDB,
-which can be exported to any TSDB.
+Metrics is a library to collect and expose [Tarantool](https://tarantool.io)-based applications metrics.
 
-Contents:
+Library includes:
+- four base metric collectors: Counter, Gauge, Histogram, Summary
+- ready to use Tarantool stats collectors built on top of base collectors
+- exporters to expose collected metrics in Prometheus, Graphite and generic JSON format
+- module to integrate into Tarantool Cartridge based applications
+
+## Table of contents
 
 * [Installation](#installation)
 * [Plugins export](#plugins-export)
-* [Examples](#examples)
+* [Metric types](#metric-types)
+  * [Counter](#counter)
+  * [Gauge](#gauge)
+  * [Histogram](#histogram)
+  * [Summary](#summary)
 * [Next steps](#next-steps)
 * [Cartridge role](#cartridge-role)
 * [Contribution](#contribution)
@@ -34,15 +43,17 @@ export plugins:
 or you can write your [custom plugin](https://www.tarantool.io/en/doc/latest/book/monitoring/plugins/#writing-custom-plugins) and use it.
 Hopefully, plugins for other TSDBs will be supported soon.
 
-## Examples
+## Metric types
 
-Below are examples of using metrics primitives.
+There are four basic metric collectors available: Counter, Gauge, Summary and Histogram.
+The exact semantics of each metric follows the [prometheus metric types](https://prometheus.io/docs/concepts/metric_types/).
 
-Note that this usage is independent of export-plugins such as
-Prometheus / Graphite / etc.
-For documentation on plugins usage, see [this](https://www.tarantool.io/en/doc/latest/book/monitoring/plugins).
+### Counter
 
-Using counters:
+Counter is a cummulative metric which value can only be incremented or reset to zero on restart.
+Counters are useful for accumulating number of events, e.g. requests processed, orders in e-shop. 
+Counter is exposed as a single numerical value.
+
 ```lua
 local metrics = require('metrics')
 
@@ -53,7 +64,12 @@ local http_requests_total_counter = metrics.counter('http_requests_total')
 http_requests_total_counter:inc(1, {method = 'GET'})
 ```
 
-Using gauges:
+### Gauge
+
+Gauge is a metric that represents a single numerical value that can be changed arbitrarily.
+Gauges are useful for capturing a snapshot of the current state, e.g. CPU utilization, number of open connections.
+Gauge is exposed as a single numerical value.
+
 ```lua
 local metrics = require('metrics')
 
@@ -68,7 +84,15 @@ metrics.register_callback(function()
 end)
 ```
 
-Using histograms:
+### Histogram
+
+Histogram counts observed values into configurable buckets.
+Histograms are useful for tracking request latencies, processing time.
+Histogram is exposed as multiple numerical values: 
+- the total count of observed events
+- the total sum of observed values
+- counters of observed events per bucket
+
 ```lua
 local metrics = require('metrics')
 
@@ -81,7 +105,15 @@ local latency = math.random(1, 10)
 http_requests_latency_hist:observe(latency)
 ```
 
-Using summaries:
+### Summary
+
+Summary aggregates observed values into configurable quantiles.
+Summaries are useful as a service level indicator (e.g. SLAs, SLOs).
+Summary is exposed as multiple numerical values:
+- the total count of observed events
+- the total sum of observed values
+- number of observed events per quantile
+
 ```lua
 local metrics = require('metrics')
 
