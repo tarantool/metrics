@@ -51,7 +51,7 @@ The exact semantics of each metric follows the [prometheus metric types](https:/
 ### Counter
 
 Counter is a cummulative metric which value can only be incremented or reset to zero on restart.
-Counters are useful for accumulating number of events e.g. requests processed, orders in eshop. 
+Counters are useful for accumulating number of events, e.g. requests processed, orders in e-shop. 
 Counter is exposed as a single numerical value.
 
 ```lua
@@ -109,10 +109,10 @@ http_requests_latency_hist:observe(latency)
 
 Summary aggregates observed values into configurable quantiles.
 Summaries are useful as a service level indicator (e.g. SLAs, SLOs).
-Summary exposed as multiple numerical values:
+Summary is exposed as multiple numerical values:
 - the total count of observed events
 - the total sum of observed values
-- number of observed event per quantile
+- number of observed events per quantile
 
 ```lua
 local metrics = require('metrics')
