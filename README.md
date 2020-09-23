@@ -13,7 +13,7 @@ Library includes:
 ## Table of contents
 
 * [Installation](#installation)
-* [Exporters](#plugins-export)
+* [Plugins export](#plugins-export)
 * [Metric types](#metric-types)
   * [Counter](#counter)
   * [Gauge](#gauge)
