@@ -246,40 +246,7 @@ Metrics functions
 
 .. function:: enable_default_metrics()
 
-    Enables default metrics collections.
-    Collects Tarantool metrics ported from https://github.com/tarantool/stat
-
-    Default metrics are:
-
-    * ``fiber_count`` - Amount of fibers
-    * ``fiber_csw`` - Fibers context switches count
-    * ``fiber_memalloc`` - Fibers memory allocated
-    * ``fiber_memused`` - Fibers memory used
-    * ``info_lsn`` - Tarantool log sequence number
-    * ``info_uptime`` - Tarantool uptime
-    * ``info_memory_*`` - memory information from `box.info.memory() <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_info/#lua-function.box.info.memory>`_
-    * ``net_sent_total`` - Totally sent in bytes
-    * ``net_received_total`` - Totally received in bytes
-    * ``net_sent_rps`` - Sending RPS
-    * ``net_received_rps`` - Receive RPS
-    * ``net_connections_rps`` - Connection RPS (for Tarantool 2.2.0 and higher)
-    * ``net_connections_total`` - Connections total amount (for Tarantool 2.2.0 and higher)
-    * ``net_connections_current`` - Current connections amount
-    * ``net_requests_rps`` - Requests RPS
-    * ``net_requests_total`` - Requests total amount
-    * ``net_requests_current`` - Pending requests
-    * ``stats_op_total`` - Total amount of operations
-    * ``stats_op_rps`` - Total RPS
-    * ``replication_replica_i_lsn`` - lsn for replica i
-    * ``replication_master_i_lsn`` - lsn for master i
-    * ``runtime_*`` - runtime information from `box.runtime.info() <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_slab/#box-runtime-info>`_
-    * ``slab_*`` - slab information from `box.slab.info() <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_slab/#box-slab-info>`_
-    * ``space_index_bsize`` - Index bsize
-    * ``space_len`` - Space length (for memtx)
-    * ``space_bsize`` - Space bsize (for memtx)
-    * ``space_total_bsize`` - Space total bsize (for memtx)
-    * ``space_count`` - Space count (for vinyl)
-    * ``cfg_current_time`` - Tarantool cfg time
+    Enables Tarantool metrics collections.
 
 .. function:: enable_cartridge_metrics()
 
@@ -402,7 +369,7 @@ CPU usage metrics
 
 **Collected metrics example**
 
-.. code-block:: console
+.. code-block:: none
 
     # HELP tnt_cpu_total Host CPU time
     # TYPE tnt_cpu_total gauge

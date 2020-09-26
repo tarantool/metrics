@@ -15,5 +15,6 @@ This chapter includes the following sections:
    :numbered: 0
 
    getting_started
+   metrics_reference
    api_reference
    plugins
