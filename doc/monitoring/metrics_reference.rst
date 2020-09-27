@@ -10,45 +10,17 @@ This page provides detailed description of each Tarantool metrics.
 Network general
 -------------------------------------------------------------------------------
 
-# HELP tnt_net_sent_total Totally sent in bytes (incremental counter from server start)
-# TYPE tnt_net_sent_total gauge
-tnt_net_sent_total 182862
+Network activity stats.
 
-# HELP tnt_net_sent_rps Sending RPS (last 5 seconds)
-# TYPE tnt_net_sent_rps gauge
-tnt_net_sent_rps 640
+``tnt_net_sent_total`` - bytes sent from this instance over network since instance start
 
-# HELP tnt_net_received_total Totally received in bytes (counter from server start)
-# TYPE tnt_net_received_total gauge
-tnt_net_received_total 4613
+``tnt_net_received_total`` - bytes this instance received since instance start
 
-# HELP tnt_net_received_rps Receive RPS
-# TYPE tnt_net_received_rps gauge
-tnt_net_received_rps 21
+``tnt_net_connections_total`` - number of incoming network connections since instance start
 
-# HELP tnt_net_connections_rps Connection RPS
-# TYPE tnt_net_connections_rps gauge
-tnt_net_connections_rps 0
+``tnt_net_connections_current`` - number of active network connections
 
-# HELP tnt_net_connections_total Connections total amount
-# TYPE tnt_net_connections_total gauge
-tnt_net_connections_total 4
-
-# HELP tnt_net_connections_current Current connections amount
-# TYPE tnt_net_connections_current gauge
-tnt_net_connections_current 3
-
-# HELP tnt_net_requests_rps Requests RPS (last 5 seconds)
-# TYPE tnt_net_requests_rps gauge
-tnt_net_requests_rps 0
-
-# HELP tnt_net_requests_total Requests total amount
-# TYPE tnt_net_requests_total gauge
-tnt_net_requests_total 201
-
-# HELP tnt_net_requests_current Pending requests
-# TYPE tnt_net_requests_current gauge
-tnt_net_requests_current 0
+``tnt_net_requests_total`` - nubmer of network requests this instance have handled since instance start
 
 -------------------------------------------------------------------------------
 Operations
@@ -82,7 +54,7 @@ Request type could be one of:
 - ``execute`` - execute SQL calls
 - ``select`` - select calls
 - ``upsert`` - upsert calls
-- ``prepare`` - SQL prepare calls 
+- ``prepare`` - SQL prepare calls
 - ``insert`` - insert calls
 
 -------------------------------------------------------------------------------
