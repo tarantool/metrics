@@ -53,27 +53,37 @@ tnt_net_requests_current 0
 -------------------------------------------------------------------------------
 Operations
 -------------------------------------------------------------------------------
-# HELP tnt_stats_op_total Total amount of operations
-# TYPE tnt_stats_op_total gauge
-tnt_stats_op_total{operation="call"} 0
 
-# HELP tnt_stats_op_rps Total RPS
-# TYPE tnt_stats_op_rps gauge
-tnt_stats_op_rps{operation="call"} 0
+Number of iproto requests this instance have processed, aggregated by request type. 
+E.g. requests made from Java client.
 
-Operations:
-delete
-error
-update
-call
-auth
-eval
-replace
-execute
-select
-upsert
-prepare
-insert
+Two types of metrics provided for each request type:
+
+* ``tnt_stats_op_total`` - total number of calls since server start
+* ``tnt_stats_op_rps`` - number of calls for the last 5 seconds
+
+Each metric have ``operation`` label to be able to distinguish different request types, e.g.:
+
+.. code-block:: none
+
+    tnt_stat_op_total{operation="select"} 10
+
+which means that there were 10 ``select`` calls since server start.
+
+Request type could be one of:
+
+- ``delete`` - delete calls
+- ``error`` - requests resulted in an error
+- ``update`` - update calls
+- ``call`` - requests to execute stored procedures
+- ``auth`` - authentication requests
+- ``eval`` - calls to evaluate lua code
+- ``replace`` - replace call
+- ``execute`` - execute SQL calls
+- ``select`` - select calls
+- ``upsert`` - upsert calls
+- ``prepare`` - SQL prepare calls 
+- ``insert`` - insert calls
 
 -------------------------------------------------------------------------------
 Replication
