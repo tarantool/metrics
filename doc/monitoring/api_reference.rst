@@ -394,7 +394,7 @@ CPU usage metrics
 
 **Collected metrics example**
 
-.. code-block::
+.. code-block:: console
 
     # HELP tnt_cpu_total Host CPU time
     # TYPE tnt_cpu_total gauge
