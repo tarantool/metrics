@@ -157,6 +157,7 @@ Import the JSON plugin:
     :return: the following structure
 
              .. code-block:: json
+
                  [
                      {
                          "name":<name>,
