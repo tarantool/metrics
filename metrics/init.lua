@@ -93,7 +93,8 @@ return {
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
     enable_default_metrics = function()
-        return require('metrics.default_metrics.tarantool').enable()
+        require('metrics.tarantool.luajit').enable()
+        require('metrics.default_metrics.tarantool').enable()
     end,
     http_middleware = require('metrics.http_middleware'),
     collect = collect,
