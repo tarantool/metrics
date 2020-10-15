@@ -118,16 +118,19 @@ via configuration.
          - path: '/path_for_prometheus_metrics'
            format: 'prometheus'
 
-You can add several entry points of the same format by different paths,
-like this:
+   The metrics will be available on the path specified in ``path`` in the format
+   specified in ``format``.
 
-.. code-block:: yaml
+   You can add several entry points of the same format by different paths,
+   like this:
 
-    metrics:
-      export:
-        - path: '/path_for_json_metrics'
-          format: 'json'
-        - path: '/another_path_for_json_metrics'
-          format: 'json'
+   .. code-block:: yaml
+
+       metrics:
+         export:
+           - path: '/path_for_json_metrics'
+             format: 'json'
+           - path: '/another_path_for_json_metrics'
+             format: 'json'
 
 .. _grafana-dashboard:
