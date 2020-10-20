@@ -61,6 +61,8 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/psutils/cpu.lua
      %{luapkgdir}/metrics/psutils/psutils_linux.lua
      %{luapkgdir}/metrics/utils.lua
+%dir %{luapkgdir}/metrics/tarantool
+     %{luapkgdir}/metrics/tarantool/luajit.lua
 %dir %{luapkgdir}/cartridge
 %dir %{luapkgdir}/cartridge/roles
      %{luapkgdir}/cartridge/roles/metrics.lua
