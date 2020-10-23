@@ -118,6 +118,25 @@ via configuration.
          - path: '/path_for_prometheus_metrics'
            format: 'prometheus'
 
+   **OR**
+
+   Use ``set_export``:
+
+   **NOTE** that ``set_export`` has lower priority than clusterwide config and won't work if metrics config is present.
+
+   .. code-block:: lua
+
+       metrics.set_export({
+           {
+               path = '/path_for_json_metrics',
+               format = 'json'
+           },
+           {
+               path = '/path_for_prometheus_metrics',
+               format = 'prometheus'
+           }
+       })
+
    The metrics will be available on the path specified in ``path`` in the format
    specified in ``format``.
 

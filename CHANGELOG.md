@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - metrics.clear() disables default metrics
 - cartridge role is permanent
+- cartridge role configuration without clusterwide config
 
 ### Added
 - Luajit platform metrics
