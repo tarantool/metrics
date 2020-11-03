@@ -16,7 +16,7 @@ local DEFAULT_SEND_INTERVAL = 2
 local LABELS_SEP = ';'
 
 local function format_observation(prefix, obs)
-    local metric_path = ('%s.%s'):format(prefix, obs.metric_name)
+    local metric_path = #prefix > 0 and ('%s.%s'):format(prefix, obs.metric_name) or obs.metric_name
 
     if next(obs.label_pairs) then
         local label_pairs_str_parts = {}
