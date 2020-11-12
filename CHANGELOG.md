@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - metrics.clear() disables default metrics
 - cartridge role is permanent
 - cartridge role configuration without clusterwide config
+- graphite plugin kills previous workers on init
 
 ### Added
 - Luajit platform metrics

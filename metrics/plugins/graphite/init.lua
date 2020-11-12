@@ -3,6 +3,7 @@ local fiber = require('fiber')
 local metrics = require('metrics')
 local checks = require('checks')
 local log = require('log')
+local fun = require('fun')
 
 local graphite = {}
 
@@ -69,6 +70,10 @@ function graphite.init(opts)
     local host = opts.host or DEFAULT_HOST
     local port = opts.port or DEFAULT_PORT
     local send_interval = opts.send_interval or DEFAULT_SEND_INTERVAL
+
+    fun.iter(fiber.info()):
+        filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
+        each(function(x) fiber.kill(x) end)
 
     fiber.create(graphite_worker, {
         prefix = prefix,
