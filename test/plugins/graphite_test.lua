@@ -8,6 +8,7 @@ local g = t.group()
 local metrics = require('metrics')
 local fiber = require('fiber')
 local fun = require('fun')
+local socket = require('socket')
 local graphite = require('metrics.plugins.graphite')
 
 g.before_all(function()
@@ -35,6 +36,9 @@ end)
 g.after_each(function()
     -- Delete all collectors and global labels
     metrics.clear()
+    fun.iter(fiber.info()):
+        filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
+        each(function(x) fiber.kill(x) end)
 end)
 
 g.test_graphite_format_observation_removes_ULL_suffix = function()
@@ -76,6 +80,22 @@ g.test_graphite_format_observation_time_in_seconds = function()
     local graphite_time = tonumber(graphite_obs:split(' ')[3])
     local sec = obs.timestamp / 10^6
     t.assert_equals(graphite_time, sec)
+end
+
+g.test_graphite_sends_data_to_socket = function()
+    local cnt = metrics.counter('test_cnt', 'test-cnt')
+    cnt:inc(1)
+    local port = 22003
+    local sock = socket('AF_INET', 'SOCK_DGRAM', 'udp')
+    sock:bind('127.0.0.1', port)
+
+    graphite.init({port = port})
+
+    fiber.sleep(0.5)
+    local graphite_obs = sock:recvfrom(50)
+    local obs_table = graphite_obs:split(' ')
+    t.assert_equals(obs_table[1], 'tarantool.test_cnt')
+    t.assert_equals(obs_table[2], '1')
 end
 
 local function mock_graphite_worker()
