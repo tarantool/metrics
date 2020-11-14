@@ -43,7 +43,7 @@ local function graphite_worker(opts)
         metrics.invoke_callbacks()
         for _, c in pairs(metrics.collectors()) do
             for _, obs in ipairs(c:collect()) do
-                local data = format_observation(opts.prefix, obs)
+                local data = graphite.format_observation(opts.prefix, obs)
                 local numbytes = opts.sock:sendto(opts.host, opts.port, data)
                 if numbytes == nil then
                     log.error('Error while sending to host %s port %s data %s',
