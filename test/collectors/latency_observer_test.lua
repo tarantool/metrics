@@ -68,10 +68,10 @@ g.test_time_measurement = function()
     local obs = nil
     local observer = stub_observer(function(_, value, _) obs = {value = value} end)
 
-    local work_times = {0.07, 0.04, 0.03, 0.01}
+    local work_times = {0.3, 0.2, 0.1}
     for _, time in ipairs(work_times) do
         observer:observe_latency({}, work_fn, time)
-        t.assert_almost_equals(obs.value, time, 0.001)
+        t.assert_almost_equals(obs.value, time, 0.01)
     end
 end
 
@@ -81,7 +81,7 @@ g.test_time_measurement_with_error = function()
         obs = {value = value, label_pairs = label_pairs}
     end)
 
-    local work_times = {0.07, 0.04, 0.03, 0.01}
+    local work_times = {0.3, 0.2, 0.1}
     for _, time in ipairs(work_times) do
         pcall(function() observer:observe_latency(
             function(ok, _, _) return {status = tostring(ok)} end,
@@ -89,6 +89,6 @@ g.test_time_measurement_with_error = function()
             time
         ) end)
         t.assert_equals(obs.label_pairs, {status = 'false'})
-        t.assert_almost_equals(obs.value, time, 0.001)
+        t.assert_almost_equals(obs.value, time, 0.01)
     end
 end
