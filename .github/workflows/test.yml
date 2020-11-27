@@ -1,0 +1,32 @@
+name: Matrix build
+on: [push]
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - "tarantool/tarantool:1.10.8"
+          - "tarantool/tarantool:2.2"
+          - "tarantool/tarantool:2.3"
+          - "tarantool/tarantool:2.4"
+          - "tarantool/tarantool:2.5"
+          - "tarantool/tarantool:2.6"
+          - "tarantool/tarantool:2.7.0"
+        cartridge: [ '', "1.2.0", "2.1.2" ]
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.os }}
+      env:
+        CARTRIDGE_VERSION: ${{ matrix.cartridge }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: deps
+        run: apk add --update alpine-sdk make curl git cmake gcc
+
+      - name: lint
+        run: make lint
+
+      - name: test
+        run: make test_with_coverage_report
