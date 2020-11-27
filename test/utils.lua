@@ -39,12 +39,13 @@ function utils.assert_observations(actual, expected)
 end
 
 function utils.find_metric(metric_name, metrics_data)
+    local m = {}
     for _, v in ipairs(metrics_data) do
         if v.metric_name == metric_name then
-            return v
+            table.insert(m, v)
         end
     end
-    return nil
+    return #m > 0 and m or nil
 end
 
 function utils.is_version_less(ver_str, reference_ver_str)
