@@ -22,6 +22,7 @@ Library includes:
 * [Next steps](#next-steps)
 * [Cartridge role](#cartridge-role)
 * [Contribution](#contribution)
+* [Contacts](#contacts)
 * [Credits](#credits)
 
 ## Installation
@@ -201,8 +202,22 @@ See:
 ## Contribution
 
 Feel free to send Pull Requests.
-For example, you can support new time series aggregation / manipulation functions
-(but be sure to check if there are any Prometheus analogues to borrow API from).
+To increase the chance of having your pull request accepted, make sure it follows these guidelines:
+
+- Title and description matches the implementation.
+- Code follows [styleguide](https://www.tarantool.io/en/doc/latest/dev_guide/lua_style_guide/).
+- The pull request closes one or more of related issues. If not, please add an issue first.
+- The pull request contains necessary tests that verify the intended behavior.
+- The pull request contains a CHANGELOG note and documentation update if needed.
+
+Your pull request will be reviewed in 3-5 days.
+
+## Contacts
+
+If you have questions, please ask it on [StackOverflow](https://stackoverflow.com/questions/tagged/tarantool) or contact us in Telegram:
+
+- [Russian-speaking chat](https://t.me/tarantoolru)
+- [English-speaking chat](https://t.me/tarantool)
 
 ## Credits
 
