@@ -1,0 +1,42 @@
+name: Deploy to packagecloud
+on: [release]
+
+jobs:
+  deploy:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - OS=el DIST=6
+          - OS=el DIST=7
+          - OS=fedora DIST=26
+          - OS=fedora DIST=27
+          - OS=fedora DIST=28
+          - OS=fedora DIST=29
+        repository:
+          - "1_10"
+          - "2x"
+          - "2_2"
+          - "2_3"
+          - "2_4"
+    runs-on: ubuntu-latest
+    env:
+      PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '2.6'
+
+      - name: deps
+        run: gem install package_cloud
+
+      - name: packpack
+        run: |
+          git clone https://github.com/packpack/packpack.git packpack
+          ${{ matrix.os }} packpack/packpack
+          ls -l build/
+
+      - name: packagecloud
+        run: package_cloud push tarantool/${{ matrix.repository }} build/*.rpm
+
