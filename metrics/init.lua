@@ -97,7 +97,7 @@ return {
         require('metrics.default_metrics.tarantool').enable()
     end,
     enable_cartridge_metrics = function()
-        return require('metrics.default_metrics.cartridge').enable()
+        return require('metrics.cartridge').enable()
     end,
     http_middleware = require('metrics.http_middleware'),
     collect = collect,

@@ -1,7 +1,7 @@
 local metrics = require('metrics')
 
 local cartridge_metrics = {
-    require('metrics.default_metrics.cartridge.issues'),
+    require('metrics.cartridge.issues'),
 }
 
 local function enable()

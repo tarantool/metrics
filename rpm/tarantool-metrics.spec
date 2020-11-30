@@ -57,9 +57,9 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/default_metrics/tarantool/slab.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/spaces.lua
      %{luapkgdir}/metrics/default_metrics/tarantool/system.lua
-%dir %{luapkgdir}/metrics/default_metrics/cartridge
-     %{luapkgdir}/metrics/default_metrics/cartridge/init.lua
-     %{luapkgdir}/metrics/default_metrics/cartridge/issues.lua
+     %{luapkgdir}/metrics/cartridge.lua
+%dir %{luapkgdir}/metrics/cartridge
+     %{luapkgdir}/metrics/cartridge/issues.lua
 %dir %{luapkgdir}/metrics/psutils
      %{luapkgdir}/metrics/psutils/cpu.lua
      %{luapkgdir}/metrics/psutils/psutils_linux.lua

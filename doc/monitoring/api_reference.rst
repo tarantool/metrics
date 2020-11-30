@@ -287,7 +287,7 @@ Metrics functions
 
     Available metrics are:
 
-    * ``cartridge_issues`` - Amount of `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>` across cluster instances
+    * ``cartridge_issues`` - Number of `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>` across cluster instances
 
 .. function:: metrics.set_global_labels(label_pairs)
 
