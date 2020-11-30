@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/tarantool/metrics.svg?branch=master)](https://travis-ci.com/tarantool/metrics)
+[![Build Status](https://github.com/tarantool/metrics/workflows/Tests/badge.svg?branch=master)](https://github.com/tarantool/metrics/actions)
 
 # Metrics
 
@@ -51,7 +51,7 @@ The exact semantics of each metric follows the [prometheus metric types](https:/
 ### Counter
 
 Counter is a cummulative metric which value can only be incremented or reset to zero on restart.
-Counters are useful for accumulating number of events, e.g. requests processed, orders in e-shop. 
+Counters are useful for accumulating number of events, e.g. requests processed, orders in e-shop.
 Counter is exposed as a single numerical value.
 
 ```lua
@@ -88,7 +88,7 @@ end)
 
 Histogram counts observed values into configurable buckets.
 Histograms are useful for tracking request latencies, processing time.
-Histogram is exposed as multiple numerical values: 
+Histogram is exposed as multiple numerical values:
 - the total count of observed events
 - the total sum of observed values
 - counters of observed events per bucket

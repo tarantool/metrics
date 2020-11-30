@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `enable_cartridge_metrics` function
 - Cartridge issues gauge
 
+### Changed
+- CI on Github Actions
+
 ## [0.5.0] - 2020-09-18
 ### Added
 - Summary collector
