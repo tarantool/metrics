@@ -98,3 +98,9 @@ g.test_not_sorted = function()
     quantile.quicksort(array, 0, 0)
     t.assert_not(array[1] >= array[0])
 end
+
+g.test_package_reload = function()
+    package.loaded['metrics.quantile'] = nil
+    local ok, quantile_package = pcall(require, 'metrics.quantile')
+    t.assert(ok, quantile_package)
+end
