@@ -7,7 +7,7 @@ ffi.cdef[[
 	typedef struct {int Delta, Width; double Value; } sample;
 ]]
 
-local sample_constructor = ffi.metatype('sample', {})
+local sample_constructor = ffi.typeof('sample')
 
 local function quicksort(array, low, high)
 	assert(low >= 0, 'Low bound must be non-negative')
