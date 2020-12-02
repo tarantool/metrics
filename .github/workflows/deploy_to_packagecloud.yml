@@ -7,12 +7,18 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - OS=el DIST=6
-          - OS=el DIST=7
-          - OS=fedora DIST=26
-          - OS=fedora DIST=27
-          - OS=fedora DIST=28
-          - OS=fedora DIST=29
+          - name: el
+            dist: 6
+          - name: el
+            dist: 7
+          - name: fedora
+            dist: 26
+          - name: fedora
+            dist: 27
+          - name: fedora
+            dist: 28
+          - name: fedora
+            dist: 29
         repository:
           - "1_10"
           - "2x"
@@ -22,6 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
+      OS: ${{ matrix.os.name }}
+      DIST: ${{ matrix.os.dist }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-ruby@v1
@@ -34,9 +42,9 @@ jobs:
       - name: packpack
         run: |
           git clone https://github.com/packpack/packpack.git packpack
-          ${{ matrix.os }} packpack/packpack
+          packpack/packpack
           ls -l build/
 
       - name: packagecloud
-        run: package_cloud push tarantool/${{ matrix.repository }} build/*.rpm
+        run: package_cloud push tarantool/${{ matrix.repository }}/$OS/$DIST build/*.rpm
 
