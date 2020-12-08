@@ -17,7 +17,7 @@ export.DEFAULT_QUANTILES = {
 
 --- Build default histogram collector
 --
--- @string[opt='histogram'] type_name `histogram` or `average`
+-- @string[opt='histogram'] type_name `histogram` or `average` or `summary`
 -- @string[opt='http_server_requests'] name
 -- @string[opt='HTTP Server Requests'] help
 -- @return collector
