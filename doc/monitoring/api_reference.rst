@@ -75,7 +75,7 @@ Gauge
 
 .. function:: gauge(name [, help])
 
-    Registers a new gauge. Returns a Counter object.
+    Registers a new gauge. Returns a Gauge object.
 
     :param string name: Collector name. Must be unique.
     :param string help: Help description.
