@@ -12,7 +12,7 @@ This page provides detailed description of metrics from module ``metrics``.
 Memory general
 -------------------------------------------------------------------------------
 
-Those metrics provide a picture of the whole Tarantool instance.
+Those metrics provide a picture of memory usage by Tarantool process.
 
 * ``tnt_info_info_memory_cache`` - number of
   bytes in the cache for the tuples stored for the vinyl storage engine.
@@ -41,7 +41,7 @@ Memory allocation
 Provides memory usage report for the slab allocator.
 The slab allocator is the main allocator used to store tuples.
 This can be used to monitor the total memory usage and memory fragmentation.
-To learn more about usage cases, see `this <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_slab/#box-slab-info>`_
+To learn more about use cases, see `this <https://www.tarantool.io/en/doc/latest/reference/reference_lua/box_slab/#box-slab-info>`_
 
 Available memory, bytes:
 
@@ -53,7 +53,7 @@ Available memory, bytes:
 
 Memory usage, bytes:
 
-* ``tnt_slab_quota_used`` - the amount of memory that is already distributed to the slab allocator
+* ``tnt_slab_quota_used`` - the amount of memory that is already reserved by the slab allocator
 
 * ``tnt_slab_arena_used`` - the efficient memory used for storing tuples and indexes together (omitting allocated, but currently free slabs)
 
@@ -73,7 +73,7 @@ Memory utilization, %:
 Spaces
 -------------------------------------------------------------------------------
 
-Those metrics provide information about spaces size.
+Those metrics provide specific information about each individual space in Tarantool instance.
 
 * ``tnt_space_len`` - number of records in space.
   This metric always has 2 labels - ``{name="test", engine="memtx"}``. ``name`` - the name of the space,
