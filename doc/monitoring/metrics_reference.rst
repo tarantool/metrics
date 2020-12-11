@@ -94,3 +94,31 @@ Those metrics provide specific information about each individual space in Tarant
 * ``tnt_space_count`` - the total tuples count for vinyl.
   This metric always has labels - ``{name="test", engine="vinyl"}``. ``name`` - the name of the space.
   ``engine`` - is the engine of the space.
+
+.. _network:
+
+-------------------------------------------------------------------------------
+Network
+-------------------------------------------------------------------------------
+
+Network activity stats. This can be used to monitor network load, usage peaks and traffic drops.
+
+Sent bytes:
+
+* ``tnt_net_sent_total`` - bytes sent from this instance over network since instance start
+
+Received bytes:
+
+* ``tnt_net_received_total`` - bytes this instance has received since instance start
+
+Connections:
+
+* ``tnt_net_connections_total`` - number of incoming network connections since instance start
+
+* ``tnt_net_connections_current`` - number of active network connections
+
+Requests:
+
+* ``tnt_net_requests_total`` - number of network requests this instance has handled since instance start
+
+* ``tnt_net_requests_current`` - amount of pending network requests
