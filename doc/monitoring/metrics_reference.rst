@@ -6,6 +6,21 @@ Metrics reference
 
 This page provides detailed description of metrics from module ``metrics``.
 
+-------------------------------------------------------------------------------
+General metrics
+-------------------------------------------------------------------------------
+
+General instance information.
+
+* ``tnt_cfg_current_time`` - instance system time in uxix timestamp format
+
+* ``tnt_info_lsn`` – LSN of instance
+
+* ``tnt_info_uptime`` – time since server was started, in seconds
+
+* ``tnt_info_vclock`` – LSN number in vclock. This metric always has label - ``{id="id"}``,
+  where ``id`` is instance number in replicaset
+
 .. _memory-general:
 
 -------------------------------------------------------------------------------
@@ -122,3 +137,73 @@ Requests:
 * ``tnt_net_requests_total`` - number of network requests this instance has handled since instance start
 
 * ``tnt_net_requests_current`` - amount of pending network requests
+
+.. _metrics-fibers:
+
+-------------------------------------------------------------------------------
+Fibers
+-------------------------------------------------------------------------------
+
+Provides statistics of :ref:`fibers <fiber-fibers>`. If your app creates a lot of fibers, it can be used for monitoring
+fibers count and memory usage.
+
+* ``tnt_fiber_count`` - number of fibers
+
+* ``tnt_fiber_csw`` - averall fibers context switches number
+
+* ``tnt_fiber_memalloc`` - the amount of memory that is reserved for fibers
+
+* ``tnt_fiber_memused`` - the amount of memory that is used by fibers
+
+.. _metrics-operations:
+
+-------------------------------------------------------------------------------
+Operations
+-------------------------------------------------------------------------------
+
+Number of iproto requests this instance has processed, aggregated by request type.
+It can be used to find out which type of operation clients make more often.
+
+* ``tnt_stats_op_total`` - total number of calls since server start
+
+That metric have ``operation`` label to be able to distinguish different request types, e.g.:
+``{operation="select"}``
+
+Request type could be one of:
+
+- ``delete`` - delete calls
+- ``error`` - requests resulted in an error
+- ``update`` - update calls
+- ``call`` - requests to execute stored procedures
+- ``auth`` - authentication requests
+- ``eval`` - calls to evaluate lua code
+- ``replace`` - replace call
+- ``execute`` - execute SQL calls
+- ``select`` - select calls
+- ``upsert`` - upsert calls
+- ``prepare`` - SQL prepare calls
+- ``insert`` - insert calls
+
+.. _metrics-replication:
+
+-------------------------------------------------------------------------------
+Replication
+-------------------------------------------------------------------------------
+
+Provides information of current replication status. To learn more about replication
+mechanism in Tarantool, see :ref:`this <replication-mechanism>`
+
+* ``tnt_replication_replica_<id>_lsn`` / ``tnt_replication_master_<id>_lsn`` - LSN of master/replica,
+  ``id`` is instance number in replicaset
+
+* ``tnt_replication_<id>_lag`` - replication lag value in seconds, ``id`` is instance number in replicaset
+
+.. _metrics-runtime:
+
+-------------------------------------------------------------------------------
+Runtime
+-------------------------------------------------------------------------------
+
+* ``tnt_runtime_lua`` – Lua garbage collector size in bytes
+
+* ``tnt_runtime_used`` - number of bytes used for Lua runtime
