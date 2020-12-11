@@ -103,8 +103,6 @@ Network
 
 Network activity stats. This can be used to monitor network load, usage peaks and traffic drops.
 
-Each group of metrics contains ``rps`` metric which is a moving average of ``total`` for the last 5 seconds.
-
 Sent bytes:
 
 * ``tnt_net_sent_total`` - bytes sent from this instance over network since instance start
