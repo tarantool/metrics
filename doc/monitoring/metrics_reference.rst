@@ -101,9 +101,9 @@ Those metrics provide specific information about each individual space in Tarant
 Network
 -------------------------------------------------------------------------------
 
-Network activity stats. This can be used to monitor the load on network, usage peaks and traffic drops.
+Network activity stats. This can be used to monitor network load, usage peaks and traffic drops.
 
-Each group of metrics also contains ``rps`` metric that present average value of ``total`` for the last 5 seconds.
+Each group of metrics contains ``rps`` metric which is a moving average of ``total`` for the last 5 seconds.
 
 Sent bytes:
 
@@ -123,4 +123,4 @@ Requests:
 
 * ``tnt_net_requests_total`` - number of network requests this instance has handled since instance start
 
-* ``tnt_net_requests_current`` - number of pending network requests
+* ``tnt_net_requests_current`` - amount of pending network requests
