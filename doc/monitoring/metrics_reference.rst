@@ -207,3 +207,76 @@ Runtime
 * ``tnt_runtime_lua`` – Lua garbage collector size in bytes
 
 * ``tnt_runtime_used`` - number of bytes used for Lua runtime
+
+.. _metrics-cartridge:
+
+-------------------------------------------------------------------------------
+Cartridge
+-------------------------------------------------------------------------------
+
+* ``cartridge_issues`` - Number of
+  `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>`
+  across cluster instances. This metric always has labels - ``{level="critical"}``.
+  ``level`` - the level of the issue. ``critical`` level is memory used ratio > 90%,
+  ``warning`` level is memory used ratio > 60% or replication issues on cluster.
+
+.. _metrics-luajit:
+
+-------------------------------------------------------------------------------
+LuaJIT metrics
+-------------------------------------------------------------------------------
+
+LuaJIT metrics helps to understand Lua GC state.
+
+* ``lj_gc_freed``  - total amount of freed memory
+
+* ``lj_strhash_hit`` - number of strings being interned
+
+* ``lj_gc_steps_atomic`` - count of incremental GC steps (atomic state)
+
+* ``lj_strhash_miss`` - total number of strings allocations during the platform lifetime
+
+* ``lj_gc_steps_sweepstring`` - count of incremental GC steps (sweepstring state)
+
+* ``lj_gc_strnum`` - amount of allocated ``string`` objects
+
+* ``lj_gc_tabnum`` - amount of allocated ``table`` objects
+
+* ``lj_gc_cdatanum`` - amount of allocated ``cdata`` objects
+
+* ``lj_jit_snap_restore`` - overall number of snap restores
+
+* ``lj_gc_total`` - memory currently allocated
+
+* ``lj_gc_udatanum`` - amount of allocated ``udata`` objects
+
+* ``lj_gc_steps_finalize`` - count of incremental GC steps (finalize state)
+
+* ``lj_gc_allocated`` - total amount of allocated memory
+
+* ``lj_jit_trace_num`` - amount of JIT traces
+
+* ``lj_gc_steps_sweep`` - count of incremental GC steps (sweep state)
+
+* ``lj_jit_trace_abort`` - overall number of abort traces
+
+* ``lj_jit_mcode_size`` - total size of all allocated machine code areas
+
+* ``lj_gc_steps_propagate`` - count of incremental GC steps (propagate state)
+
+* ``lj_gc_steps_pause`` - count of incremental GC steps (pause state)
+
+.. _metrics-psutils:
+
+-------------------------------------------------------------------------------
+CPU metrics
+-------------------------------------------------------------------------------
+
+Those metrics provides CPU usage statistics. Only for Linux.
+
+* ``tnt_cpu_count`` - the number of processors
+
+* ``tnt_cpu_thread`` - Tarantool thread cpu time. This metric always has labels -
+  ``{kind="user", thread_name="tarantool", thread_pid="pid", file_name="init.lua"}``,
+  where ``kind`` is ``user`` or ``system``, ``thread_name`` is ``tarantool`` or
+  ``coio``, ``file_name`` is entrypoint file name, e.g. ``init.lua``.

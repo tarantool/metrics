@@ -252,10 +252,6 @@ Metrics functions
 
     Enables Cartridge metrics collections.
 
-    Available metrics are:
-
-    * ``cartridge_issues`` - Number of `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>` across cluster instances
-
 .. function:: metrics.set_global_labels(label_pairs)
 
     Set global labels that will be added to every observation.
