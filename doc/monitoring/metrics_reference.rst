@@ -14,12 +14,7 @@ General instance information.
 
 * ``tnt_cfg_current_time`` - instance system time in uxix timestamp format
 
-* ``tnt_info_lsn`` – LSN of instance
-
-* ``tnt_info_uptime`` – time since server was started, in seconds
-
-* ``tnt_info_vclock`` – LSN number in vclock. This metric always has label - ``{id="id"}``,
-  where ``id`` is instance number in replicaset
+* ``tnt_info_uptime`` – time since instance was started, in seconds
 
 .. _memory-general:
 
@@ -149,7 +144,7 @@ fibers count and memory usage.
 
 * ``tnt_fiber_count`` - number of fibers
 
-* ``tnt_fiber_csw`` - averall fibers context switches number
+* ``tnt_fiber_csw`` - averall amount of fibers context switches
 
 * ``tnt_fiber_memalloc`` - the amount of memory that is reserved for fibers
 
@@ -192,6 +187,11 @@ Replication
 
 Provides information of current replication status. To learn more about replication
 mechanism in Tarantool, see :ref:`this <replication-mechanism>`
+
+* ``tnt_info_lsn`` – LSN of instance
+
+* ``tnt_info_vclock`` – LSN number in vclock. This metric always has label - ``{id="id"}``,
+  where ``id`` is instance number in replicaset
 
 * ``tnt_replication_replica_<id>_lsn`` / ``tnt_replication_master_<id>_lsn`` - LSN of master/replica,
   ``id`` is instance number in replicaset
