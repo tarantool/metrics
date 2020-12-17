@@ -234,7 +234,7 @@ LuaJIT metrics helps to understand Lua GC state.
 
 * ``lj_gc_steps_atomic`` - count of incremental GC steps (atomic state)
 
-* ``lj_strhash_miss`` - total number of strings allocations during the platform lifetime
+* ``lj_strhash_miss`` - total number of string allocations during the platform lifetime
 
 * ``lj_gc_steps_sweepstring`` - count of incremental GC steps (sweepstring state)
 
