@@ -246,15 +246,13 @@ Metrics functions
 
 .. function:: enable_default_metrics()
 
-    Enables Tarantool metrics collections.
+    Enables Tarantool metrics collections. See :ref:`metrics reference <metrics-reference>`
+    for details.
 
 .. function:: enable_cartridge_metrics()
 
-    Enables Cartridge metrics collections.
-
-    Available metrics are:
-
-    * ``cartridge_issues`` - Number of `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>` across cluster instances
+    Enables Cartridge metrics collections. See :ref:`metrics reference <metrics-cartridge>`
+    for details.
 
 .. function:: metrics.set_global_labels(label_pairs)
 
@@ -366,6 +364,18 @@ latency statistics.
 -------------------------------------------------------------------------------
 CPU usage metrics
 -------------------------------------------------------------------------------
+
+CPU metrics work only on Linux. See :ref:`metrics reference <metrics-psutils>`
+for details. To enable it you should register callback:
+
+.. code-block:: lua
+
+    local metrics = require('metrics')
+
+    metrics.register_callback(function()
+        local cpu_metrics = require('metrics.psutils.cpu')
+        cpu_metrics.update()
+    end)
 
 **Collected metrics example**
 
