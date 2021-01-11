@@ -17,5 +17,3 @@ gauge:set(1)
 local fh = fio.open('prometheus-input', {'O_RDWR', 'O_CREAT'}, tonumber('644',8))
 fh:write(prometheus.collect_http().body)
 fh:close()
-
-os.exit()
