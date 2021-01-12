@@ -18,7 +18,7 @@ local handlers = {
 local function init()
     local params, err = argparse.parse()
     assert(params, err)
-    metrics.set_global_labels({alias = params.alias})
+    metrics.set_global_labels({alias = params.alias or params.instance_name})
     metrics.enable_default_metrics()
     metrics.enable_cartridge_metrics()
 end
