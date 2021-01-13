@@ -77,7 +77,7 @@ via configuration.
 **Usage**
 
 #. Add the ``metrics`` package to dependencies in the ``.rockspec`` file.
-   Make sure that you are using version 0.3.0 or higher.
+   Make sure that you are using version **0.3.0** or higher.
 
    .. code-block:: lua
 
@@ -87,7 +87,8 @@ via configuration.
            ...
        }
 
-#. Add ``cartridge.roles.metrics`` to the roles list in ``cartridge.cfg``
+#. If you are using versions **0.3.0-0.5.0** then add ``cartridge.roles.metrics``
+   to the roles list in ``cartridge.cfg``
    in your entry-point file (e.g. ``init.lua``).
 
    .. code-block:: lua
@@ -101,8 +102,13 @@ via configuration.
            },
        })
 
+   Since version **0.6.0** metrics role is permanent and enabled on instances by default.
+
 #. After role initialization, default metrics will be enabled and the global
-   label 'alias' will be set. If you need to use the functionality of any
+   label ``'alias'`` will be set. **Note** that ``'alias'`` label is set by
+   configuration option ``alias``.
+
+   If you need to use the functionality of any
    metrics package, you may get it as a Cartridge service and use it like
    a regular package after ``require``:
 
