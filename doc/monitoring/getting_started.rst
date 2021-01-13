@@ -102,6 +102,11 @@ via configuration.
            },
        })
 
+   And then enable it in interface:
+
+   .. image:: images/role-enable.png
+      :align: center
+
    Since version **0.6.0** metrics role is permanent and enabled on instances by default.
 
 #. After role initialization, default metrics will be enabled and the global
@@ -129,6 +134,9 @@ via configuration.
            format: 'json'
          - path: '/path_for_prometheus_metrics'
            format: 'prometheus'
+
+   .. image:: images/role-config.png
+      :align: center
 
    **OR**
 
