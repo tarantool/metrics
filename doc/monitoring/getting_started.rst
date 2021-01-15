@@ -76,7 +76,7 @@ via configuration.
 
 **Usage**
 
-#. Add the ``metrics`` package to dependencies in the ``.rockspec`` file.
+#. Add ``metrics`` package to dependencies in the ``.rockspec`` file.
    Make sure that you are using version **0.3.0** or higher.
 
    .. code-block:: lua
@@ -110,7 +110,7 @@ via configuration.
    Since version **0.6.0** metrics role is permanent and enabled on instances by default.
 
 #. After role initialization, default metrics will be enabled and the global
-   label ``'alias'`` will be set. **Note** that ``'alias'`` label is set by
+   label ``'alias'`` will be set. **Note** that ``'alias'`` label value is set by
    configuration option ``alias``.
 
    If you need to use the functionality of any
