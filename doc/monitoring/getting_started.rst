@@ -87,8 +87,8 @@ via configuration.
            ...
        }
 
-#. If you are using versions **0.3.0**-**0.5.0** then add ``cartridge.roles.metrics``
-   to the roles list in ``cartridge.cfg``
+#. Make sure that you have ``cartridge.roles.metrics``
+   in the roles list in ``cartridge.cfg``
    in your entry-point file (e.g. ``init.lua``).
 
    .. code-block:: lua
@@ -102,7 +102,7 @@ via configuration.
            },
        })
 
-   And then enable it in interface:
+#. Enable role in the interface:
 
    .. image:: images/role-enable.png
       :align: center
