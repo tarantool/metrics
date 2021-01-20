@@ -87,7 +87,7 @@ via configuration.
            ...
        }
 
-#. If you are using versions **0.3.0-0.5.0** then add ``cartridge.roles.metrics``
+#. If you are using versions **0.3.0**-**0.5.0** then add ``cartridge.roles.metrics``
    to the roles list in ``cartridge.cfg``
    in your entry-point file (e.g. ``init.lua``).
 
