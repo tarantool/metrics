@@ -111,7 +111,7 @@ via configuration.
 
 #. After role initialization, default metrics will be enabled and the global
    label ``'alias'`` will be set. **Note** that ``'alias'`` label value is set by
-   instance :ref:`configuration option <cartridge-cfg>` ``alias``.
+   instance :ref:`configuration option <cartridge-cfg>` ``alias`` or ``instance_name`` (since **0.6.1**).
 
    If you need to use the functionality of any
    metrics package, you may get it as a Cartridge service and use it like
