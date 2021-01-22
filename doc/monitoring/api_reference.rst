@@ -26,9 +26,9 @@ A collector represents one or more observations that are changing over time.
 Counter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. module:: metrics
+..  module:: metrics
 
-.. function:: counter(name [, help])
+..  function:: counter(name [, help])
 
     Registers a new counter.
 
@@ -54,7 +54,7 @@ Counter
 
         :return: Array of ``observation`` objects for the given counter.
 
-        .. code-block:: lua
+        ..  code-block:: lua
 
             {
                 label_pairs: table,          -- `label_pairs` key-value table
@@ -71,9 +71,9 @@ Counter
 Gauge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. module:: metrics
+..  module:: metrics
 
-.. function:: gauge(name [, help])
+..  function:: gauge(name [, help])
 
     Registers a new gauge. Returns a Gauge object.
 
@@ -84,21 +84,21 @@ Gauge
 
     :rtype: gauge_obj
 
-.. class:: gauge_obj
+..  class:: gauge_obj
 
-    .. method:: inc(num, label_pairs)
+    ..  method:: inc(num, label_pairs)
 
         Same as Counter ``inc()``.
 
-    .. method:: inc(num, label_pairs)
+    ..  method:: inc(num, label_pairs)
 
         Same as ``inc()``, but decreases the observation.
 
-    .. method:: set(num, label_pairs)
+    ..  method:: set(num, label_pairs)
 
         Same as ``inc()``, but sets the observation.
 
-    .. method:: collect()
+    ..  method:: collect()
 
         Returns an array of ``observation`` objects for the given gauge.
         For ``observation`` description, see
@@ -110,9 +110,9 @@ Gauge
 Histogram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. module:: metrics
+..  module:: metrics
 
-.. function:: histogram(name [, help, buckets])
+..  function:: histogram(name [, help, buckets])
 
     Registers a new histogram.
 
@@ -138,9 +138,9 @@ Histogram
            ``le`` (low or equal). So to access a specific bucket ``x`` (``x`` is a number),
            you should specify the value ``x`` for the label ``le``.
 
-.. class:: histogram_obj
+..  class:: histogram_obj
 
-    .. method: observe(num, label_pairs)
+    ..  method:: observe(num, label_pairs)
 
         Records a new value in a histogram.
         This increments all buckets sizes under labels ``le`` >= ``num``
@@ -152,7 +152,7 @@ Histogram
                                   A new value is observed by all internal counters
                                   with these labels specified.
 
-    .. method: collect()
+    .. method:: collect()
 
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``histogram_obj``. For ``observation`` description,
@@ -164,9 +164,9 @@ Histogram
 Summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. module:: metrics
+..  module:: metrics
 
-.. function:: summary(name [, help, objectives])
+..  function:: summary(name [, help, objectives])
 
     Registers a new summary. Quantile computation is based on the algorithm `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
 
@@ -189,9 +189,9 @@ Summary
            ``quantile`` (low or equal). So to access a specific quantile ``x`` (``x`` is a number),
            you should specify the value ``x`` for the label ``quantile``.
 
-.. class:: summary_obj
+..  class:: summary_obj
 
-    .. method: observe(num, label_pairs)
+    ..  method:: observe(num, label_pairs)
 
         Records a new value in a summary.
 
@@ -201,7 +201,7 @@ Summary
                                   A new value is observed by all internal counters
                                   with these labels specified.
 
-    .. method: collect()
+    ..  method:: collect()
 
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``summary_obj``. For ``observation`` description,
@@ -220,7 +220,7 @@ Labels are used to differentiate the characteristics of a thing being
 measured. For example, in a metric associated with the total number of http
 requests, you can use methods and statuses label pairs:
 
-.. code-block:: lua
+..  code-block:: lua
 
     http_requests_total_counter:inc(1, {method = 'POST', status = '200'})
 
@@ -242,19 +242,19 @@ You can also set global labels by calling
 Metrics functions
 -------------------------------------------------------------------------------
 
-.. module:: metrics
+..  module:: metrics
 
-.. function:: enable_default_metrics()
+..  function:: enable_default_metrics()
 
     Enables Tarantool metrics collections. See :ref:`metrics reference <metrics-reference>`
     for details.
 
-.. function:: enable_cartridge_metrics()
+..  function:: enable_cartridge_metrics()
 
     Enables Cartridge metrics collections. See :ref:`metrics reference <metrics-cartridge>`
     for details.
 
-.. function:: metrics.set_global_labels(label_pairs)
+..  function:: metrics.set_global_labels(label_pairs)
 
     Set global labels that will be added to every observation.
 
@@ -270,7 +270,7 @@ Metrics functions
     if you pass ``label_pairs`` to an observation method with the same key as
     some global label, the method argument value will be used.
 
-.. function:: register_callback(callback)
+..  function:: register_callback(callback)
 
     Registers a function ``callback`` which will be called right before metrics
     collection on plugin export.
@@ -289,9 +289,9 @@ Collecting HTTP requests latency statistics
 (set by the `http <https://github.com/tarantool/http>`_ module)
 latency statistics.
 
-.. module:: metrics.http_middleware
+..  module:: metrics.http_middleware
 
-.. function:: configure_default_collector(type_name, name, help)
+..  function:: configure_default_collector(type_name, name, help)
 
     Registers a collector for the middleware and sets it as default.
 
@@ -302,7 +302,7 @@ latency statistics.
     If a collector with the same type and name already exists in the registry,
     throws an error.
 
-.. function:: build_default_collector(type_name, name [, help])
+..  function:: build_default_collector(type_name, name [, help])
 
     Registers a collector for the middleware and returns it.
 
@@ -313,20 +313,20 @@ latency statistics.
     If a collector with the same type and name already exists in the registry,
     throws an error.
 
-.. function:: set_default_collector(collector)
+..  function:: set_default_collector(collector)
 
     Sets the default collector.
 
     :param collector: Middleware collector object.
 
-.. function:: get_default_collector()
+..  function:: get_default_collector()
 
     Returns the default collector.
     If the default collector hasn't been set yet, registers it (with default
     ``http_middleware.build_default_collector(...)`` parameters) and sets it
     as default.
 
-.. function:: v1(handler, collector)
+..  function:: v1(handler, collector)
 
     Latency measure wrap-up for HTTP ver. 1.x.x handler. Returns a wrapped handler.
 
@@ -340,7 +340,7 @@ latency statistics.
     For a more detailed example,
     see https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v1.lua
 
-.. function:: v2(collector)
+..  function:: v2(collector)
 
     Returns the latency measure middleware for HTTP ver. 2.x.x.
 
@@ -350,7 +350,7 @@ latency statistics.
 
     **Usage:**
 
-    .. code-block:: lua
+    ..  code-block:: lua
 
         router = require('http.router').new()
         router:route(route, request_handler)
@@ -368,7 +368,7 @@ CPU usage metrics
 CPU metrics work only on Linux. See :ref:`metrics reference <metrics-psutils>`
 for details. To enable it you should register callback:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local metrics = require('metrics')
 
@@ -379,7 +379,7 @@ for details. To enable it you should register callback:
 
 **Collected metrics example**
 
-.. code-block:: none
+..  code-block:: none
 
     # HELP tnt_cpu_total Host CPU time
     # TYPE tnt_cpu_total gauge
@@ -395,7 +395,7 @@ for details. To enable it you should register callback:
 
 **Prometheus query aggregated by thread name**
 
-.. code-block:: promql
+..  code-block:: text
 
     sum by (thread_name) (idelta(tnt_cpu_thread[$__interval]))
       / scalar(idelta(tnt_cpu_total[$__interval]) / tnt_cpu_count)
@@ -414,7 +414,7 @@ their the :ref:`Metrics plugins <metrics-plugins>` section.
 
 Using counters:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local metrics = require('metrics')
 
@@ -426,7 +426,7 @@ Using counters:
 
 Using gauges:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local metrics = require('metrics')
 
@@ -442,7 +442,7 @@ Using gauges:
 
 Using histograms:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local metrics = require('metrics')
 
@@ -456,7 +456,7 @@ Using histograms:
 
 Using summaries:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local metrics = require('metrics')
 

@@ -12,7 +12,7 @@ General metrics
 
 General instance information.
 
-* ``tnt_cfg_current_time`` - instance system time in uxix timestamp format
+* ``tnt_cfg_current_time`` - instance system time in Unix timestamp format
 
 * ``tnt_info_uptime`` – time since instance was started, in seconds
 
@@ -22,7 +22,7 @@ General instance information.
 Memory general
 -------------------------------------------------------------------------------
 
-Those metrics provide a picture of memory usage by Tarantool process.
+These metrics provide a picture of memory usage by Tarantool process.
 
 * ``tnt_info_info_memory_cache`` - number of
   bytes in the cache for the tuples stored for the vinyl storage engine.
