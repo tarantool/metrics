@@ -13,6 +13,10 @@ local handlers = {
         local http_handler = require('metrics.plugins.prometheus').collect_http
         return http_handler(...)
     end,
+    ['health'] = function(...)
+        local http_handler = require('metrics.plugins.health').is_healthy
+        return http_handler(...)
+    end,
 }
 
 local function init()

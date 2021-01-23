@@ -129,6 +129,10 @@ local latency = math.random(1, 10)
 http_requests_latency:observe(latency)
 ```
 
+### Instance health check
+
+In production environments Tarantool Cluster usually has a large number of so called "routers", Tarantool instances that handle input load and it is required to evenly distribute the load. Various load-balancers are used for this, but any load-balancer have to know which "routers" are ready to accept the load at that very moment. Metrics library has a special plugin that creates an http handler that can be used by the load-balancer to check the current state of any Tarantula instance. If the instance is ready to accept the load, it will return a response with a 200 status code, if not, with a 500 status code.
+
 ## Cartridge role
 
 `cartridge.roles.metrics` is a role for
@@ -179,6 +183,8 @@ via configuration.
          format: 'json'
        - path: '/path_for_prometheus_metrics'
          format: 'prometheus'
+       - path: '/health'
+         format: 'health'
    ```
 
 You can add several entry points of the same format by different paths, like this:
