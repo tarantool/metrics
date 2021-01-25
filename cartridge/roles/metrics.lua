@@ -14,7 +14,7 @@ local handlers = {
         return http_handler(...)
     end,
     ['health'] = function(...)
-        local http_handler = require('metrics.plugins.health').is_healthy
+        local http_handler = require('metrics.plugins.health.health').is_healthy
         return http_handler(...)
     end,
 }

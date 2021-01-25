@@ -57,3 +57,18 @@ g.test_cartridge_health_handler = function()
     local resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 end
+
+g.test_cartridge_health_fail_handler = function()
+    check_cartridge_version()
+    upload_config()
+    local main_server = g.cluster:server('main')
+    main_server.net_box:eval([[
+        box.info() = function()
+            return {
+                status = 'orphan'
+            }
+        end
+    ]])
+    local resp = main_server:http_request('get', '/health')
+    t.assert_equals(resp.status, 500)
+end

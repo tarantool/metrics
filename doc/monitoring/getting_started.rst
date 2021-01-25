@@ -63,6 +63,21 @@ Now you can use the HTTP API endpoint ``/metrics`` to collect your metrics
 in the Prometheus format. If you need your custom metrics, see the
 :ref:`API reference <metrics-api-reference>`.
 
+.. _instance-health-check:
+
+-------------------------------------------------------------------------------
+Instance health check
+-------------------------------------------------------------------------------
+
+In production environments Tarantool Cluster usually has a large number of so called
+"routers", Tarantool instances that handle input load and it is required to evenly 
+distribute the load. Various load-balancers are used for this, but any load-balancer 
+have to know which "routers" are ready to accept the load at that very moment. Metrics 
+library has a special plugin that creates an http handler that can be used by the 
+load-balancer to check the current state of any Tarantool instance. If the instance 
+is ready to accept the load, it will return a response with a 200 status code, if not, 
+with a 500 status code.
+
 .. _cartridge-role:
 
 -------------------------------------------------------------------------------
@@ -134,6 +149,8 @@ via configuration.
            format: 'json'
          - path: '/path_for_prometheus_metrics'
            format: 'prometheus'
+         - path: '/health'
+           format: 'health'
 
    .. image:: images/role-config.png
       :align: center
@@ -154,7 +171,11 @@ via configuration.
            {
                path = '/path_for_prometheus_metrics',
                format = 'prometheus'
-           }
+           },
+           {
+               path = '/health',
+               format = 'health'
+           }           
        })
 
    The metrics will be available on the path specified in ``path`` in the format

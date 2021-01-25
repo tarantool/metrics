@@ -45,7 +45,7 @@ cp -rv cartridge %{br_luapkgdir}
 %dir %{luapkgdir}/metrics/plugins/json
      %{luapkgdir}/metrics/plugins/json/init.lua
 %dir %{luapkgdir}/metrics/plugins/health
-     %{luapkgdir}/metrics/plugins/health/init.lua
+     %{luapkgdir}/metrics/plugins/health/health.lua
 %dir %{luapkgdir}/metrics/default_metrics
 %dir %{luapkgdir}/metrics/default_metrics/tarantool
      %{luapkgdir}/metrics/default_metrics/tarantool/fibers.lua
