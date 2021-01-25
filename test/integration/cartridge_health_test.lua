@@ -63,7 +63,7 @@ g.test_cartridge_health_fail_handler = function()
     upload_config()
     local main_server = g.cluster:server('main')
     main_server.net_box:eval([[
-        box.info() = function()
+        box.info = function()
             return {
                 status = 'orphan'
             }
