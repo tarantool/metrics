@@ -9,3 +9,4 @@ build
 !/tmp/.keep
 .history
 .vscode
+prometheus-input
