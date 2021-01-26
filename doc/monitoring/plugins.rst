@@ -9,7 +9,7 @@ worrying about the way metrics export is performed.
 If you want to use another DB to store metrics data, you can use an
 appropriate export plugin just by changing one line of code.
 
-.. _avaliable-plugins:
+.. _available-plugins:
 
 -------------------------------------------------------------------------------
 Available plugins
@@ -25,13 +25,13 @@ Prometheus
 
 Import the Prometheus plugin:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local prometheus = require('metrics.plugins.prometheus')
 
 Further, use the ``prometheus.collect_http()`` function, which returns:
 
-.. code-block:: lua
+..  code-block:: lua
 
     {
         status = 200,
@@ -48,7 +48,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 * In Tarantool `http.server v1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
   (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`_):
 
-  .. code-block:: lua
+  ..  code-block:: lua
 
       local httpd = require('http.server').new(...)
       ...
@@ -57,7 +57,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 * In Tarantool `http.server v2 <https://github.com/tarantool/http/>`_
   (the latest version):
 
-  .. code-block:: lua
+  ..  code-block:: lua
 
       local httpd = require('http.server').new(...)
       local router = require('http.router').new(...)
@@ -69,7 +69,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 
 * For Tarantool ``http.server`` v1:
 
-  .. code-block:: lua
+  ..  code-block:: lua
 
       metrics = require('metrics')
       metrics.enable_default_metrics()
@@ -80,7 +80,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 
 * For Tarantool Cartridge (with ``http.server`` v1):
 
-  .. code-block:: lua
+  ..  code-block:: lua
 
       cartridge = require('cartridge')
       httpd = cartridge.service_get('httpd')
@@ -91,7 +91,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 
 * For Tarantool ``http.server`` v2:
 
-  .. code-block:: lua
+  ..  code-block:: lua
 
       metrics = require('metrics')
       metrics.enable_default_metrics()
@@ -112,7 +112,7 @@ Graphite
 
 Import the Graphite plugin:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local graphite = require('metrics.plugins.graphite')
 
@@ -121,7 +121,7 @@ To start automatically exporting the current values of all
 
 .. module:: metrics.plugins.graphite
 
-.. function:: init(options)
+..  function:: init(options)
 
     :param table options: Possible options:
 
@@ -146,34 +146,34 @@ JSON
 
 Import the JSON plugin:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local json_metrics = require('metrics.plugins.json')
 
-.. module:: metrics.plugins.json
+..  module:: metrics.plugins.json
 
-.. function:: export()
+..  function:: export()
 
     :return: the following structure
 
-             .. code-block:: json
+        ..  code-block:: json
 
-                 [
-                     {
-                         "name":<name>,
-                         "label_pairs": {
-                             <name>:<value>,
-                             ...
-                         },
-                         "timestamp":<number>,
-                         "value":<value>
-                     },
-                     ...
-                 ]
+            [
+                {
+                    "name": "<name>",
+                    "label_pairs": {
+                        "<name>": "<value>",
+                        "...": "..."
+                        },
+                    "timestamp": "<number>",
+                    "value": "<value>"
+                },
+                "..."
+            ]
 
     :rtype: string
 
-    .. IMPORTANT::
+    ..  IMPORTANT::
 
         Values can be ``+-math.huge``, ``math.huge * 0``. Then:
 
@@ -183,38 +183,38 @@ Import the JSON plugin:
 
     **Example**
 
-    .. code-block:: json
+    ..  code-block:: json
 
         [
             {
-                "label_pairs":{
-                    "type":"nan"
+                "label_pairs": {
+                    "type": "nan"
                 },
-                "timestamp":1559211080514607,
-                "metric_name":"test_nan",
-                "value":"nan"
+                "timestamp": 1559211080514607,
+                "metric_name": "test_nan",
+                "value": "nan"
             },
             {
-                "label_pairs":{
-                    "type":"-inf"
+                "label_pairs": {
+                    "type": "-inf"
                 },
-                "timestamp":1559211080514607,
-                "metric_name":"test_inf",
-                "value":"-inf"
+                "timestamp": 1559211080514607,
+                "metric_name": "test_inf",
+                "value": "-inf"
             },
             {
-                "label_pairs":{
-                    "type":"inf"
+                "label_pairs": {
+                    "type": "inf"
                 },
-                "timestamp":1559211080514607,
-                "metric_name":"test_inf",
-                "value":"inf"
+                "timestamp": 1559211080514607,
+                "metric_name": "test_inf",
+                "value": "inf"
             }
         ]
 
 To be used in Tarantool ``http.server`` as follows:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local httpd = require('http.server').new(...)
     ...
@@ -240,29 +240,29 @@ We encourage you to use the following methods **only when developing a new plugi
 
 .. module:: metrics
 
-.. function:: invoke_callbacks()
+..  function:: invoke_callbacks()
 
     Invokes the function registered via
     ``metrics.register_callback(<callback>)``.
     Used in exporters.
 
-.. function:: collectors()
+..  function:: collectors()
 
     Designed to be used in exporters in favor of ``metrics.collect()``.
 
     :return: a list of created collectors
 
-.. class:: collector_object
+..  class:: collector_object
 
-    .. method:: collect()
+    ..  method:: collect()
 
-        .. NOTE::
+        ..  NOTE::
 
             You'll probably want to use ``metrics.collectors()`` instead.
 
         Equivalent to:
 
-        .. code-block:: lua
+        ..  code-block:: lua
 
             for _, c in pairs(metrics.collectors()) do
                 for _, obs in ipairs(c:collect()) do
@@ -273,7 +273,7 @@ We encourage you to use the following methods **only when developing a new plugi
         :return: Concatenation of ``observation`` objects across all
                  created collectors.
 
-            .. code-block:: lua
+            ..  code-block:: lua
 
                 {
                     label_pairs: table,         -- `label_pairs` key-value table
@@ -292,7 +292,7 @@ Writing custom plugins
 
 Inside your main export function:
 
-.. code-block:: lua
+..  code-block:: lua
 
     -- Invoke all callbacks registered via `metrics.register_callback(<callback-function>)`.
     metrics.invoke_callbacks()

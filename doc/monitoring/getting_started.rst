@@ -12,20 +12,20 @@ Tarantool
 
 First, you need to install the ``metrics`` package:
 
-.. code-block:: console
+..  code-block:: console
 
     $ cd ${PROJECT_ROOT}
     $ tarantoolctl rocks install metrics
 
 Next, require it in your code:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local metrics = require('metrics')
 
 Set a global label for your metrics:
 
-.. code-block:: lua
+..  code-block:: lua
 
     metrics.set_global_labels({alias = 'alias'})
 
@@ -111,7 +111,7 @@ via configuration.
 
 #. After role initialization, default metrics will be enabled and the global
    label ``'alias'`` will be set. **Note** that ``'alias'`` label value is set by
-   instance :ref:`configuration option <cartridge-cfg>` ``alias`` or ``instance_name`` (since **0.6.1**).
+   instance :ref:`configuration option <cartridge-config>` ``alias`` or ``instance_name`` (since **0.6.1**).
 
    If you need to use the functionality of any
    metrics package, you may get it as a Cartridge service and use it like
@@ -126,7 +126,7 @@ via configuration.
    (to learn more about Cartridge configuration, see
    `this <https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data>`_):
 
-   .. code-block:: yaml
+   ..  code-block:: yaml
 
        metrics:
          export:
@@ -144,7 +144,7 @@ via configuration.
 
    **NOTE** that ``set_export`` has lower priority than clusterwide config and won't work if metrics config is present.
 
-   .. code-block:: lua
+   ..  code-block:: lua
 
        metrics.set_export({
            {
@@ -163,7 +163,7 @@ via configuration.
    You can add several entry points of the same format by different paths,
    like this:
 
-   .. code-block:: yaml
+   ..  code-block:: yaml
 
        metrics:
          export:
