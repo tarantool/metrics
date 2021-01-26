@@ -53,6 +53,7 @@ build = {
         ['metrics.tarantool.luajit']                     = 'metrics/tarantool/luajit.lua',
         ['metrics.utils']                                = 'metrics/utils.lua',
         ['cartridge.roles.metrics']                      = 'cartridge/roles/metrics.lua',
+        ['cartridge.health']                             = 'cartridge/health.lua',
     }
 }
 
