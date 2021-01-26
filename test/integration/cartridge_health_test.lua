@@ -67,6 +67,6 @@ g.test_cartridge_health_fail_handler = function()
                 status = 'orphan',
             }
     ]])
-    local resp = main_server:http_request('get', '/health')
+    local resp = main_server:http_request('get', '/health', {raise = false})
     t.assert_equals(resp.status, 500)
 end
