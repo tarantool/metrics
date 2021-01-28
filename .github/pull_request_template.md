@@ -4,6 +4,7 @@ I didn't forget about
 
 - [ ] Tests
 - [ ] Changelog
-- [ ] Documentation
+- [ ] Documentation (README and rst)
+- [ ] Rockspec and rpm spec
 
 Close #???

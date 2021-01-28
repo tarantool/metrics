@@ -8,18 +8,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - "tarantool/tarantool:1.10.8"
-          - "tarantool/tarantool:2.2"
-          - "tarantool/tarantool:2.3"
-          - "tarantool/tarantool:2.4"
-          - "tarantool/tarantool:2.5"
-          - "tarantool/tarantool:2.6"
-          - "tarantool/tarantool:2.7.0"
-        cartridge: [ '', "1.2.0", "2.1.2" ]
+        tarantool:
+          - "1.10.8"
+          - "2.2"
+          - "2.3"
+          - "2.4"
+          - "2.5"
+          - "2.6"
+          - "2.7.0"
+        cartridge: [ "", "1.2.0", "2.1.2" ]
     runs-on: ubuntu-latest
     container:
-      image: ${{ matrix.os }}
+      image: tarantool/tarantool:${{ matrix.tarantool }}
       env:
         CARTRIDGE_VERSION: ${{ matrix.cartridge }}
     steps:
