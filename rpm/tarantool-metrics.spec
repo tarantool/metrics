@@ -67,6 +67,7 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/utils.lua
 %dir %{luapkgdir}/metrics/tarantool
      %{luapkgdir}/metrics/tarantool/luajit.lua
+     %{luapkgdir}/metrics/tarantool/vinyl.lua
 %dir %{luapkgdir}/cartridge
      %{luapkgdir}/cartridge/health.lua
 %dir %{luapkgdir}/cartridge/roles
