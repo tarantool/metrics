@@ -311,3 +311,71 @@ There are also the following cross-platform metrics obtained using the call ``ge
 
 * ``tnt_cpu_user_time`` - Tarantool CPU user time.
 * ``tnt_cpu_system_time`` - Tarantool CPU system time.
+
+.. _metrics-vinyl:
+
+-------------------------------------------------------------------------------
+Vinyl
+-------------------------------------------------------------------------------
+
+Vinyl metrics provide :ref:`vinyl engine <storing-data-with-vinyl>` statistics.
+
+**Disk**
+
+* ``tnt_vinyl_disk_data_size`` - the amount of data that has gone into files, in bytes
+
+* ``tnt_vinyl_disk_index_size`` - the amount of index that has gone into files, in bytes
+
+* ``tnt_vinyl_disk_data_compacted_size`` - sum size of data stored at the last LSM tree level,
+in bytes, without taking disk compression into account
+
+**Regulator**
+
+* ``tnt_vinyl_regulator_dump_bandwidth`` - the estimated average rate at which dumps are done.
+Initially this will appear as 10485760 (10 megabytes per second). Only significant dumps
+(larger than one megabyte) are used for estimating
+
+* ``tnt_vinyl_regulator_write_rate`` - the actual average rate at which recent writes to disk are done.
+Averaging is done over a 5-second time window
+
+* ``tnt_vinyl_regulator_rate_limit`` - the write rate limit, in bytes per second,
+imposed on transactions by the regulator based on the observed dump/compaction performance
+
+* ``tnt_vinyl_regulator_dump_watermark`` - the point when dumping must occur.
+The value is slightly smaller than the amount of memory that is allocated for vinyl trees,
+which is the vinyl_memory paramete
+
+**Transactional activity**
+
+* ``tnt_vinyl_tx_conflict`` - counts conflicts that caused a transaction to roll back
+
+* ``tnt_vinyl_tx_commit`` - the count of commits (successful transaction ends).
+It includes implicit commits, for example any insert causes a commit unless it is within a begin-end block
+
+* ``tnt_vinyl_tx_rollback`` - the count of rollbacks (unsuccessful transaction ends).
+This is not merely a count of explicit ``box.rollback()`` requests – it includes requests that ended in errors
+
+**Memory**
+
+* ``tnt_vinyl_memory_tuple_cache`` - the number of bytes that are being used for tuples
+
+* ``tnt_vinyl_memory_level0`` - is the “level0” memory area, sometimes abbreviated “L0”,
+which is the area that vinyl can use for in-memory storage of an LSM tree.
+Therefore we can say that “L0 is becoming full” when the amount in this metric is close to the maximum,
+which is ``tnt_vinyl_regulator_dump_watermark``. We can expect that “L0 = 0” immediately after a dump
+
+* ``tnt_vinyl_memory_page_index`` - the number of bytes that are being used for indexes
+
+* ``tnt_vinyl_memory_bloom_filter`` - the number of bytes that are being used for bloom filter
+
+**Scheduler**
+
+* ``tnt_vinyl_scheduler_tasks_inprogress`` - number of currently running dump/compaction tasks
+
+* ``tnt_vinyl_scheduler_tasks_completed`` - number of successfully completed dump/compaction tasks
+
+* ``tnt_vinyl_scheduler_tasks_failed`` - number of dump/compaction tasks aborted due to errors
+
+* ``tnt_vinyl_scheduler_dump_time`` - total time spent by all worker threads performing dumps, in seconds
+
+* ``tnt_vinyl_scheduler_dump_count`` - the count of completed dumps
