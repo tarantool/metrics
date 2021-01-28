@@ -24,7 +24,7 @@ test: .rocks
 .PHONY: test_with_coverage_report
 test_with_coverage_report: .rocks
 	rm -f tmp/luacov.*.out*
-	.rocks/bin/luatest --coverage
+	.rocks/bin/luatest --coverage -v
 	.rocks/bin/luacov .
 	echo
 	grep -A999 '^Summary' tmp/luacov.report.out
