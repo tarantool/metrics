@@ -70,12 +70,12 @@ Instance health check
 -------------------------------------------------------------------------------
 
 In production environments Tarantool Cluster usually has a large number of so called
-"routers", Tarantool instances that handle input load and it is required to evenly 
-distribute the load. Various load-balancers are used for this, but any load-balancer 
-have to know which "routers" are ready to accept the load at that very moment. Metrics 
-library has a special plugin that creates an http handler that can be used by the 
-load-balancer to check the current state of any Tarantool instance. If the instance 
-is ready to accept the load, it will return a response with a 200 status code, if not, 
+"routers", Tarantool instances that handle input load and it is required to evenly
+distribute the load. Various load-balancers are used for this, but any load-balancer
+have to know which "routers" are ready to accept the load at that very moment. Metrics
+library has a special plugin that creates an http handler that can be used by the
+load-balancer to check the current state of any Tarantool instance. If the instance
+is ready to accept the load, it will return a response with a 200 status code, if not,
 with a 500 status code.
 
 .. _cartridge-role:
@@ -117,6 +117,31 @@ via configuration.
            },
        })
 
+#. To view metrics via API endpoints, use ``set_export``:
+
+   **NOTE** that ``set_export`` has lower priority than clusterwide config and won't work if metrics config is present.
+
+   ..  code-block:: lua
+
+       local metrics = require('cartridge.roles.metrics')
+       metrics.set_export({
+           {
+               path = '/path_for_json_metrics',
+               format = 'json'
+           },
+           {
+               path = '/path_for_prometheus_metrics',
+               format = 'prometheus'
+           },
+           {
+               path = '/health',
+               format = 'health'
+           }
+       })
+
+   The metrics will be available on the path specified in ``path`` in the format
+   specified in ``format``.
+
 #. Enable role in the interface:
 
    .. image:: images/role-enable.png
@@ -137,7 +162,7 @@ via configuration.
        local cartridge = require('cartridge')
        local metrics = cartridge.service_get('metrics')
 
-#. To view metrics via API endpoints, use the following configuration
+#. To change metrics HTTP path, use the following configuration
    (to learn more about Cartridge configuration, see
    `this <https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data>`_):
 
@@ -154,32 +179,6 @@ via configuration.
 
    .. image:: images/role-config.png
       :align: center
-
-   **OR**
-
-   Use ``set_export``:
-
-   **NOTE** that ``set_export`` has lower priority than clusterwide config and won't work if metrics config is present.
-
-   ..  code-block:: lua
-
-       metrics.set_export({
-           {
-               path = '/path_for_json_metrics',
-               format = 'json'
-           },
-           {
-               path = '/path_for_prometheus_metrics',
-               format = 'prometheus'
-           },
-           {
-               path = '/health',
-               format = 'health'
-           }           
-       })
-
-   The metrics will be available on the path specified in ``path`` in the format
-   specified in ``format``.
 
    You can add several entry points of the same format by different paths,
    like this:

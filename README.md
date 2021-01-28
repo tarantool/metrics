@@ -186,7 +186,30 @@ via configuration.
        - path: '/health'
          format: 'health'
    ```
+   **OR**
 
+   Use `set_export`:
+
+   **NOTE** that `set_export` has lower priority than clusterwide config and won't work if metrics config is present.
+
+   ```lua
+
+       local metrics = require('cartridge.roles.metrics')
+       metrics.set_export({
+           {
+               path = '/path_for_json_metrics',
+               format = 'json'
+           },
+           {
+               path = '/path_for_prometheus_metrics',
+               format = 'prometheus'
+           },
+           {
+               path = '/health',
+               format = 'health'
+           }
+       })
+   ```
 You can add several entry points of the same format by different paths, like this:
 ```yaml
 metrics:

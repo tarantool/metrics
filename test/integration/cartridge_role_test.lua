@@ -274,3 +274,18 @@ g.test_non_empty_clusterwide_config_overrides_set_export = function()
     resp = server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 404)
 end
+
+g.test_set_export_from_require_role = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_export(...)
+    ]], {{
+        {
+            path = '/metrics',
+            format = 'json',
+        },
+    }})
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+end
