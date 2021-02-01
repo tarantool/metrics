@@ -6,9 +6,9 @@ local function update()
     end
 
     local vinyl_stat = box.stat.vinyl()
-    utils.set_gauge('vinyl_disk_data_size', 'Amount of data that has gone into files', vinyl_stat.disk.data)
-    utils.set_gauge('vinyl_disk_index_size', 'Amount of index that has gone into files', vinyl_stat.disk.index)
-    utils.set_gauge('vinyl_disk_data_compacted_size', 'Amount of index that has gone into files',
+    utils.set_gauge('vinyl_disk_data_size', 'Amount of data stored in files', vinyl_stat.disk.data)
+    utils.set_gauge('vinyl_disk_index_size', 'Amount of index stored in files', vinyl_stat.disk.index)
+    utils.set_gauge('vinyl_disk_data_compacted_size', 'Size of data stored at the last LSM tree level',
         vinyl_stat.disk.data_compacted)
 
     utils.set_gauge('vinyl_regulator_dump_bandwidth', 'Estimated average rate at which dumps are done',
@@ -29,9 +29,12 @@ local function update()
     utils.set_gauge('vinyl_memory_page_index', 'Size of page indexes', vinyl_stat.memory.page_index)
     utils.set_gauge('vinyl_memory_bloom_filter', 'Size of bloom filter', vinyl_stat.memory.bloom_filter)
 
-    utils.set_gauge('vinyl_scheduler_tasks_inprogress', 'Running tasks count', vinyl_stat.scheduler.tasks_inprogress)
-    utils.set_gauge('vinyl_scheduler_tasks_completed', 'Completed tasks count', vinyl_stat.scheduler.tasks_completed)
-    utils.set_gauge('vinyl_scheduler_tasks_failed', 'Aborted tasks count', vinyl_stat.scheduler.tasks_failed)
+    utils.set_gauge('vinyl_scheduler_tasks', 'Vinyl tasks count', vinyl_stat.scheduler.tasks_inprogress,
+        {status = 'inprogress'})
+    utils.set_gauge('vinyl_scheduler_tasks', 'Vinyl tasks count', vinyl_stat.scheduler.tasks_completed,
+        {status = 'completed'})
+    utils.set_gauge('vinyl_scheduler_tasks', 'Vinyl tasks count', vinyl_stat.scheduler.tasks_failed,
+        {status = 'failed'})
 
     utils.set_gauge('vinyl_scheduler_dump_time', 'Total time spent by all worker threads performing dump',
         vinyl_stat.scheduler.dump_time)
