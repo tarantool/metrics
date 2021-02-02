@@ -139,6 +139,22 @@ via configuration.
            }
        })
 
+   You can add several entry points of the same format by different paths,
+   like this:
+
+   ..  code-block:: yaml
+
+       metrics.set_export({
+           {
+               path = '/path_for_json_metrics',
+               format = 'json'
+           },
+           {
+               path = '/another_path_for_json_metrics',
+               format = 'json'
+           },
+       })
+
    The metrics will be available on the path specified in ``path`` in the format
    specified in ``format``.
 
@@ -162,9 +178,10 @@ via configuration.
        local cartridge = require('cartridge')
        local metrics = cartridge.service_get('metrics')
 
-#. To change metrics HTTP path, use the following configuration
+#. To change metrics HTTP path in **runtime**, you may use the following configuration
    (to learn more about Cartridge configuration, see
-   `this <https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data>`_):
+   `this <https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data>`_).
+   We don't recommend to use it to set up metrics role, use ``set_export`` instead.
 
    ..  code-block:: yaml
 
@@ -180,14 +197,4 @@ via configuration.
    .. image:: images/role-config.png
       :align: center
 
-   You can add several entry points of the same format by different paths,
-   like this:
-
-   ..  code-block:: yaml
-
-       metrics:
-         export:
-           - path: '/path_for_json_metrics'
-             format: 'json'
-           - path: '/another_path_for_json_metrics'
-             format: 'json'
+.. _grafana-dashboard:
