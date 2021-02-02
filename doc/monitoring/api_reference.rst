@@ -90,7 +90,7 @@ Gauge
 
         Same as Counter ``inc()``.
 
-    ..  method:: inc(num, label_pairs)
+    ..  method:: dec(num, label_pairs)
 
         Same as ``inc()``, but decreases the observation.
 
