@@ -281,7 +281,7 @@ to properly display panels (e.g. provided with ``cartridge.roles.metrics`` role)
             fieldpass = ["value"]
 
     Be sure to include each label key as ``label_pairs_<key>`` so it will be
-    extracted with plugin. For example, if you use ``{ state = 'ready' }`` labels
+    extracted with plugin. For example, if you use :code:`{ state = 'ready' }` labels
     somewhere in metric collectors, add ``label_pairs_state`` tag key.
 
     If you connect Telegraf instance to InfluxDB storage, metrics will be stored
