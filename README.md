@@ -164,7 +164,46 @@ via configuration.
        },
    })
    ```
-3. After role initialization, default metrics will be enabled and the global
+
+3. To view metrics via API endpoints, use `set_export`.
+   **NOTE** that `set_export` has lower priority than clusterwide config and won't work if metrics config is present.
+
+   ```lua
+   local metrics = require('cartridge.roles.metrics')
+   metrics.set_export({
+       {
+           path = '/path_for_json_metrics',
+           format = 'json'
+       },
+       {
+           path = '/path_for_prometheus_metrics',
+           format = 'prometheus'
+       },
+       {
+           path = '/health',
+           format = 'health'
+       }
+   })
+   ```
+   You can add several entry points of the same format by different paths,
+   like this:
+
+   ```lua
+   metrics.set_export({
+      {
+          path = '/path_for_json_metrics',
+          format = 'json'
+      },
+      {
+          path = '/another_path_for_json_metrics',
+          format = 'json'
+      },
+   })
+   ```
+   The metrics will be available on the path specified in `path` in the format
+   specified in `format`.
+
+4. After role initialization, default metrics will be enabled and the global
    label 'alias' will be set. If you need to use the functionality of any metrics
    package, you may get it as a Cartridge service and use it like a regular
    package after `require`:
@@ -172,53 +211,6 @@ via configuration.
    local cartridge = require('cartridge')
    local metrics = cartridge.service_get('metrics')
    ```
-
-4. To view metrics via API endpoints, use the following configuration
-   (to learn more about Cartridge configuration, see
-   [this](https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data)):
-   ```yaml
-   metrics:
-     export:
-       - path: '/path_for_json_metrics'
-         format: 'json'
-       - path: '/path_for_prometheus_metrics'
-         format: 'prometheus'
-       - path: '/health'
-         format: 'health'
-   ```
-   **OR**
-
-   Use `set_export`:
-
-   **NOTE** that `set_export` has lower priority than clusterwide config and won't work if metrics config is present.
-
-   ```lua
-
-       local metrics = require('cartridge.roles.metrics')
-       metrics.set_export({
-           {
-               path = '/path_for_json_metrics',
-               format = 'json'
-           },
-           {
-               path = '/path_for_prometheus_metrics',
-               format = 'prometheus'
-           },
-           {
-               path = '/health',
-               format = 'health'
-           }
-       })
-   ```
-You can add several entry points of the same format by different paths, like this:
-```yaml
-metrics:
-  export:
-    - path: '/path_for_json_metrics'
-      format: 'json'
-    - path: '/another_path_for_json_metrics'
-      format: 'json'
-```
 
 ## Next steps
 

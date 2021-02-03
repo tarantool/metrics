@@ -117,7 +117,7 @@ via configuration.
            },
        })
 
-#. To view metrics via API endpoints, use ``set_export``:
+#. To view metrics via API endpoints, use ``set_export``.
 
    **NOTE** that ``set_export`` has lower priority than clusterwide config and won't work if metrics config is present.
 
@@ -197,4 +197,3 @@ via configuration.
    .. image:: images/role-config.png
       :align: center
 
-.. _grafana-dashboard:
