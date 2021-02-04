@@ -192,5 +192,3 @@ via configuration.
              format: 'json'
            - path: '/another_path_for_json_metrics'
              format: 'json'
-
-.. _grafana-dashboard:

@@ -18,3 +18,4 @@ This chapter includes the following sections:
    metrics_reference
    api_reference
    plugins
+   grafana_dashboard
