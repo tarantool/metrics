@@ -123,3 +123,11 @@ g.test_fiber_yield = function()
         quantile.Insert(q1, math.random(1))
     end
 end
+
+g.test_query_on_empty_quantile = function()
+    local emptyQuantile = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+
+    local res = quantile.Query(emptyQuantile, 0.99)
+
+    t.assert_equals(res, math.huge)
+end

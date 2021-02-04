@@ -168,6 +168,8 @@ Summary
     :param string   help: Help description.
     :param table objectives: Quantiles to observe in the form ``{quantile = error, ... }``.
                           For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``
+    :param number max_age: Lifetime of bucket in sliding window, in seconds
+    :param number age_buckets: Configures how many buckets summary has in sliding window
 
     :return: Summary object
 
