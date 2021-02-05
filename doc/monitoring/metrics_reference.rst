@@ -24,21 +24,21 @@ Memory general
 
 These metrics provide a picture of memory usage by Tarantool process.
 
-* ``tnt_info_info_memory_cache`` - number of
+* ``tnt_info_memory_cache`` - number of
   bytes in the cache for the tuples stored for the vinyl storage engine.
 
-* ``tnt_info_info_memory_data`` - number of bytes used for storing user data (the tuples)
+* ``tnt_info_memory_data`` - number of bytes used for storing user data (the tuples)
   with the memtx engine and with level 0 of the vinyl engine, without taking memory fragmentation into account.
 
-* ``tnt_info_info_memory_index`` - number of bytes used for indexing user data,
+* ``tnt_info_memory_index`` - number of bytes used for indexing user data,
   including memtx and vinyl memory tree extents, the vinyl page index, and the vinyl bloom filters.
 
-* ``tnt_info_info_memory_lua`` - number of bytes used for Lua runtime.
+* ``tnt_info_memory_lua`` - number of bytes used for Lua runtime.
   Lua memory is bounded by 2 GB per instance. Monitoring of this metric can prevent memory overflow.
 
-* ``tnt_info_info_memory_net`` - number of bytes used for network input/output buffers.
+* ``tnt_info_memory_net`` - number of bytes used for network input/output buffers.
 
-* ``tnt_info_info_memory_tx`` - number of bytes in use by active transactions.
+* ``tnt_info_memory_tx`` - number of bytes in use by active transactions.
   For the vinyl storage engine, this is the total size of all allocated objects
   (struct txv, struct vy_tx, struct vy_read_interval) and tuples pinned for those objects.
 
@@ -215,7 +215,7 @@ Cartridge
 -------------------------------------------------------------------------------
 
 * ``cartridge_issues`` - Number of
-  `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>`
+  `issues <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_api/modules/cartridge.issues/>`_
   across cluster instances. This metric always has labels - ``{level="critical"}``.
   ``level`` - the level of the issue. ``critical`` level is associated with critical
   cluster problems, e.g. memory used ratio > 90%, ``warning`` is associated with
