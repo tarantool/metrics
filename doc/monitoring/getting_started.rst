@@ -142,7 +142,7 @@ via configuration.
    You can add several entry points of the same format by different paths,
    like this:
 
-   ..  code-block:: yaml
+   ..  code-block:: lua
 
        metrics.set_export({
            {
