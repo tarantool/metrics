@@ -212,6 +212,10 @@ via configuration.
    local metrics = cartridge.service_get('metrics')
    ```
 
+5. There is an ability in Tarantool Cartridge >= '2.4.0' to set a zone for each 
+   server in cluster. If zone was set for the server 'zone' label for all metrics 
+   of this server will be added.
+   
 ## Next steps
 
 See:

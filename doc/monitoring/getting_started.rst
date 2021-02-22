@@ -178,6 +178,10 @@ via configuration.
        local cartridge = require('cartridge')
        local metrics = cartridge.service_get('metrics')
 
+#. There is an ability in Tarantool Cartridge >= ``'2.4.0'`` to set a zone for each 
+   server in cluster. If zone was set for the server ``'zone'`` label for all metrics 
+   of this server will be added.
+
 #. To change metrics HTTP path in **runtime**, you may use the following configuration
    (to learn more about Cartridge configuration, see
    `this <https://www.tarantool.io/en/doc/latest/book/cartridge/topics/clusterwide-config/#managing-role-specific-data>`_).
