@@ -3,6 +3,7 @@ local t = require('luatest')
 local yaml = require('yaml')
 local g = t.group()
 
+local utils = require('test.utils')
 local helpers = require('test.helper')
 
 local function set_export(export)
@@ -288,4 +289,68 @@ g.test_set_export_from_require_role = function()
     }})
     local resp = server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
+end
+
+local function set_zones(zones)
+    local servers = {}
+    for k, v in pairs(zones) do
+        table.insert(servers, {uuid = k, zone = v})
+    end
+    return g.cluster.main_server.net_box:eval([[
+        local servers = ...
+        local ret, err = require('cartridge').admin_edit_topology({
+            servers = servers,
+        })
+        if ret == nil then
+            return nil, err
+        end
+        return true
+    ]], {servers})
+end
+
+local function check_cartridge_version(version)
+    local cartridge_version = require('cartridge.VERSION')
+    t.skip_if(cartridge_version == 'unknown',
+    'Cartridge version is unknown, must be 2.0.2 or greater')
+    t.skip_if(utils.is_version_less(cartridge_version, version),
+    string.format('Cartridge version is must be %s or greater', version))
+end
+
+g.test_zone_label_present = function()
+    check_cartridge_version('2.4.0')
+    local server = g.cluster.main_server
+
+    local ok, err = set_zones({
+        [server.instance_uuid] = 'z1',
+    })
+    t.assert_equals({ok, err}, {true, nil})
+    assert_upload_metrics_config('/metrics')
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(
+            'z1', obs.label_pairs['zone'],
+            ('Alias label is present in metric %s'):format(obs.metric_name)
+        )
+    end
+end
+
+g.test_zone_label_changes_in_runtime = function()
+    check_cartridge_version('2.4.0')
+    local server = g.cluster.main_server
+
+    local ok, err = set_zones({
+        [server.instance_uuid] = 'z2',
+    })
+    t.assert_equals({ok, err}, {true, nil})
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(
+            'z2', obs.label_pairs['zone'],
+            ('Alias label is present in metric %s'):format(obs.metric_name)
+        )
+    end
 end

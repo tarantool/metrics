@@ -19,10 +19,19 @@ local handlers = {
     end,
 }
 
-local function init()
+local function set_labels()
     local params, err = argparse.parse()
     assert(params, err)
-    metrics.set_global_labels({alias = params.alias or params.instance_name})
+    local this_instance = cartridge.admin_get_servers(box.info.uuid)
+    local zone
+    if this_instance and this_instance[1] then
+        zone = this_instance[1].zone
+    end
+    metrics.set_global_labels({alias = params.alias or params.instance_name, zone = zone})
+end
+
+local function init()
+    set_labels()
     metrics.enable_default_metrics()
     metrics.enable_cartridge_metrics()
 end
@@ -118,6 +127,7 @@ local function apply_config(conf)
         end
         metrics_config_present = false
     end
+    set_labels()
     apply_routes(metrics_conf.export)
 end
 
