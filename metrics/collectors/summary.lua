@@ -6,15 +6,15 @@ local fiber = require('fiber')
 
 local Summary = Shared:new_class('summary', {'observe_latency'})
 
-function Summary:new(name, help, objectives, max_age, age_buckets)
+function Summary:new(name, help, objectives, max_age_time, age_buckets_count)
     local obj = Shared.new(self, name, help)
 
     obj.count_collector = Counter:new(name .. '_count', help)
     obj.sum_collector = Counter:new(name .. '_sum', help)
     obj.objectives = objectives
-    obj.max_age = max_age
-    obj.age_buckets = age_buckets or 0
-    obj.age_buckets_obs = {}
+    obj.max_age_time = max_age_time
+    obj.age_buckets_count = age_buckets_count or 1
+    obj.observation_buckets = {}
     obj.last_rotate = {}
     return obj
 end
@@ -35,11 +35,11 @@ function Summary:set_registry(registry)
 end
 
 function Summary:rotate_age_buckets(key)
-    self.observations[key] = self.age_buckets_obs[key][1]
-    for i = 2, self.age_buckets do
-        self.age_buckets_obs[key][i - 1] = self.age_buckets_obs[key][i]
+    self.observations[key] = self.observation_buckets[key][1]
+    for i = 2, self.age_buckets_count do
+        self.observation_buckets[key][i - 1] = self.observation_buckets[key][i]
     end
-    self.age_buckets_obs[key][self.age_buckets] = Quantile.NewTargeted(self.objectives)
+    self.observation_buckets[key][self.age_buckets_count] = Quantile.NewTargeted(self.objectives)
     self.last_rotate[key] = os.time()
 end
 
@@ -53,26 +53,26 @@ function Summary:observe(num, label_pairs)
     if self.objectives then
         local key = self.make_key(label_pairs)
         if not self.observations[key] then
-            self.observations[key] = Quantile.NewTargeted(self.objectives)
-            self.age_buckets_obs[key] = self.age_buckets and {}
-            for i = 1, self.age_buckets do
-                self.age_buckets_obs[key][i] = Quantile.NewTargeted(self.objectives)
+            self.observation_buckets[key] = {}
+            for i = 1, self.age_buckets_count do
+                self.observation_buckets[key][i] = Quantile.NewTargeted(self.objectives)
             end
+            self.observations[key] = self.observation_buckets[key][1]
             self.label_pairs[key] = label_pairs
             self.last_rotate[key] = os.time()
         end
         Quantile.Insert(self.observations[key], num)
-        for i = 1, self.age_buckets do
-            Quantile.Insert(self.age_buckets_obs[key][i], num)
+        for i = 2, self.age_buckets_count do
+            fiber.create(function() Quantile.Insert(self.observation_buckets[key][i], num) end)
         end
-        if self.age_buckets > 0 and os.time() - self.last_rotate[key] >= self.max_age then
+        if self.age_buckets_count > 1 and os.time() - self.last_rotate[key] >= self.max_age_time then
             self:rotate_age_buckets(key)
         end
     end
 end
 
 function Summary:collect_quantiles()
-    if next(self.observations) == nil then
+    if not self.objectives or next(self.observations) == nil then
         return {}
     end
     local result = {}

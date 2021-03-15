@@ -7,6 +7,10 @@ local Summary = require('metrics.collectors.summary')
 local Quantile = require('metrics.quantile')
 local metrics = require('metrics')
 
+g.before_each = function()
+    metrics.clear()
+end
+
 g.test_collect = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
     instance:observe(1)
@@ -71,10 +75,10 @@ g.test_summary_4_age_buckets_value_in_each_bucket = function()
         instance:observe(i)
     end
 
-    t.assert_equals(#instance.age_buckets_obs[''], 4)
+    t.assert_equals(#instance.observation_buckets[''], 4)
 
     local q = Quantile.Query(instance.observations[''], 0.5)
-    for _,v in ipairs(instance.age_buckets_obs['']) do
+    for _,v in ipairs(instance.observation_buckets['']) do
         t.assert_equals(q, Quantile.Query(v, 0.5))
     end
 end
@@ -86,8 +90,8 @@ g.test_summary_4_age_buckets_rotates = function()
     instance:observe(1) -- summary rotates at this moment
 
     local q = Quantile.Query(instance.observations[''], 0.5)
-    local q1 = Quantile.Query(instance.age_buckets_obs[''][4], 0.5)
-    local last_bucket_len = instance.age_buckets_obs[''][4].b_len + instance.age_buckets_obs[''][4].stream.n
+    local q1 = Quantile.Query(instance.observation_buckets[''][4], 0.5)
+    local last_bucket_len = instance.observation_buckets[''][4].b_len + instance.observation_buckets[''][4].stream.n
     local first_bucket_len = instance.observations[''].b_len + instance.observations[''].stream.n
 
     t.assert_not_equals(last_bucket_len, first_bucket_len)
@@ -103,6 +107,23 @@ g.test_summary_counter_values_equals = function()
     local count = instance.observations[''].b_len + instance.observations[''].stream.n
 
     t.assert_equals(instance.count_collector.observations[''], count)
+end
+
+g.test_summary_with_age_buckets_refresh_values = function()
+    local s1 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+    local s2 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 0, 4)
+
+    for i = 1, 10 do
+        s1:observe(i)
+        s2:observe(i)
+    end
+    for i = 0.1, 1, 0.1 do
+        s1:observe(i)
+        s2:observe(i)
+    end
+
+    t.assert_equals(s1:collect()[5].value, 10)
+    t.assert_not_equals(s1:collect()[5].value, s2:collect()[5].value)
 end
 
 g.test_summary_wrong_label = function()
