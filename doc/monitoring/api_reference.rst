@@ -454,10 +454,10 @@ Using summaries:
 
     local metrics = require('metrics')
 
-    -- create a summary
+    -- create a summary with a sliding wingow with 5 age buckets and 600s bucket lifetime
     local http_requests_latency = metrics.summary(
         'http_requests_latency', 'HTTP requests total',
-        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}
+        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 600, 5
     )
 
     -- somewhere in the HTTP requests middleware:
