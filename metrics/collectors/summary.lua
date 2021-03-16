@@ -95,13 +95,13 @@ end
 
 function Summary:collect()
     local result = {}
-    for _, obs in pairs(self.count_collector:collect()) do
+    for _, obs in ipairs(self.count_collector:collect()) do
         table.insert(result, obs)
     end
-    for _, obs in pairs(self.sum_collector:collect()) do
+    for _, obs in ipairs(self.sum_collector:collect()) do
         table.insert(result, obs)
     end
-    for _, obs in pairs(self:collect_quantiles()) do
+    for _, obs in ipairs(self:collect_quantiles()) do
         table.insert(result, obs)
     end
     return result
