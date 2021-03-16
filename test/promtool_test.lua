@@ -6,7 +6,8 @@ local metrics = require('metrics')
 local counter = metrics.counter('counter_total', 'help text')
 local gauge = metrics.gauge('gauge', 'help text')
 local histogram = metrics.histogram('histogran', 'help text', nil)
-local summary = metrics.summary('summary', 'help text', {[0.5] = 0.01, [0.9] = 0.01, [0.99] = 0.01})
+local summary = metrics.summary('summary', 'help text', {[0.5] = 0.01, [0.9] = 0.01, [0.99] = 0.01},
+    {max_age_time = 600, age_buckets_count = 5})
 for i = 1, 10^3 do
     summary:observe(i)
     histogram:observe(i)

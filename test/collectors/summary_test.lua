@@ -44,7 +44,8 @@ end
 local test_data_collect = {
     ['100_values'] = {num_observations = 100, input = {{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}}},
     ['10k'] = {num_observations = 10^4, input = {{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}}},
-    ['10k_4_age_buckets'] = {num_observations = 10^4, input = {{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 1, 4}},
+    ['10k_4_age_buckets'] = {num_observations = 10^4, input = {{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 1, age_buckets_count = 4}}},
 }
 
 for test_case, test_data in pairs(test_data_collect) do
@@ -70,7 +71,8 @@ for test_case, test_data in pairs(test_data_collect) do
 end
 
 g.test_summary_4_age_buckets_value_in_each_bucket = function()
-    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 10, 4)
+    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 10, age_buckets_count = 4})
     for i = 1, 10^3 do
         instance:observe(i)
     end
@@ -84,7 +86,8 @@ g.test_summary_4_age_buckets_value_in_each_bucket = function()
 end
 
 g.test_summary_4_age_buckets_rotates = function()
-    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 0, 4)
+    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 0, age_buckets_count = 4})
 
     instance:observe(1)
     instance:observe(1) -- summary rotates at this moment
@@ -111,7 +114,8 @@ end
 
 g.test_summary_with_age_buckets_refresh_values = function()
     local s1 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
-    local s2 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 0, 4)
+    local s2 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 0, age_buckets_count = 4})
 
     for i = 1, 10 do
         s1:observe(i)
@@ -127,7 +131,8 @@ g.test_summary_with_age_buckets_refresh_values = function()
 end
 
 g.test_summary_wrong_label = function()
-    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 0, 4)
+    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 0, age_buckets_count = 4})
 
     t.assert_error_msg_contains('Label "quantile" are not allowed in summary',
         instance.observe, instance, 1, {quantile = 0.5})
@@ -135,18 +140,20 @@ end
 
 local test_data_wrong_input = {
     objectives = {error = 'Invalid value for objectives', input = {'summary', nil, {0.5, 0.9, 0.99}}},
-    max_age = {error = 'Max age must be positive', input = {'summary', nil, {[0.5]=0.01}, -1}},
+    max_age = {error = 'Max age must be positive', input = {'summary', nil, {[0.5]=0.01}, {max_age_time = -1}}},
     age_buckets = {error = 'Age buckets count must be greater or equal than one',
-        input = {'summary', nil, {[0.5]=0.01}, 1, -1}},
+        input = {'summary', nil, {[0.5]=0.01}, {max_age_time = 1, age_buckets_count = -1}}},
     age_buckets_without_max_age = {error = 'Age buckets count and max age must be present only together',
-        input = {'summary', nil, {[0.5]=0.01}, nil, 1}},
+        input = {'summary', nil, {[0.5]=0.01}, {age_buckets_count = 1}}},
     max_age_without_age_buckets = {error = 'Age buckets count and max age must be present only together',
-        input = {'summary', nil, {[0.5]=0.01}, 1, nil}},
+        input = {'summary', nil, {[0.5]=0.01}, {max_age_time = 1}}},
     bad_collector_name_type = {error = 'bad argument', input = {nil}},
     bad_help_string_type = {error = 'bad argument', input = {'summary', {}}},
     bad_objectives_type = {error = 'bad argument', input = {'summary', 'help', 'objectives'}},
-    bad_max_age_type = {error = 'bad argument', input = {'summary', 'help', {[0.5]=0.01}, '1', 1}},
-    bad_age_buckets_type = {error = 'bad argument', input = {'summary', 'help', {[0.5]=0.01}, 1, '1'}},
+    bad_max_age_type = {error = 'bad argument', input = {'summary', 'help', {[0.5]=0.01},
+        {max_age_time = '1', age_buckets_count = 1}}},
+    bad_age_buckets_type = {error = 'bad argument', input = {'summary', 'help', {[0.5]=0.01},
+        {max_age_time = 1, age_buckets_count = '1'}}},
 }
 
 for case_name, test_data in pairs(test_data_wrong_input) do

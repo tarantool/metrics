@@ -56,22 +56,28 @@ local function histogram(name, help, buckets)
     return registry:find_or_create(Histogram, name, help, buckets)
 end
 
-local function summary(name, help, objectives, max_age, age_buckets)
-    checks('string', '?string', '?table', '?number', '?number')
+local function summary(name, help, objectives, params)
+    checks('string', '?string', '?table', {
+        age_buckets_count = '?number',
+        max_age_time = '?number',
+    })
     if objectives ~= nil and not Summary.check_quantiles(objectives) then
         error('Invalid value for objectives')
     end
-    if max_age and max_age <= 0 then
+    params = params or {}
+    local age_buckets_count = params.age_buckets_count
+    local max_age_time = params.max_age_time
+    if max_age_time and max_age_time <= 0 then
         error('Max age must be positive')
     end
-    if age_buckets and age_buckets < 1 then
+    if age_buckets_count and age_buckets_count < 1 then
         error('Age buckets count must be greater or equal than one')
     end
-    if (max_age and not age_buckets) or (not max_age and age_buckets) then
+    if (max_age_time and not age_buckets_count) or (not max_age_time and age_buckets_count) then
         error('Age buckets count and max age must be present only together')
     end
 
-    return registry:find_or_create(Summary, name, help, objectives, max_age, age_buckets)
+    return registry:find_or_create(Summary, name, help, objectives, params)
 end
 
 local function set_global_labels(label_pairs)
