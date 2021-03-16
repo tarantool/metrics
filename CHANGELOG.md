@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New default metrics: cpu_user_time, cpu_system_time
 - Vinyl metrics
 
+### Fixed
+- `ipairs` instead of `pairs` while iteration in `histogram`
+
 ## [0.7.1] - 2021-03-18
 ### Added
 - zone label support for Tarantool Cartridge >= '2.4.0'
