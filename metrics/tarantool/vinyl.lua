@@ -8,8 +8,6 @@ local function update()
     local vinyl_stat = box.stat.vinyl()
     utils.set_gauge('vinyl_disk_data_size', 'Amount of data stored in files', vinyl_stat.disk.data)
     utils.set_gauge('vinyl_disk_index_size', 'Amount of index stored in files', vinyl_stat.disk.index)
-    utils.set_gauge('vinyl_disk_data_compacted_size', 'Size of data stored at the last LSM tree level',
-        vinyl_stat.disk.data_compacted)
 
     utils.set_gauge('vinyl_regulator_dump_bandwidth', 'Estimated average rate at which dumps are done',
         vinyl_stat.regulator.dump_bandwidth)
@@ -22,6 +20,7 @@ local function update()
     utils.set_gauge('vinyl_tx_conflict', 'Count of transaction conflicts', vinyl_stat.tx.conflict)
     utils.set_gauge('vinyl_tx_commit', 'Count of commits', vinyl_stat.tx.commit)
     utils.set_gauge('vinyl_tx_rollback', 'Count of rollbacks', vinyl_stat.tx.rollback)
+    utils.set_gauge('vinyl_tx_read_views', 'Count of open read views', vinyl_stat.tx.read_views)
 
     utils.set_gauge('vinyl_memory_tuple_cache', 'Number of bytes that are being used for tuple',
         vinyl_stat.memory.tuple_cache)

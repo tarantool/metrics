@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - New default metrics: cpu_user_time, cpu_system_time
+- Vinyl metrics
 
 ## [0.7.1] - 2021-03-18
 ### Added
