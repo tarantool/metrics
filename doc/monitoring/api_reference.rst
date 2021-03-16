@@ -168,8 +168,9 @@ Summary
     :param string   help: Help description.
     :param table objectives: Quantiles to observe in the form ``{quantile = error, ... }``.
                           For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``
-    :param number max_age: Lifetime of bucket in sliding window, in seconds
-    :param number age_buckets: Configures how many buckets summary has in sliding window
+    :param table params: Table of summary parameters, ``age_buckets_count`` -
+            configures how many buckets summary has in sliding window, ``max_age_time`` -
+            lifetime of bucket in sliding window, in seconds
 
     :return: Summary object
 
@@ -457,7 +458,8 @@ Using summaries:
     -- create a summary with a sliding wingow with 5 age buckets and 600s bucket lifetime
     local http_requests_latency = metrics.summary(
         'http_requests_latency', 'HTTP requests total',
-        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 600, 5
+        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 600, age_buckets_count = 5}
     )
 
     -- somewhere in the HTTP requests middleware:

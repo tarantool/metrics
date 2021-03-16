@@ -6,14 +6,15 @@ local fiber = require('fiber')
 
 local Summary = Shared:new_class('summary', {'observe_latency'})
 
-function Summary:new(name, help, objectives, max_age_time, age_buckets_count)
+function Summary:new(name, help, objectives, params)
+    params = params or {}
     local obj = Shared.new(self, name, help)
 
     obj.count_collector = Counter:new(name .. '_count', help)
     obj.sum_collector = Counter:new(name .. '_sum', help)
     obj.objectives = objectives
-    obj.max_age_time = max_age_time
-    obj.age_buckets_count = age_buckets_count or 1
+    obj.max_age_time = params.max_age_time
+    obj.age_buckets_count = params.age_buckets_count or 1
     obj.observation_buckets = {}
     obj.last_rotate = {}
     return obj
