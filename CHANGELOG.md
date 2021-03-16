@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - `tnt_cartridge_issues` gathers only local issues [#211](https://github.com/tarantool/metrics/issues/211)
 
+### Added
+- Age buckets in `summary`
+
 ## [0.8.0] - 2021-04-13
 ### Added
 - New default metrics: cpu_user_time, cpu_system_time
