@@ -168,7 +168,7 @@ g.test_validate_config_invalid_export_format = function()
                 },
             },
         }
-    }, 'format must be "json" or "prometheus"')
+    }, 'format must be "json", "prometheus" or "health"')
 end
 
 g.test_validate_config_duplicate_paths = function()
@@ -253,7 +253,7 @@ g.test_set_export_validates_input = function()
             format = 'invalid-format'
         },
     })
-    t.assert_str_icontains(err, 'format must be "json" or "prometheus"')
+    t.assert_str_icontains(err, 'format must be "json", "prometheus" or "health"')
 end
 
 g.test_empty_clusterwide_config_not_overrides_set_export = function()

@@ -63,7 +63,7 @@ local function validate_routes(export)
     for _, v in ipairs(export) do
         v.path = remove_side_slashes(v.path)
         assert(type(v.path) == 'string', 'export.path must be string')
-        assert(handlers[v.format], 'format must be "json" or "prometheus"')
+        assert(handlers[v.format], 'format must be "json", "prometheus" or "health"')
         assert(paths[v.path] == nil, 'paths must be unique')
         paths[v.path] = true
     end
