@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - zone label support for Tarantool Cartridge >= '2.4.0'
+- rpm packaging for CentOS 8, Fedora 30, 31, 32
 
 ## [0.7.0] - 2021-02-09
 ### Added

@@ -12,6 +12,8 @@ jobs:
         os:
           - name: el
             dist: 7
+          - name: el
+            dist: 8
           - name: fedora
             dist: 26
           - name: fedora
@@ -20,6 +22,12 @@ jobs:
             dist: 28
           - name: fedora
             dist: 29
+          - name: fedora
+            dist: 30
+          - name: fedora
+            dist: 31
+          - name: fedora
+            dist: 32
         repository:
           - "1_10"
           - "2x"
