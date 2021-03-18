@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.1] - 2021-03-18
 ### Added
 - zone label support for Tarantool Cartridge >= '2.4.0'
 - rpm packaging for CentOS 8, Fedora 30, 31, 32
