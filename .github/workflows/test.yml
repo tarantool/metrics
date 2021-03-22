@@ -52,10 +52,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: install Tarantool
-        run: |
-          curl -L https://tarantool.io/installer.sh | sudo VER=2.4 bash
-          sudo apt install -y tarantool-dev
+      - uses: tarantool/setup-tarantool@v1
+        with:
+          tarantool-version: '2.4'
 
       - uses: actions/setup-go@v2
         with:
