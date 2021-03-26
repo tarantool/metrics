@@ -78,7 +78,7 @@ local function assert_upload_metrics_config(path)
 end
 
 
-g.before_all = function()
+g.before_each(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     g.cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
@@ -94,7 +94,12 @@ g.before_all = function()
         },
     })
     g.cluster:start()
-end
+end)
+
+g.after_each( function()
+    g.cluster:stop()
+    fio.rmtree(g.cluster.datadir)
+end )
 
 g.after_all = function()
     g.cluster:stop()
@@ -339,6 +344,7 @@ end
 g.test_zone_label_changes_in_runtime = function()
     check_cartridge_version('2.4.0')
     local server = g.cluster.main_server
+    assert_upload_metrics_config('/metrics')
 
     local ok, err = set_zones({
         [server.instance_uuid] = 'z2',
