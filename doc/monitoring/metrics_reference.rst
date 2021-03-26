@@ -221,15 +221,20 @@ Runtime
 Cartridge
 -------------------------------------------------------------------------------
 
-``cartridge_issues``—Number of
-:ref:`issues across cluster instances <cartridge.issues>`.
-This metric always has label ``{level="critical"}``, where
-``level`` is the level of the issue:
+* ``tnt_cartridge_issues``—Number of
+  :ref:`issues across cluster instances <cartridge.issues>`.
+  This metric always has label ``{level="critical"}``, where
+  ``level`` is the level of the issue:
 
-*   ``critical`` level is associated with critical
-    cluster problems, for example when memory used ratio is more than 90%.
-*   ``warning`` level is associated with
-    other cluster problems, e.g. replication issues on cluster.
+  *   ``critical`` level is associated with critical
+      cluster problems, for example when memory used ratio is more than 90%.
+  *   ``warning`` level is associated with
+      other cluster problems, e.g. replication issues on cluster.
+
+  This metric **will be disabled by default** in next releases.
+  To disable it use ``require('metrics.cartridge.issues').disable_global_issues()``.
+  It's not recommended to enable cluster issues on each instance because it
+  makes N network requests per instance (N is the number of instances in cluster).
 
 .. _metrics-luajit:
 

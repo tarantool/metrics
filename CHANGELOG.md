@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - New default metrics: cpu_user_time, cpu_system_time
+- `disable_global_issues` function that disables metric `tnt_cartridge_issues`
+
+### Deprecated
+- enabling `tnt_cartridge_issues` metric by default
 
 ## [0.7.1] - 2021-03-18
 ### Added

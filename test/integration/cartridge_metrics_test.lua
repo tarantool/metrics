@@ -67,62 +67,75 @@ g.test_cartridge_issues_present_on_healthy_cluster = function()
     end)
 end
 
-g.test_cartridge_issues_metric_warning = function()
-    check_cartridge_version()
+local function issues_warning(enable_global, assert_cnt)
+    return function()
+        check_cartridge_version()
 
-    local main_server = g.cluster:server('main')
-    local replica_server = g.cluster:server('replica')
-    upload_config()
-
-    -- Stage replication issue "Duplicate key exists in unique index 'primary' in space '_space'"
-    main_server.net_box:eval([[
-        __replication = box.cfg.replication
-        box.cfg{replication = box.NULL}
-    ]])
-    replica_server.net_box:eval([[
-        box.cfg{read_only = false}
-        box.schema.space.create('test')
-    ]])
-    main_server.net_box:eval([[
-        box.schema.space.create('test')
-        pcall(box.cfg, {replication = __replication})
-        __replication = nil
-    ]])
-
-    t.helpers.retrying({}, function()
-        local resp = main_server:http_request('get', '/metrics')
-        local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[1]
-        t.assert_equals(issues_metric.value, 2, [[
-          Issues count is two cause cluster should has two replication issues:
-          replication from main to replica is stopped and
-          replication from replica to main is stopped.
-        ]])
-        t.assert_equals(issues_metric.label_pairs.level, 'warning')
-    end)
-end
-
-g.test_cartridge_issues_metric_critical = function()
-    check_cartridge_version()
-    upload_config()
-    local main_server = g.cluster:server('main')
-
-    main_server.net_box:eval([[
-        box.slab.info = function()
-            return {
-                items_used = 99,
-                items_size = 100,
-                arena_used = 99,
-                arena_size = 100,
-                quota_used = 99,
-                quota_size = 100,
-            }
+        local main_server = g.cluster:server('main')
+        local replica_server = g.cluster:server('replica')
+        upload_config()
+        if enable_global then
+            main_server.net_box:eval("require('metrics.cartridge.issues').enable_global_issues()")
         end
-    ]])
-
-    t.helpers.retrying({}, function()
-        local resp = main_server:http_request('get', '/metrics')
-        local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[2]
-        t.assert_equals(issues_metric.value, 1)
-        t.assert_equals(issues_metric.label_pairs.level, 'critical')
-    end)
+        -- Stage replication issue "Duplicate key exists in unique index 'primary' in space '_space'"
+        main_server.net_box:eval([[
+            __replication = box.cfg.replication
+            box.cfg{replication = box.NULL}
+        ]])
+        replica_server.net_box:eval([[
+            box.cfg{read_only = false}
+            box.schema.space.create('test')
+        ]])
+        main_server.net_box:eval([[
+            box.schema.space.create('test')
+            pcall(box.cfg, {replication = __replication})
+            __replication = nil
+        ]])
+        t.helpers.retrying({}, function()
+            local resp = main_server:http_request('get', '/metrics')
+            local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[2]
+            t.assert_equals(issues_metric.value, assert_cnt)
+            t.assert_equals(issues_metric.label_pairs.level, 'warning')
+            t.assert_equals(issues_metric.label_pairs.issues, enable_global and 'global' or 'local')
+        end)
+    end
 end
+
+g.test_cartridge_issues_metric_warning_local = issues_warning(false, 1)
+g.test_cartridge_issues_metric_warning_global = issues_warning(true, 2)
+
+local function issues_critical(enable_global, assert_cnt)
+    return function()
+        check_cartridge_version()
+        local main_server = g.cluster:server('main')
+        local replica = g.cluster:server('replica')
+        upload_config()
+        if enable_global then
+            main_server.net_box:eval("require('metrics.cartridge.issues').enable_global_issues()")
+        end
+        for _, instance in ipairs({main_server, replica}) do
+            instance.net_box:eval([[
+                box.slab.info = function()
+                    return {
+                        items_used = 99,
+                        items_size = 100,
+                        arena_used = 99,
+                        arena_size = 100,
+                        quota_used = 99,
+                        quota_size = 100,
+                    }
+                end
+                ]])
+        end
+        t.helpers.retrying({}, function()
+            local resp = main_server:http_request('get', '/metrics')
+            local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[1]
+            t.assert_equals(issues_metric.value, assert_cnt)
+            t.assert_equals(issues_metric.label_pairs.level, 'critical')
+            t.assert_equals(issues_metric.label_pairs.issues, enable_global and 'global' or 'local')
+        end)
+    end
+end
+
+g.test_cartridge_issues_metric_critical_local = issues_critical(false, 1)
+g.test_cartridge_issues_metric_critical_global = issues_critical(true, 2)
