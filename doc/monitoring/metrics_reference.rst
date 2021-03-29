@@ -321,26 +321,26 @@ Vinyl
 Vinyl metrics provide :ref:`vinyl engine <storing-data-with-vinyl>` statistics.
 
 **Disk**
-Disk metrics could be useful to monitoring overall data size on disk.
+Disk metrics are used to monitor overall data size on disk.
 
 * ``tnt_vinyl_disk_data_size``—the amount of data stored in files, in bytes
 
 * ``tnt_vinyl_disk_index_size``—the amount of index stored in files, in bytes
 
 **Regulator**
-The vinyl regulator decides when to take or delay actions for disk IO,
-grouping activity in batches so that it is consistent and efficient.
+The vinyl regulator decides when to take disk IO actions.
+It groups activities in batches so that they are more consistent and efficient.
 
-* ``tnt_vinyl_regulator_dump_bandwidth``—the estimated average rate at which dumps are done.
+* ``tnt_vinyl_regulator_dump_bandwidth``—the estimated average rate at which dumps are performed.
   Initially this will appear as 10485760 (10 megabytes per second). Only significant dumps
-  (larger than one megabyte) are used for estimating
+  (larger than one megabyte) are used for the estimate.
 
-* ``tnt_vinyl_regulator_write_rate``—the actual average rate at which recent writes to disk are done.
-  Averaging is done over a 5-second time window. Monitoring of this value can be useful to understand state of disk.
+* ``tnt_vinyl_regulator_write_rate``—the actual average rate at which recent writes to disk are performed.
+  This is a moving average with a 5-second window. Monitoring of the value can be useful for understanding state of disk.
 
 * ``tnt_vinyl_regulator_rate_limit``—the write rate limit, in bytes per second,
   imposed on transactions by the regulator based on the observed dump/compaction performance.
-  If this value is decreasing to about 10^5 it indicates that something is wrong with disk or scheduler.
+  If the value is down to approx. 10^5 it indicates that something is wrong with the disk or scheduler.
 
 * ``tnt_vinyl_regulator_dump_watermark``—the point when dumping must occur.
   The value is slightly smaller than the amount of memory that is allocated for vinyl trees,
@@ -349,7 +349,7 @@ grouping activity in batches so that it is consistent and efficient.
 **Transactional activity**
 
 * ``tnt_vinyl_tx_conflict``—counts conflicts that caused a transaction to roll back.
-  Ratio ``tnt_vinyl_tx_commit / tnt_vinyl_tx_conflict`` is above 5% indicates that
+  Ratio ``tnt_vinyl_tx_commit / tnt_vinyl_tx_conflict`` above 5% indicates that
   vinyl is not healthy. At this moment you'll probably see a lot of other problems with vinyl.
 
 * ``tnt_vinyl_tx_commit``—the count of commits (successful transaction ends).
@@ -359,7 +359,7 @@ grouping activity in batches so that it is consistent and efficient.
   This is not merely a count of explicit ``box.rollback()`` requests – it includes requests that ended in errors
 
 * ``tnt_vinyl_tx_read_views``—the count of open read views (open transactions that holds copy of data).
-  Usually this value will be 0, but if it stays non-zero for a long time, it means that your memory is leaking.
+  Usually this value is 0. If it stays non-zero for a long time, it indicates of a memory leak.
 
 **Memory**
 
@@ -367,17 +367,17 @@ grouping activity in batches so that it is consistent and efficient.
 
 * ``tnt_vinyl_memory_level0``—is the “level0” memory area, sometimes abbreviated “L0”,
   which is the area that vinyl can use for in-memory storage of an LSM tree.
-  Therefore we can say that “L0 is becoming full” when the amount in this metric is close to the maximum,
-  which is ``tnt_vinyl_regulator_dump_watermark``. We can expect that “L0 = 0” immediately after a dump
+  “L0 is becoming full” means this metric is close to its maximum,
+  which is ``tnt_vinyl_regulator_dump_watermark``. We can expect “L0 = 0” immediately after a dump
 
 * ``tnt_vinyl_memory_page_index``—the number of bytes that are being used for indexes.
   If this metric is close to :ref:`vinyl_memory <confval-vinyl_memory>` that indicates
-  that :ref:`vinyl_page_size <confval-vinyl_page_size>` is choosed incorrect.
+  to incorrectly chosen :ref:`vinyl_page_size <confval-vinyl_page_size>`.
 
-* ``tnt_vinyl_memory_bloom_filter``—the number of bytes that are being used for bloom filter
+* ``tnt_vinyl_memory_bloom_filter``—the number of bytes used by the bloom filter
 
 **Scheduler**
-The scheduler invokes regulator, once per second, and updates related variables whenever it is invoked.
+The scheduler invokes regulator and updates related variables. This happens once per second.
 
 * ``tnt_vinyl_scheduler_tasks``—number of scheduler dump/compaction tasks. Always has label ``{status = "status"}``
   where ``status`` is ``inprogress`` for currently running tasks, ``completed`` for successfully completed tasks
