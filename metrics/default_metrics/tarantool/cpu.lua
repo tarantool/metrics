@@ -70,5 +70,5 @@ local function update_info_metrics()
 end
 
 return {
-    update = update_info_metrics
+    update = update_info_metrics,
 }
