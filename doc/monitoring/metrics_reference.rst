@@ -306,3 +306,8 @@ They are only available on Linux.
     *   ``kind`` can be either ``user`` or ``system``.
     *   ``thread_name`` is ``tarantool``, ``wal``, ``iproto``, or ``coio``.
     *   ``file_name`` is the entrypoint file name, for example, ``init.lua``.
+
+There are also the following cross-platform metrics obtained using the call ``getrusage()``
+
+* ``tnt_cpu_user_time`` - Tarantool CPU user time.
+* ``tnt_cpu_system_time`` - Tarantool CPU system time.
