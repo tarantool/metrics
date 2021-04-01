@@ -10,3 +10,4 @@ build
 .history
 .vscode
 prometheus-input
+/doc/.doctrees/

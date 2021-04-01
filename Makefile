@@ -34,6 +34,12 @@ test_promtool: .rocks
 	tarantool test/promtool_test.lua
 	cat prometheus-input | promtool check metrics
 
+update-pot:
+	sphinx-build doc/monitoring doc/locale/en/ -c doc/ -d doc/.doctrees -b gettext
+
+update-po:
+	sphinx-intl update -p doc/locale/en/ -d doc/locale/ -l "ru"
+
 .PHONY: clean
 clean:
 	rm -rf .rocks
