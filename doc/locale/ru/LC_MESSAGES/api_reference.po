@@ -1,0 +1,403 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the Cartridge package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Cartridge 2.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-02 01:25+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.0\n"
+
+msgid "API reference"
+msgstr ""
+
+msgid "Collectors"
+msgstr ""
+
+msgid ""
+"An application using the ``metrics`` module has 4 primitives (called "
+"\"collectors\") at its disposal:"
+msgstr ""
+
+msgid ":ref:`Counter <counter>`"
+msgstr ""
+
+msgid ":ref:`Gauge <gauge>`"
+msgstr ""
+
+msgid ":ref:`Histogram <histogram>`"
+msgstr ""
+
+msgid ":ref:`Summary <summary>`"
+msgstr ""
+
+msgid ""
+"A collector represents one or more observations that are changing over "
+"time."
+msgstr ""
+
+msgid "Counter"
+msgstr ""
+
+msgid "Registers a new counter."
+msgstr ""
+
+msgid "Parameters"
+msgstr ""
+
+msgid "Collector name. Must be unique."
+msgstr ""
+
+msgid "Help description."
+msgstr ""
+
+msgid "Returns"
+msgstr ""
+
+msgid "Counter object"
+msgstr ""
+
+msgid "Return type"
+msgstr ""
+
+msgid ""
+"Increments an observation under ``label_pairs``. If ``label_pairs`` "
+"didn't exist before, this creates it."
+msgstr ""
+
+msgid "Increase value."
+msgstr ""
+
+msgid "Table containing label names as keys, label values as values."
+msgstr ""
+
+msgid "Array of ``observation`` objects for the given counter."
+msgstr ""
+
+msgid "Gauge"
+msgstr ""
+
+msgid "Registers a new gauge. Returns a Gauge object."
+msgstr ""
+
+msgid "Gauge object"
+msgstr ""
+
+msgid "Same as Counter ``inc()``."
+msgstr ""
+
+msgid "Same as ``inc()``, but decreases the observation."
+msgstr ""
+
+msgid "Same as ``inc()``, but sets the observation."
+msgstr ""
+
+msgid ""
+"Returns an array of ``observation`` objects for the given gauge. For "
+"``observation`` description, see :ref:`counter_obj:collect() <counter-"
+"collect>`."
+msgstr ""
+
+msgid "Histogram"
+msgstr ""
+
+msgid "Registers a new histogram."
+msgstr ""
+
+msgid ""
+"Histogram buckets (an array of sorted positive numbers). Infinity bucket "
+"(``INF``) is appended automatically. Default is ``{.005, .01, .025, .05, "
+".075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}``."
+msgstr ""
+
+msgid "Histogram object"
+msgstr ""
+
+msgid "The histogram is just a set of collectors:"
+msgstr ""
+
+msgid ""
+"``name .. \"_sum\"`` - A counter holding the sum of added observations. "
+"Contains only an empty label set."
+msgstr ""
+
+msgid ""
+"``name .. \"_count\"`` - A counter holding the number of added "
+"observations. Contains only an empty label set."
+msgstr ""
+
+msgid ""
+"``name .. \"_bucket\"`` - A counter holding all bucket sizes under the "
+"label ``le`` (low or equal). So to access a specific bucket ``x`` (``x`` "
+"is a number), you should specify the value ``x`` for the label ``le``."
+msgstr ""
+
+msgid ""
+"Records a new value in a histogram. This increments all buckets sizes "
+"under labels ``le`` >= ``num`` and labels matching ``label_pairs``."
+msgstr ""
+
+msgid "Value to put in the histogram."
+msgstr ""
+
+msgid ""
+"Table containing label names as keys, label values as values (table). A "
+"new value is observed by all internal counters with these labels "
+"specified."
+msgstr ""
+
+msgid ""
+"Returns a concatenation of ``counter_obj:collect()`` across all internal "
+"counters of ``histogram_obj``. For ``observation`` description, see "
+":ref:`counter_obj:collect() <counter-collect>`."
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid ""
+"Registers a new summary. Quantile computation is based on the algorithm "
+"`\"Effective computation of biased quantiles over data streams\" "
+"<https://ieeexplore.ieee.org/document/1410103>`_"
+msgstr ""
+
+msgid ""
+"Quantiles to observe in the form ``{quantile = error, ... }``. For "
+"example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``"
+msgstr ""
+
+msgid "Summary object"
+msgstr ""
+
+msgid "The summary is just a set of collectors:"
+msgstr ""
+
+msgid "``name .. \"_sum\"`` - A counter holding the sum of added observations."
+msgstr ""
+
+msgid ""
+"``name .. \"_count\"`` - A counter holding the number of added "
+"observations."
+msgstr ""
+
+msgid ""
+"``name`` - It's holding all quantiles under observation under the label "
+"``quantile`` (low or equal). So to access a specific quantile ``x`` "
+"(``x`` is a number), you should specify the value ``x`` for the label "
+"``quantile``."
+msgstr ""
+
+msgid "Records a new value in a summary."
+msgstr ""
+
+msgid "Value to put in the data stream."
+msgstr ""
+
+msgid ""
+"Returns a concatenation of ``counter_obj:collect()`` across all internal "
+"counters of ``summary_obj``. For ``observation`` description, see "
+":ref:`counter_obj:collect() <counter-collect>`."
+msgstr ""
+
+msgid "Labels"
+msgstr ""
+
+msgid ""
+"All collectors support providing ``label_pairs`` on data modification. "
+"Labels are basically a metainfo that you associate with a metric in the "
+"format of key-value pairs. See tags in Graphite and labels in Prometheus."
+" Labels are used to differentiate the characteristics of a thing being "
+"measured. For example, in a metric associated with the total number of "
+"http requests, you can use methods and statuses label pairs:"
+msgstr ""
+
+msgid "You don't have to predefine labels in advance."
+msgstr ""
+
+msgid ""
+"Using labels on your metrics allows you to later derive new time series "
+"(visualize their graphs) by specifying conditions on label values. In the"
+" example above, we could derive these time series:"
+msgstr ""
+
+msgid ""
+"The total number of requests over time with method = \"POST\" (and any "
+"status)."
+msgstr ""
+
+msgid "The total number of requests over time with status = 500 (and any method)."
+msgstr ""
+
+msgid ""
+"You can also set global labels by calling ``metrics.set_global_labels({ "
+"label = value, ...})``."
+msgstr ""
+
+msgid "Metrics functions"
+msgstr ""
+
+msgid ""
+"Enables Tarantool metrics collections. See :ref:`metrics reference "
+"<metrics-reference>` for details."
+msgstr ""
+
+msgid ""
+"Enables Cartridge metrics collections. See :ref:`metrics reference "
+"<metrics-cartridge>` for details."
+msgstr ""
+
+msgid "Set global labels that will be added to every observation."
+msgstr ""
+
+msgid ""
+"Table containing label names as string keys, label values as values "
+"(table)."
+msgstr ""
+
+msgid ""
+"Global labels are applied only on metrics collection and have no effect "
+"on how observations are stored."
+msgstr ""
+
+msgid "Global labels can be changed on the fly."
+msgstr ""
+
+msgid ""
+"Observation ``label_pairs`` has priority over global labels: if you pass "
+"``label_pairs`` to an observation method with the same key as some global"
+" label, the method argument value will be used."
+msgstr ""
+
+msgid ""
+"Registers a function ``callback`` which will be called right before "
+"metrics collection on plugin export."
+msgstr ""
+
+msgid "Function which takes no parameters."
+msgstr ""
+
+msgid "Most common usage is for gauge metrics updates."
+msgstr ""
+
+msgid "Collecting HTTP requests latency statistics"
+msgstr ""
+
+msgid ""
+"``metrics`` also provides a middleware for monitoring HTTP (set by the "
+"`http <https://github.com/tarantool/http>`_ module) latency statistics."
+msgstr ""
+
+msgid "Registers a collector for the middleware and sets it as default."
+msgstr ""
+
+msgid "Collector type: \"histogram\" or \"summary\". Default is \"histogram\"."
+msgstr ""
+
+msgid "Collector name. Default is \"http_server_request_latency\"."
+msgstr ""
+
+msgid "Help description. Default is \"HTTP Server Request Latency\"."
+msgstr ""
+
+msgid ""
+"If a collector with the same type and name already exists in the "
+"registry, throws an error."
+msgstr ""
+
+msgid "Registers a collector for the middleware and returns it."
+msgstr ""
+
+msgid "Sets the default collector."
+msgstr ""
+
+msgid "Middleware collector object."
+msgstr ""
+
+msgid ""
+"Returns the default collector. If the default collector hasn't been set "
+"yet, registers it (with default "
+"``http_middleware.build_default_collector(...)`` parameters) and sets it "
+"as default."
+msgstr ""
+
+msgid ""
+"Latency measure wrap-up for HTTP ver. 1.x.x handler. Returns a wrapped "
+"handler."
+msgstr ""
+
+msgid "Handler function."
+msgstr ""
+
+msgid ""
+"Middleware collector object. If not set, uses the default collector (like"
+" in ``http_middleware.get_default_collector()``)."
+msgstr ""
+
+msgid ""
+"**Usage:** ``httpd:route(route, http_middleware.v1(request_handler, "
+"collector))``"
+msgstr ""
+
+msgid ""
+"For a more detailed example, see "
+"https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v1.lua"
+msgstr ""
+
+msgid "Returns the latency measure middleware for HTTP ver. 2.x.x."
+msgstr ""
+
+msgid "**Usage:**"
+msgstr ""
+
+msgid ""
+"For a more detailed example, see "
+"https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v2.lua"
+msgstr ""
+
+msgid "CPU usage metrics"
+msgstr ""
+
+msgid ""
+"CPU metrics work only on Linux. See :ref:`metrics reference <metrics-"
+"psutils>` for details. To enable it you should register callback:"
+msgstr ""
+
+msgid "**Collected metrics example**"
+msgstr ""
+
+msgid "**Prometheus query aggregated by thread name**"
+msgstr ""
+
+msgid "Examples"
+msgstr ""
+
+msgid "Below are examples of using metrics primitives."
+msgstr ""
+
+msgid ""
+"Notice that this usage is independent of export-plugins such as "
+"Prometheus / Graphite / etc. For documentation on plugins usage, see "
+"their the :ref:`Metrics plugins <metrics-plugins>` section."
+msgstr ""
+
+msgid "Using counters:"
+msgstr ""
+
+msgid "Using gauges:"
+msgstr ""
+
+msgid "Using histograms:"
+msgstr ""
+
+msgid "Using summaries:"
+msgstr ""
+
