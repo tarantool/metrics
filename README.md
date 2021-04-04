@@ -220,8 +220,8 @@ via configuration.
 
 See:
 
-- A more detailed [getting started guide](https://www.tarantool.io/en/doc/latest/book/monitoring/monitoring-getting-started)
-- Metrics [API reference](https://www.tarantool.io/en/doc/latest/book/monitoring/metrics-api-reference)
+- A more detailed [getting started guide](https://www.tarantool.io/en/doc/latest/book/monitoring/getting_started/)
+- Metrics [API reference](https://www.tarantool.io/en/doc/latest/book/monitoring/api_reference/)
 - Detailed information on [plugins](https://www.tarantool.io/en/doc/latest/book/monitoring/plugins)
 
 ## Contribution
