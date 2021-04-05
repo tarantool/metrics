@@ -46,6 +46,7 @@ build = {
         ['metrics.default_metrics.tarantool.slab']       = 'metrics/default_metrics/tarantool/slab.lua',
         ['metrics.default_metrics.tarantool.spaces']     = 'metrics/default_metrics/tarantool/spaces.lua',
         ['metrics.default_metrics.tarantool.system']     = 'metrics/default_metrics/tarantool/system.lua',
+        ['metrics.default_metrics.tarantool.cpu']        = 'metrics/default_metrics/tarantool/cpu.lua',
         ['metrics.cartridge']                            = 'metrics/cartridge.lua',
         ['metrics.cartridge.issues']                     = 'metrics/cartridge/issues.lua',
         ['metrics.psutils.cpu']                          = 'metrics/psutils/cpu.lua',
