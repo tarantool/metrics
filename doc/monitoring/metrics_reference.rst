@@ -303,9 +303,9 @@ They are only available on Linux.
   ``{kind="user", thread_name="tarantool", thread_pid="pid", file_name="init.lua"}``,
   where:
 
-    *   ``kind`` can be either ``user`` or ``system``.
-    *   ``thread_name`` is ``tarantool``, ``wal``, ``iproto``, or ``coio``.
-    *   ``file_name`` is the entrypoint file name, for example, ``init.lua``.
+  *   ``kind`` can be either ``user`` or ``system``.
+  *   ``thread_name`` is ``tarantool``, ``wal``, ``iproto``, or ``coio``.
+  *   ``file_name`` is the entrypoint file name, for example, ``init.lua``.
 
 There are also the following cross-platform metrics obtained using the call ``getrusage()``
 
@@ -318,71 +318,109 @@ There are also the following cross-platform metrics obtained using the call ``ge
 Vinyl
 -------------------------------------------------------------------------------
 
-Vinyl metrics provide :ref:`vinyl engine <storing-data-with-vinyl>` statistics.
+Vinyl metrics provide the :ref:`vinyl engine <engines-vinyl>` statistics.
 
 **Disk**
-Disk metrics are used to monitor overall data size on disk.
 
-* ``tnt_vinyl_disk_data_size``—the amount of data stored in files, in bytes
+The disk metrics are used to monitor the overall data size on disk.
 
-* ``tnt_vinyl_disk_index_size``—the amount of index stored in files, in bytes
+*   ``tnt_vinyl_disk_data_size``—the amount of data stored in the ``.run`` files
+    located in the :ref:`vinyl_dir <cfg_basic-vinyl_dir>` directory, bytes.
+
+* ``tnt_vinyl_disk_index_size``—the amount of data stored in the ``.index`` files
+    located in the :ref:`vinyl_dir <cfg_basic-vinyl_dir>` directory, bytes.
+
+.. _metrics-vinyl-regulator:
 
 **Regulator**
-The vinyl regulator decides when to take disk IO actions.
-It groups activities in batches so that they are more consistent and efficient.
 
-* ``tnt_vinyl_regulator_dump_bandwidth``—the estimated average rate at which dumps are performed.
-  Initially this will appear as 10485760 (10 megabytes per second). Only significant dumps
-  (larger than one megabyte) are used for the estimate.
+The vinyl regulator decides when to take the disk IO actions.
+It groups activities in batches so that they will be more consistent and
+efficient.
 
-* ``tnt_vinyl_regulator_write_rate``—the actual average rate at which recent writes to disk are performed.
-  This is a moving average with a 5-second window. Monitoring of the value can be useful for understanding state of disk.
+*   ``tnt_vinyl_regulator_dump_bandwidth``—the estimated average rate of taking
+    dumps, bytes per second. Initially, the rate value is 10485760
+    (10 megabytes per second) and being recalculated depending on the the actual
+    rate. Only significant dumps that are larger than one megabyte are used for
+    the estimate.
 
-* ``tnt_vinyl_regulator_rate_limit``—the write rate limit, in bytes per second,
-  imposed on transactions by the regulator based on the observed dump/compaction performance.
-  If the value is down to approx. 10^5 it indicates that something is wrong with the disk or scheduler.
+*   ``tnt_vinyl_regulator_write_rate``—the actual average rate of performing the
+    write operations, bytes per second. The rate is calculated as
+    a 5-second moving average. If the metric value is gradually going down,
+    this can indicate some disk issues.
 
-* ``tnt_vinyl_regulator_dump_watermark``—the point when dumping must occur.
-  The value is slightly smaller than the amount of memory that is allocated for vinyl trees,
-  which is the ``vinyl_memory`` parameter
+*   ``tnt_vinyl_regulator_rate_limit``—the write rate limit, bytes per second.
+    The regulator imposes the limit on transactions based on the observed
+    dump/compaction performance. If the metric value is down to approximately
+    10^5, this indicates issues with the disk or the :ref:`scheduler <metrics-vinyl-scheduler>`.
+
+*   ``tnt_vinyl_regulator_dump_watermark``—the maximum amount of memory used
+    for in-memory storing of a vinyl LSM tree, bytes. When accessing this
+    maximum, the dumping must occur. For details, see :ref:`engines-algorithm_filling_lsm`.
+    The value is slightly smaller than the amount of memory allocated
+    for vinyl trees, which is the :ref:`vinyl_memory <cfg_storage-vinyl_memory>`
+    parameter.
 
 **Transactional activity**
 
-* ``tnt_vinyl_tx_conflict``—counts conflicts that caused a transaction to roll back.
-  Ratio ``tnt_vinyl_tx_commit / tnt_vinyl_tx_conflict`` above 5% indicates that
-  vinyl is not healthy. At this moment you'll probably see a lot of other problems with vinyl.
+*   ``tnt_vinyl_tx_commit``—the counter of commits (successful transaction ends).
+    It includes implicit commits: for example, any insert operation causes a
+    commit unless it is within a
+    :doc:`/reference/reference_lua/box_txn_management/begin`–:doc:`/reference/reference_lua/box_txn_management/commit`
+    block.
 
-* ``tnt_vinyl_tx_commit``—the count of commits (successful transaction ends).
-  It includes implicit commits, for example any insert causes a commit unless it is within a begin-end block
+*   ``tnt_vinyl_tx_rollback``—the counter of rollbacks (unsuccessful transaction
+    ends). This is not merely a count of explicit :doc:`/reference/reference_lua/box_txn_management/rollback`
+    requests—it includes requests that ended with errors.
 
-* ``tnt_vinyl_tx_rollback``—the count of rollbacks (unsuccessful transaction ends).
-  This is not merely a count of explicit ``box.rollback()`` requests – it includes requests that ended in errors
+*   ``tnt_vinyl_tx_conflict``—the counter of conflicts that caused transactions
+    to roll back. The ratio ``tnt_vinyl_tx_conflict / tnt_vinyl_tx_commit``
+    above 5% indicates that vinyl is not healthy. At this moment you'll probably
+    see a lot of other problems with vinyl.
 
-* ``tnt_vinyl_tx_read_views``—the count of open read views (open transactions that holds copy of data).
-  Usually this value is 0. If it stays non-zero for a long time, it indicates of a memory leak.
+*   ``tnt_vinyl_tx_read_views``—the counter of read views, that is, transactions
+    entered a read-only state to avoid conflict temporarily. Usually the value
+    is ``0``. If it stays non-zero for a long time, it indicates of a memory leak.
 
 **Memory**
 
-* ``tnt_vinyl_memory_tuple_cache``—the number of bytes that are being used for tuples
+These metrics show the state memory areas used by vinyl for caches and write
+buffers.
 
-* ``tnt_vinyl_memory_level0``—is the “level0” memory area, sometimes abbreviated “L0”,
-  which is the area that vinyl can use for in-memory storage of an LSM tree.
-  “L0 is becoming full” means this metric is close to its maximum,
-  which is ``tnt_vinyl_regulator_dump_watermark``. We can expect “L0 = 0” immediately after a dump
+*   ``tnt_vinyl_memory_tuple_cache``—the amount of memory that is being used
+    for storing tuples (data), bytes.
 
-* ``tnt_vinyl_memory_page_index``—the number of bytes that are being used for indexes.
-  If this metric is close to :ref:`vinyl_memory <confval-vinyl_memory>` that indicates
-  to incorrectly chosen :ref:`vinyl_page_size <confval-vinyl_page_size>`.
+*   ``tnt_vinyl_memory_level0``—the "level 0" (L0) memory area, bytes.
+    L0 is the area that vinyl can use for in-memory storage of an LSM tree.
+    By monitoring the metric, you can see when L0 is getting close to its
+    maximum (``tnt_vinyl_regulator_dump_watermark``) at which a dump will be
+    taken. You can expect L0 = 0 immediately after the dump operation is
+    completed.
 
-* ``tnt_vinyl_memory_bloom_filter``—the number of bytes used by the bloom filter
+*   ``tnt_vinyl_memory_page_index``—the amount of memory that is being used
+    for storing indexes, bytes. If the metric value is close to :ref:`vinyl_memory <cfg_storage-vinyl_memory>`,
+    this indicates the incorrectly chosen :ref:`vinyl_page_size <cfg_storage-vinyl_page_size>`.
+
+*   ``tnt_vinyl_memory_bloom_filter``—the amount of memory used by
+    :ref:`bloom filters <vinyl-lsm_disadvantages_compression_bloom_filters>`,
+    bytes.
+
+.. _metrics-vinyl-scheduler:
 
 **Scheduler**
-The scheduler invokes regulator and updates related variables. This happens once per second.
 
-* ``tnt_vinyl_scheduler_tasks``—number of scheduler dump/compaction tasks. Always has label ``{status = "status"}``
-  where ``status`` is ``inprogress`` for currently running tasks, ``completed`` for successfully completed tasks
-  and ``failed`` for tasks aborted due to errors
+The vinyl scheduler invokes the :ref:`regulator <metrics-vinyl-regulator>` and
+updates the related variables. This happens once per second.
 
-* ``tnt_vinyl_scheduler_dump_time``—total time spent by all worker threads performing dumps, in seconds
+*   ``tnt_vinyl_scheduler_tasks``—the number of the scheduler dump/compaction
+    tasks. The metric always has label ``{status = <status_value>}``
+    where ``<status_value>`` can be:
 
-* ``tnt_vinyl_scheduler_dump_count``—the count of completed dumps
+    *   ``inprogress`` for currently running tasks
+    *   ``completed`` for successfully completed tasks
+    *   ``failed`` for tasks aborted due to errors.
+
+*   ``tnt_vinyl_scheduler_dump_time``—total time spent by all worker threads
+    performing dumps, seconds.
+
+*   ``tnt_vinyl_scheduler_dump_count``—the counter of dumps completed.
