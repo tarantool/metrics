@@ -77,10 +77,11 @@ g.test_summary_4_age_buckets_value_in_each_bucket = function()
         instance:observe(i)
     end
 
-    t.assert_equals(#instance.observation_buckets[''], 4)
+    local observations = instance:get_observations()
+    t.assert_equals(#observations.buckets, 4)
 
-    local q = Quantile.Query(instance.observations[''], 0.5)
-    for _,v in ipairs(instance.observation_buckets['']) do
+    local q = Quantile.Query(observations.buckets[1], 0.5)
+    for _, v in ipairs(observations.buckets) do
         t.assert_equals(q, Quantile.Query(v, 0.5))
     end
 end
@@ -89,16 +90,39 @@ g.test_summary_4_age_buckets_rotates = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
         {max_age_time = 0, age_buckets_count = 4})
 
+    instance:observe(2) -- 0.5-quantile now is 2
     instance:observe(1)
-    instance:observe(1) -- summary rotates at this moment
+    -- summary rotates at this moment
+    -- now head index is 2 and previous head bucket resets
+    -- head bucket has 0.5-quantile = 2
+    -- previous head was reset and now has 0.5-quantile = 2
 
-    local q = Quantile.Query(instance.observations[''], 0.5)
-    local q1 = Quantile.Query(instance.observation_buckets[''][4], 0.5)
-    local last_bucket_len = instance.observation_buckets[''][4].b_len + instance.observation_buckets[''][4].stream.n
-    local first_bucket_len = instance.observations[''].b_len + instance.observations[''].stream.n
+    local observations = instance:get_observations().buckets
+    local head_quantile = Quantile.Query(observations[2], 0.5)
+    local previous_quantile = Quantile.Query(observations[1], 0.5)
+    local head_bucket_len = observations[2].b_len + observations[2].stream.n
+    local previous_bucket_len = observations[1].b_len + observations[1].stream.n
 
-    t.assert_not_equals(last_bucket_len, first_bucket_len)
-    t.assert_not_equals(q, q1)
+    t.assert_not_equals(head_bucket_len, previous_bucket_len)
+    t.assert_not_equals(head_quantile, previous_quantile)
+end
+
+g.test_summary_full_circle_rotates = function()
+    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 0, age_buckets_count = 4})
+
+    for i = 1, 5 do
+        instance:observe(i)
+    end
+
+    local observations = instance:get_observations().buckets
+    local head_quantile = Quantile.Query(observations[2], 0.5)
+    local previous_quantile = Quantile.Query(observations[1], 0.5)
+    local head_bucket_len = observations[2].b_len + observations[2].stream.n
+    local previous_bucket_len = observations[1].b_len + observations[1].stream.n
+
+    t.assert_not_equals(head_bucket_len, previous_bucket_len)
+    t.assert_not_equals(head_quantile, previous_quantile)
 end
 
 g.test_summary_counter_values_equals = function()
@@ -107,7 +131,8 @@ g.test_summary_counter_values_equals = function()
         instance:observe(i)
     end
 
-    local count = instance.observations[''].b_len + instance.observations[''].stream.n
+    local observations = instance:get_observations()
+    local count = observations.b_len + observations.stream.n
 
     t.assert_equals(instance.count_collector.observations[''], count)
 end

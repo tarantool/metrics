@@ -15,8 +15,12 @@ function Summary:new(name, help, objectives, params)
     obj.objectives = objectives
     obj.max_age_time = params.max_age_time
     obj.age_buckets_count = params.age_buckets_count or 1
-    obj.observation_buckets = {}
-    obj.last_rotate = {}
+    obj.observations = {}
+
+    obj.quantiles = {}
+    for q, _ in pairs(objectives) do
+        table.insert(obj.quantiles, q)
+    end
     return obj
 end
 
@@ -36,12 +40,11 @@ function Summary:set_registry(registry)
 end
 
 function Summary:rotate_age_buckets(key)
-    self.observations[key] = self.observation_buckets[key][1]
-    for i = 2, self.age_buckets_count do
-        self.observation_buckets[key][i - 1] = self.observation_buckets[key][i]
-    end
-    self.observation_buckets[key][self.age_buckets_count] = Quantile.NewTargeted(self.objectives)
-    self.last_rotate[key] = os.time()
+    local obs_object = self.observations[key]
+    local old_index = obs_object.head_bucket_index
+    obs_object.head_bucket_index = ((obs_object.head_bucket_index + 1) % self.age_buckets_count) + 1
+    Quantile.Reset(obs_object.buckets[old_index])
+    obs_object.last_rotate = os.time()
 end
 
 function Summary:observe(num, label_pairs)
@@ -52,22 +55,31 @@ function Summary:observe(num, label_pairs)
     self.count_collector:inc(1, label_pairs)
     self.sum_collector:inc(num, label_pairs)
     if self.objectives then
+        local now = os.time()
         local key = self.make_key(label_pairs)
+
         if not self.observations[key] then
-            self.observation_buckets[key] = {}
-            for i = 1, self.age_buckets_count do
-                self.observation_buckets[key][i] = Quantile.NewTargeted(self.objectives)
-            end
-            self.observations[key] = self.observation_buckets[key][1]
+            local obs_object = {
+                buckets = {},
+                head_bucket_index = 1,
+                last_rotate = now,
+                label_pairs = label_pairs,
+            }
             self.label_pairs[key] = label_pairs
-            self.last_rotate[key] = os.time()
-        end
-        Quantile.Insert(self.observations[key], num)
-        for i = 2, self.age_buckets_count do
-            fiber.create(function() Quantile.Insert(self.observation_buckets[key][i], num) end)
-        end
-        if self.age_buckets_count > 1 and os.time() - self.last_rotate[key] >= self.max_age_time then
-            self:rotate_age_buckets(key)
+            for i = 1, self.age_buckets_count do
+                local quantile_obj = Quantile.NewTargeted(self.objectives)
+                Quantile.Insert(quantile_obj, num)
+                obs_object.buckets[i] = quantile_obj
+            end
+            self.observations[key] = obs_object
+        else
+            local obs_object = self.observations[key]
+            if self.age_buckets_count > 1 and now - obs_object.last_rotate >= self.max_age_time then
+                self:rotate_age_buckets(key)
+            end
+            for _, bucket in ipairs(obs_object.buckets) do
+                Quantile.Insert(bucket, num)
+            end
         end
     end
 end
@@ -76,15 +88,16 @@ function Summary:collect_quantiles()
     if not self.objectives or next(self.observations) == nil then
         return {}
     end
+
     local result = {}
-    for key, observation in pairs(self.observations) do
-        for objective, _ in pairs(self.objectives) do
-            local label_pairs = table.deepcopy(self:append_global_labels(self.label_pairs[key]))
+    for _, observation in pairs(self.observations) do
+        for _, objective in ipairs(self.quantiles) do
+            local label_pairs = table.deepcopy(self:append_global_labels(observation.label_pairs))
             label_pairs.quantile = objective
             local obs = {
                 metric_name = self.name,
                 label_pairs = label_pairs,
-                value = Quantile.Query(observation, objective),
+                value = Quantile.Query(observation.buckets[observation.head_bucket_index], objective),
                 timestamp = fiber.time64(),
             }
             table.insert(result, obs)
@@ -105,6 +118,16 @@ function Summary:collect()
         table.insert(result, obs)
     end
     return result
+end
+
+function Summary:get_observations(label_pairs)
+    local key = self.make_key(label_pairs or {})
+    local obs = self.observations[key]
+    if self.age_buckets_count > 1 then
+        return obs
+    else
+        return obs.buckets[1]
+    end
 end
 
 return Summary
