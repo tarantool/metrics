@@ -16,7 +16,7 @@ export.DEFAULT_QUANTILES = {
 }
 
 export.DEFAULT_SUMMARY_PARAMS = {
-    max_age_time = 600,
+    max_age_time = 60,
     age_buckets_count = 5,
 }
 

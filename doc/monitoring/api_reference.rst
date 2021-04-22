@@ -162,15 +162,30 @@ Summary
 
 ..  function:: summary(name [, help, objectives])
 
-    Registers a new summary. Quantile computation is based on the algorithm `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
+    Registers a new summary. Quantile computation is based on the algorithm
+    `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
 
     :param string   name: Collector name. Must be unique.
     :param string   help: Help description.
-    :param table objectives: Quantiles to observe in the form ``{quantile = error, ... }``.
-                          For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``
-    :param table params: Table of summary parameters, ``age_buckets_count`` -
-            configures how many buckets summary has in sliding window, ``max_age_time`` -
-            lifetime of bucket in sliding window, in seconds
+    :param table objectives: A list of 'targeted' :math:`\\varphi`-quantiles in the form ``{quantile = error, ... }``.
+        For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``.
+        A targeted :math:`\\varphi`-quantile is specified in the form of a :math:`\\varphi`-quantile and tolerated
+        error. For example a ``{[0.5] = 0.1}`` means that the median (= 50th
+        percentile) should be returned with 10 percent error. Note that
+        percentiles and quantiles are the same concept, except percentiles are
+        expressed as percentages. The :math:`\\varphi`-quantile must be in the interval [0, 1].
+        Note that a lower tolerated error for a :math:`\\varphi`-quantile results in higher
+        usage of resources (memory and cpu) to calculate the summary.
+
+    :param table params: Table of summary parameters, used for configuring sliding
+        window of time.
+        ``max_age_time`` set the duration of the time window, i.e., how long
+        observations are kept before they are discarded, in seconds
+        ``age_buckets_count`` set the number of buckets of the time window. It
+        determines the number of buckets used to exclude observations that are
+        older than ``max_age_time`` from the Summary. The value is
+        a trade-off between resources (memory and cpu for maintaining the bucket)
+        and how smooth the time window is moved.
 
     :return: Summary object
 
@@ -197,12 +212,19 @@ Summary
                                   label values as values (table).
                                   A new value is observed by all internal counters
                                   with these labels specified.
+                                  Label ``"quantile"`` are not allowed in ``summary``.
+                                  It will be added automatically.
+                                  If ``max_age_time`` and ``age_buckets_count`` are set,
+                                  observed value will be added to each bucket.
 
     ..  method:: collect()
 
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``summary_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
+        If ``max_age_time`` and ``age_buckets_count`` are set, quantile observations
+        will be collect only from the head bucket in sliding window and not from every
+        bucket.
 
 .. _labels:
 
@@ -455,11 +477,11 @@ Using summaries:
 
     local metrics = require('metrics')
 
-    -- create a summary with a sliding wingow with 5 age buckets and 600s bucket lifetime
+    -- create a summary with a sliding wingow with 5 age buckets and 60s bucket lifetime
     local http_requests_latency = metrics.summary(
         'http_requests_latency', 'HTTP requests total',
         {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
-        {max_age_time = 600, age_buckets_count = 5}
+        {max_age_time = 60, age_buckets_count = 5}
     )
 
     -- somewhere in the HTTP requests middleware:
