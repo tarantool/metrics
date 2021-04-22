@@ -27,7 +27,7 @@ end
 function Summary.check_quantiles(objectives)
     for k, v in pairs(objectives) do
         if type(k) ~= 'number' then return false end
-        if k >= 1 or k < 0 then return false end
+        if k > 1 or k < 0 then return false end
         if type(v) ~= 'number' then return false end
     end
     return true
@@ -90,7 +90,11 @@ function Summary:collect_quantiles()
     end
 
     local result = {}
-    for _, observation in pairs(self.observations) do
+    local now = os.time()
+    for key, observation in pairs(self.observations) do
+        if self.age_buckets_count > 1 and now - observation.last_rotate >= self.max_age_time then
+            self:rotate_age_buckets(key)
+        end
         for _, objective in ipairs(self.quantiles) do
             local label_pairs = table.deepcopy(self:append_global_labels(observation.label_pairs))
             label_pairs.quantile = objective
