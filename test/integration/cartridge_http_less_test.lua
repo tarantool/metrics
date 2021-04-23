@@ -2,7 +2,6 @@ local fio = require('fio')
 local t = require('luatest')
 local g = t.group('cartridge_role_http_less')
 
-local utils = require('test.utils')
 local helpers = require('test.helper')
 
 local function upload_config()
