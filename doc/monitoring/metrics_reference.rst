@@ -221,7 +221,7 @@ Runtime
 Cartridge
 -------------------------------------------------------------------------------
 
-``cartridge_issues``—Number of
+``tnt_cartridge_issues``—Number of
 :ref:`issues across cluster instances <cartridge.issues>`.
 This metric always has label ``{level="critical"}``, where
 ``level`` is the level of the issue:
@@ -327,7 +327,7 @@ The disk metrics are used to monitor the overall data size on disk.
 *   ``tnt_vinyl_disk_data_size``—the amount of data stored in the ``.run`` files
     located in the :ref:`vinyl_dir <cfg_basic-vinyl_dir>` directory, bytes.
 
-* ``tnt_vinyl_disk_index_size``—the amount of data stored in the ``.index`` files
+*   ``tnt_vinyl_disk_index_size``—the amount of data stored in the ``.index`` files
     located in the :ref:`vinyl_dir <cfg_basic-vinyl_dir>` directory, bytes.
 
 .. _metrics-vinyl-regulator:
