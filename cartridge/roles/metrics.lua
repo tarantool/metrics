@@ -84,29 +84,33 @@ local current_paths = {}
 
 local function apply_routes(export)
     local httpd = cartridge.service_get('httpd')
-    for _, exporter in ipairs(export) do
-        local path, format = remove_side_slashes(exporter.path), exporter.format
-        if current_paths[path] ~= format then
-            if current_paths[path] then
-                delete_route(httpd, path)
-            end
-            httpd:route({method = 'GET', name = path, path = path}, handlers[format])
-            current_paths[path] = format
-        end
-    end
-    -- deletes paths that was enabled, but aren't in config now
-    for path, _ in pairs(current_paths) do
-        local is_present = false
+    if httpd then
         for _, exporter in ipairs(export) do
-            if path == remove_side_slashes(exporter.path) then
-                is_present = true
-                break
+            local path, format = remove_side_slashes(exporter.path), exporter.format
+            if current_paths[path] ~= format then
+                if current_paths[path] then
+                    delete_route(httpd, path)
+                end
+                httpd:route({method = 'GET', name = path, path = path}, handlers[format])
+                current_paths[path] = format
             end
         end
-        if not is_present then
-            delete_route(httpd, path)
-            current_paths[path] = nil
+        -- deletes paths that was enabled, but aren't in config now
+        for path, _ in pairs(current_paths) do
+            local is_present = false
+            for _, exporter in ipairs(export) do
+                if path == remove_side_slashes(exporter.path) then
+                    is_present = true
+                    break
+                end
+            end
+            if not is_present then
+                delete_route(httpd, path)
+                current_paths[path] = nil
+            end
         end
+    else
+        log.warn("HTTP server not found. Metrics will not be available")
     end
 end
 
