@@ -178,14 +178,19 @@ Summary
         usage of resources (memory and cpu) to calculate the summary.
 
     :param table params: Table of summary parameters, used for configuring sliding
-        window of time.
-        ``max_age_time`` set the duration of the time window, i.e., how long
+        window of time. 'Sliding window' consists of several buckets to store observations.
+        New observation are added to each bucket. After a time period, 'head' bucket
+        (bucket from which observations are collected) is reset and next bucket becomes
+        new 'head'. I.e. each bucket will be store observations for the last
+        ``max_age_time * age_buckets_count`` seconds before it will be reset.
+        ``max_age_time`` set the duration of each bucket lifetime, i.e., how long
         observations are kept before they are discarded, in seconds
         ``age_buckets_count`` set the number of buckets of the time window. It
         determines the number of buckets used to exclude observations that are
         older than ``max_age_time`` from the Summary. The value is
         a trade-off between resources (memory and cpu for maintaining the bucket)
         and how smooth the time window is moved.
+        Default value is `{max_age_time = math.huge, age_buckets_count = 1}`
 
     :return: Summary object
 
