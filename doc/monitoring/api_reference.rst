@@ -20,13 +20,13 @@ at its disposal:
 
 A collector represents one or more observations that are changing over time.
 
+..  module:: metrics
+
 .. _counter:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Counter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-..  module:: metrics
 
 ..  function:: counter(name [, help])
 
@@ -71,8 +71,6 @@ Counter
 Gauge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..  module:: metrics
-
 ..  function:: gauge(name [, help])
 
     Registers a new gauge. Returns a Gauge object.
@@ -109,8 +107,6 @@ Gauge
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Histogram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-..  module:: metrics
 
 ..  function:: histogram(name [, help, buckets])
 
@@ -163,8 +159,6 @@ Histogram
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-..  module:: metrics
 
 ..  function:: summary(name [, help, objectives])
 
@@ -241,8 +235,6 @@ You can also set global labels by calling
 -------------------------------------------------------------------------------
 Metrics functions
 -------------------------------------------------------------------------------
-
-..  module:: metrics
 
 ..  function:: enable_default_metrics()
 
