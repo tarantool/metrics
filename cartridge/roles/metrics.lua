@@ -84,6 +84,9 @@ local current_paths = {}
 
 local function apply_routes(export)
     local httpd = cartridge.service_get('httpd')
+    if httpd == nil then
+        return
+    end
     for _, exporter in ipairs(export) do
         local path, format = remove_side_slashes(exporter.path), exporter.format
         if current_paths[path] ~= format then
