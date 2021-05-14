@@ -137,6 +137,8 @@ function stream:merge(samples, len)
 		if i % 1000 == 0 then
 			fiber.yield()
 		end
+		assert(z - 1 < ffi.sizeof(samples)/ffi.sizeof('sample'), z - 1 .. ' out of bound ' .. tostring(ffi.sizeof(samples)/ffi.sizeof('sample')))
+
 		local sample = samples[z-1]
 		for j = i, s.l_len do
             local c = s.l[j]
@@ -259,7 +261,7 @@ end
 
 -- Insert inserts v into the stream.
 function quantile.Insert(stream_obj, v)
-	assert(stream_obj.b_len < ffi.sizeof(stream_obj.b)/ffi.sizeof('sample'), 'Array index out of bound ' .. stream_obj.b_len .. '  ' .. ffi.sizeof(stream_obj.b)/ffi.sizeof('sample'))
+	assert(stream_obj.b_len < ffi.sizeof(stream_obj.b)/ffi.sizeof('double'), 'Array index out of bound ' .. stream_obj.b_len .. '  ' .. ffi.sizeof(stream_obj.b)/ffi.sizeof('double'))
 
 	stream_obj.b[stream_obj.b_len] = v
 	stream_obj.b_len = stream_obj.b_len + 1
