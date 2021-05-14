@@ -137,7 +137,7 @@ function stream:merge(samples, len)
 		if i % 1000 == 0 then
 			fiber.yield()
 		end
-		assert(z - 1 < ffi.sizeof(samples)/ffi.sizeof('sample'), z - 1 .. ' out of bound ' .. tostring(ffi.sizeof(samples)/ffi.sizeof('sample')))
+		assert(z - 1 < ffi.sizeof(samples)/ffi.sizeof('double'), z - 1 .. ' out of bound ' .. tostring(ffi.sizeof(samples)/ffi.sizeof('double')))
 
 		local sample = samples[z-1]
 		for j = i, s.l_len do

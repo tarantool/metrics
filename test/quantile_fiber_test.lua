@@ -10,13 +10,15 @@ g.test_fiber = function()
     for i=1,1e6 do quantile.Insert(q, math.random(1)) end
 
     local fs = {}
-    for i=1,1 do 
+    for _=1,200 do
         local f = fiber.new(function()
             for i=1,1e4 do quantile.Insert(q, math.random(1000)) end
         end)
         f:set_joinable(true)
         table.insert(fs, f)
     end
+
+    for i=1,1e6 do quantile.Insert(q, math.random(1000)) end
 
     for _, f in ipairs(fs) do
         f:join()
