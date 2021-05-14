@@ -1,7 +1,9 @@
 local fio = require('fio')
 local t = require('luatest')
+local yaml = require('yaml')
 local g = t.group()
 
+local utils = require('test.utils')
 local helpers = require('test.helper')
 
 local function set_export(export)
