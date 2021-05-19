@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - cpu metrics hot reload [#228](https://github.com/tarantool/metrics/issues/228)
+- cartridge metrics role fails to start without http [#225](https://github.com/tarantool/metrics/issues/225)
 
 ## [0.8.0] - 2021-04-13
 ### Added
