@@ -5,7 +5,18 @@ on:
        - '*'
 
 jobs:
+  stress-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install Tarantool
+        run: |
+          curl -L https://tarantool.io/installer.sh | sudo VER=2.4 bash
+          sudo apt install -y tarantool-dev
+      - name: stress test
+        run: make stress_test
   deploy:
+    needs: stress-test
     strategy:
       fail-fast: false
       matrix:

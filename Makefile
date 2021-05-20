@@ -24,10 +24,14 @@ test: .rocks
 .PHONY: test_with_coverage_report
 test_with_coverage_report: .rocks
 	rm -f tmp/luacov.*.out*
-	.rocks/bin/luatest --coverage -v --shuffle group
+	.rocks/bin/luatest --coverage -v --shuffle group --exclude stress
 	.rocks/bin/luacov .
 	echo
 	grep -A999 '^Summary' tmp/luacov.report.out
+
+.PHONY: stress_test
+stress_test: .rocks
+	.rocks/bin/luatest --pattern stress
 
 .PHONY: test_promtool
 test_promtool: .rocks

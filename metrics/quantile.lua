@@ -135,7 +135,6 @@ function stream:merge(samples, len)
 	local i = 1
     local r = 0
     for z = 1, len do
-		if i%500 ==0 then require'fiber'.yield() end
 		local sample = samples[z-1]
 		for j = i, s.l_len do
             local c = s.l[j]
