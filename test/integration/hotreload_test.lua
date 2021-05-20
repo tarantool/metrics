@@ -21,7 +21,7 @@ g.test_reload = function()
     require('metrics.default_metrics.tarantool').enable()
     require('metrics.tarantool.luajit').enable()
 
-    for k, mod in pairs(package.loaded) do
+    for k, _ in pairs(package.loaded) do
         if k:find('metrics') ~= nil then
             package.loaded[k] = nil
         end
