@@ -1,11 +1,12 @@
-local fiber = require('fiber')
 local ffi = require('ffi')
 
 local quantile = {}
 
-ffi.cdef[[
-	typedef struct {int Delta, Width; double Value; } sample;
-]]
+if not pcall(ffi.typeof, "sample") then
+	ffi.cdef[[
+		typedef struct sample {int Delta, Width; double Value; } sample;
+	]]
+end
 
 local sample_constructor = ffi.typeof('sample')
 
@@ -134,9 +135,6 @@ function stream:merge(samples, len)
 	local i = 1
     local r = 0
     for z = 1, len do
-        if i % 1000 == 0 then
-            fiber.yield()
-		end
 		local sample = samples[z-1]
 		for j = i, s.l_len do
             local c = s.l[j]
@@ -165,9 +163,6 @@ function stream:query(q)
     local p = s.l[0]
 	local r = 0
 	for i = 1, s.l_len do
-        if i % 500 == 0 then
-            fiber.yield()
-        end
         local c = s.l[i]
         if r + c.Width + c.Delta > t then
             return p.Value
@@ -189,9 +184,6 @@ function stream:compress()
 	local r = s.n - x.Width
 
     for i = s.l_len - 1, 1, -1 do
-        if i % 1000 == 0 then
-            fiber.yield()
-		end
 		local c = make_sample(0)
 		sample_copy(c, s.l[i])
 		if c.Width + x.Width + x.Delta <= s.f(s, r) then
