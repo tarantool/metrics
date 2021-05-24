@@ -3,8 +3,7 @@ on:
   push:
     branches:
      - '*'
-    tags:
-     - '*'
+
 jobs:
   test:
     strategy:
@@ -67,14 +66,3 @@ jobs:
         run: |
           GO111MODULE=on go get github.com/prometheus/prometheus/cmd/promtool@a6be548dbc17780d562a39c0e4bd0bd4c00ad6e2
           make test_promtool
-  stress-test:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags')
-    steps:
-      - uses: actions/checkout@v2
-      - name: install Tarantool
-        run: |
-          curl -L https://tarantool.io/installer.sh | sudo VER=2.4 bash
-          sudo apt install -y tarantool-dev
-      - name: stress test
-        run: make stress_test

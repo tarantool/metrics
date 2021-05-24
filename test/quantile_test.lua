@@ -106,15 +106,10 @@ g.test_package_reload = function()
     t.assert(ok, quantile_package)
 end
 
-g.test_fiber_yield_stress = function()
-    local q1 = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+g.test_fiber_yield = function()
+    local q1 = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 1000)
 
-    for _=1,1e6 do
-        t.assert(q1.b_len < q1.__max_samples)
-        quantile.Insert(q1, math.random(1))
-    end
-
-    for _=1,500 do
+    for _=1,10 do
         fiber.create(function()
             for _=1,1e2 do
                 t.assert(q1.b_len < q1.__max_samples)
@@ -123,8 +118,8 @@ g.test_fiber_yield_stress = function()
         end)
     end
 
-    for _=1,1e6 do
+    for _=1,10 do
         t.assert(q1.b_len < q1.__max_samples)
-        quantile.Insert(q1, math.random(1000))
+        quantile.Insert(q1, math.random(1))
     end
 end

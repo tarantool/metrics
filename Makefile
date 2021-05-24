@@ -29,10 +29,6 @@ test_with_coverage_report: .rocks
 	echo
 	grep -A999 '^Summary' tmp/luacov.report.out
 
-.PHONY: stress_test
-stress_test: .rocks
-	.rocks/bin/luatest --pattern stress
-
 .PHONY: test_promtool
 test_promtool: .rocks
 	tarantool test/promtool_test.lua
