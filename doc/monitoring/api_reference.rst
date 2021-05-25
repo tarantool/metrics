@@ -179,13 +179,13 @@ Summary
 
     :param table params: Table of summary parameters, used for configuring sliding
         window of time. 'Sliding window' consists of several buckets to store observations.
-        New observation are added to each bucket. After a time period, 'head' bucket
+        New observations are added to each bucket. After a time period, 'head' bucket
         (bucket from which observations are collected) is reset and next bucket becomes
-        new 'head'. I.e. each bucket will be store observations for the last
+        new 'head'. I.e. each bucket will store observations for
         ``max_age_time * age_buckets_count`` seconds before it will be reset.
-        ``max_age_time`` set the duration of each bucket lifetime, i.e., how long
+        ``max_age_time`` sets the duration of each bucket lifetime, i.e., how long
         observations are kept before they are discarded, in seconds
-        ``age_buckets_count`` set the number of buckets of the time window. It
+        ``age_buckets_count`` sets the number of buckets of the time window. It
         determines the number of buckets used to exclude observations that are
         older than ``max_age_time`` from the Summary. The value is
         a trade-off between resources (memory and cpu for maintaining the bucket)
@@ -482,7 +482,7 @@ Using summaries:
 
     local metrics = require('metrics')
 
-    -- create a summary with a sliding wingow with 5 age buckets and 60s bucket lifetime
+    -- create a summary with a window of 5 age buckets and 60s bucket lifetime
     local http_requests_latency = metrics.summary(
         'http_requests_latency', 'HTTP requests total',
         {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
