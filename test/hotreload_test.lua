@@ -7,7 +7,7 @@ local g = t.group('hotreload')
 
 g.test_reload = function()
     local tmpdir = fio.tempdir()
-    box.cfg{
+    box.cfg {
         wal_dir = tmpdir,
         memtx_dir = tmpdir,
     }
