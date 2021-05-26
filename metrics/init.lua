@@ -9,7 +9,11 @@ local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
 local Summary = require('metrics.collectors.summary')
 
-local registry = Registry.new()
+local registry = rawget(_G, '__metrics_registry')
+if not registry then 
+    registry = Registry.new()
+end
+rawset(_G, '__metrics_registry', registry)
 
 local function collectors()
     return registry.collectors

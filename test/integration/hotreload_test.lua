@@ -34,8 +34,9 @@ g.test_reload = function()
         end
     end
 
-    require('metrics')
+    metrics = require('metrics')
 
     require('metrics.default_metrics.tarantool').enable()
     require('metrics.tarantool.luajit').enable()
+    metrics.enable_default_metrics()
 end

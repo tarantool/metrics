@@ -159,6 +159,9 @@ g.test_v1_middleware = function()
 end
 
 g.test_v2_middleware = function()
+
+    require('http.server')
+    
     local httpd = require('http.server').new('127.0.0.1', 12345)
     t.skip_if(httpd.set_router == nil, 'Skip http 2.x test')
     local router = require('http.router').new()
