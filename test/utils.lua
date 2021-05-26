@@ -60,4 +60,16 @@ function utils.is_version_less(ver_str, reference_ver_str)
     end
 end
 
+function utils.is_version_greater(ver_str, reference_ver_str)
+    local major, minor, patch = string.match(ver_str, '^(%d+).(%d+).(%d+)')
+    local ref_major, ref_minor, ref_patch = string.match(reference_ver_str, '^(%d+).(%d+).(%d+)')
+
+    if ( major > ref_major ) or ( major == ref_major and minor > ref_minor) or
+      ( major == ref_major and minor == ref_minor and patch > ref_patch) then
+        return true
+    else
+        return false
+    end
+end
+
 return utils

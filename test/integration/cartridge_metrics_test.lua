@@ -50,6 +50,13 @@ local function check_cartridge_version()
     t.skip_if(utils.is_version_less(cartridge_version, '2.0.2'), 'Cartridge version is must be v2.0.2 or greater')
 end
 
+local function check_cartridge_less_250()
+    -- Issues introduced in Cartridge 2.0.2
+    local cartridge_version = require('cartridge.VERSION')
+    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.0.2 or greater')
+    t.skip_if(utils.is_version_greater(cartridge_version, '2.5.0'), 'Cartridge version is must be v2.5.0 or less')
+end
+
 g.test_cartridge_issues_present_on_healthy_cluster = function()
     check_cartridge_version()
     upload_config()
@@ -88,8 +95,9 @@ g.test_cartridge_issues_metric_warning = function()
         pcall(box.cfg, {replication = __replication})
         __replication = nil
     ]])
-
-    t.helpers.retrying({timeout=20}, function()
+    
+    t.helpers.retrying({}, function()
+        check_cartridge_less_250()
         local resp = main_server:http_request('get', '/metrics')
         local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[1]
         t.assert_equals(issues_metric.value, 2, [[
