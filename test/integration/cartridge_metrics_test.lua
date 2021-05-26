@@ -89,7 +89,7 @@ g.test_cartridge_issues_metric_warning = function()
         __replication = nil
     ]])
 
-    t.helpers.retrying({}, function()
+    t.helpers.retrying({timeout=20}, function()
         local resp = main_server:http_request('get', '/metrics')
         local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[1]
         t.assert_equals(issues_metric.value, 2, [[
