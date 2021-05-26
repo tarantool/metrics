@@ -7,10 +7,12 @@ local g = t.group('hotreload')
 
 g.test_reload = function()
     local tmpdir = fio.tempdir()
-    box.cfg {
-        wal_dir = tmpdir,
-        memtx_dir = tmpdir,
-    }
+    if type(box.cfg) == 'function' then
+        box.cfg {
+            wal_dir = tmpdir,
+            memtx_dir = tmpdir,
+        }
+    end
 
     local metrics = require('metrics')
 
