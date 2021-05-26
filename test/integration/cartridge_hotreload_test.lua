@@ -2,7 +2,6 @@ local fio = require('fio')
 local t = require('luatest')
 local g = t.group('cartridge-hotreload')
 
-local utils = require('test.utils')
 local helpers = require('test.helper')
 
 g.before_each( function()
@@ -43,17 +42,11 @@ local function upload_config()
     })
 end
 
-local function check_cartridge_version()
-    -- Health check is compatible cartridge 2.0.2 or greater
-    local cartridge_version = require('cartridge.VERSION')
-    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.0.2 or greater')
-    t.skip_if(utils.is_version_less(cartridge_version, '2.0.2'), 'Cartridge version is must be v2.0.2 or greater')
-end
-
 g.test_cartridge_hotreload = function()
-    check_cartridge_version()
-    upload_config()
     local main_server = g.cluster:server('main')
+    t.skip_if(main_server.net_box:eval([[ return require('cartridge.roles').reload == nil]]))
+
+    upload_config()
     local resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 
