@@ -33,7 +33,7 @@ g.test_reload = function()
     end
 
     require('metrics')
-    
+
     require('metrics.default_metrics.tarantool').enable()
     require('metrics.tarantool.luajit').enable()
 end
