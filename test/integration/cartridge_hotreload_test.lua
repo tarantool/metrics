@@ -44,7 +44,8 @@ end
 
 g.test_cartridge_hotreload = function()
     local main_server = g.cluster:server('main')
-    t.skip_if(main_server.net_box:eval([[ return require('cartridge.roles').reload == nil]]))
+    t.skip_if(main_server.net_box:eval([[ return pcall(require, 'cartridge.roles') == false ]]))
+    t.skip_if(main_server.net_box:eval([[ return require('cartridge.roles').reload == nil ]]))
 
     upload_config()
     local resp = main_server:http_request('get', '/health')
