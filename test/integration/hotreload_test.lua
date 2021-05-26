@@ -1,11 +1,16 @@
 require('strict').on()
 
+local fio = require('fio')
 
 local t = require('luatest')
 local g = t.group('hotreload')
 
 g.test_reload = function()
-    box.cfg{}
+    local tmpdir = fio.tempdir()
+    box.cfg{
+        wal_dir = tmpdir,
+        memtx_dir = tmpdir,
+    }
 
     local metrics = require('metrics')
 
@@ -29,6 +34,6 @@ g.test_reload = function()
 
     require('metrics')
     
-    t.assert_not_equals(require('metrics.default_metrics.tarantool').enable(), nil, "Metrics can't reload")
-   require('metrics.tarantool.luajit').enable()
+    require('metrics.default_metrics.tarantool').enable()
+    require('metrics.tarantool.luajit').enable()
 end
