@@ -124,6 +124,9 @@ function Summary:collect()
     return result
 end
 
+-- debug function to get observation quantiles from summary
+-- returns array of quantile objects or
+-- single quantile object if summary has only one bucket
 function Summary:get_observations(label_pairs)
     local key = self.make_key(label_pairs or {})
     local obs = self.observations[key]
