@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)
+- `ipairs` instead of `pairs` while iteration in `histogram` [#196](https://github.com/tarantool/metrics/issues/196)
 
 ### Fixed
 - be gentle to http routes, don't leave gaps in the array
@@ -29,9 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - New default metrics: cpu_user_time, cpu_system_time
 - Vinyl metrics
-
-### Fixed
-- `ipairs` instead of `pairs` while iteration in `histogram`
 
 ## [0.7.1] - 2021-03-18
 ### Added
