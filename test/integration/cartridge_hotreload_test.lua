@@ -57,13 +57,13 @@ g.test_cartridge_hotreload = function()
     local resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 
-    local main_server = g.cluster:server('main')
+    main_server = g.cluster:server('main')
     main_server.net_box:eval([[
         require('cartridge.roles').reload()
     ]])
 
-    local main_server = g.cluster:server('main')
-    local resp = main_server:http_request('get', '/health')
+    main_server = g.cluster:server('main')
+    resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 
     local replica = g.cluster:server('replica')
@@ -71,7 +71,7 @@ g.test_cartridge_hotreload = function()
         require('cartridge.roles').reload()
     ]])
 
-    local replica = g.cluster:server('replica')
-    local resp = replica:http_request('get', '/health')
+    replica = g.cluster:server('replica')
+    resp = replica:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 end

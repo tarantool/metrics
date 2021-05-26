@@ -95,7 +95,7 @@ g.test_cartridge_issues_metric_warning = function()
         pcall(box.cfg, {replication = __replication})
         __replication = nil
     ]])
-    
+
     t.helpers.retrying({}, function()
         check_cartridge_less_250()
         local resp = main_server:http_request('get', '/metrics')
