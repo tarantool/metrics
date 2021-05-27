@@ -37,6 +37,10 @@ local function upload_config()
                     path = '/health',
                     format = 'health'
                 },
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
             },
         }
     })
@@ -47,9 +51,20 @@ g.test_cartridge_hotreload = function()
     t.skip_if(main_server.net_box:eval([[ return pcall(require, 'cartridge.roles') == false ]]))
     t.skip_if(main_server.net_box:eval([[ return require('cartridge.roles').reload == nil ]]))
 
+    main_server.net_box:eval([[
+        box.schema.space.create('test'):create_index('pkey')
+        box.schema.space.create('vinni_test', {engine='vinyl'}):create_index('pkey')
+        box.space.test:put{1, 1}
+        box.space.vinni_test:put{1, 1}
+    ]])
+
     upload_config()
     local resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
+
+    resp = main_server:http_request('get', '/metrics')
+    t.assert_str_contains(resp.body, '"test"')
+    t.assert_str_contains(resp.body, '"vinni_test"')
 
     main_server = g.cluster:server('main')
     main_server.net_box:eval([[
@@ -68,4 +83,8 @@ g.test_cartridge_hotreload = function()
     replica = g.cluster:server('replica')
     resp = replica:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
+
+    resp = main_server:http_request('get', '/metrics')
+    t.assert_str_contains(resp.body, '"test"')
+    t.assert_str_contains(resp.body, '"vinni_test"')
 end
