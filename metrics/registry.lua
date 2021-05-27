@@ -15,11 +15,7 @@ function Registry:clear()
 end
 
 function Registry:find(kind, name)
-    for _, c in ipairs(self.collectors) do
-        if c.name == name and c.kind == kind then
-            return c
-        end
-    end
+    return self.collectors[name .. kind]
 end
 
 function Registry:find_or_create(class, name, ...)
@@ -32,22 +28,18 @@ end
 
 function Registry:register(collector)
     assert(collector ~= nil, 'Collector is empty')
-    assert(not is_empty(collector.name), "Collector''s name is empty")
-    assert(not is_empty(collector.kind), "Collector''s kind is empty")
+    assert(not is_empty(collector.name), "Collector's name is empty")
+    assert(not is_empty(collector.kind), "Collector's kind is empty")
     if self:find(collector.kind, collector.name) then
         error('Already registered')
     end
     collector:set_registry(self)
-    table.insert(self.collectors, collector)
+    self.collectors[collector.name .. collector.kind] = collector
     return collector
 end
 
 function Registry:unregister(collector)
-    for i, c in ipairs(self.collectors) do
-        if c.name == collector.name and c.kind == collector.kind then
-            table.remove(self.collectors, i)
-        end
-    end
+    self.collectors[collector.name .. collector.kind] = nil
 end
 
 function Registry:invoke_callbacks()
