@@ -222,14 +222,14 @@ Cartridge
 -------------------------------------------------------------------------------
 
 ``tnt_cartridge_issues``—Number of
-:ref:`issues across cluster instances <cartridge.issues>`.
+:ref:`issues of instance <cartridge.issues>`.
 This metric always has label ``{level="critical"}``, where
 ``level`` is the level of the issue:
 
 *   ``critical`` level is associated with critical
-    cluster problems, for example when memory used ratio is more than 90%.
+    instance problems, for example when memory used ratio is more than 90%.
 *   ``warning`` level is associated with
-    other cluster problems, e.g. replication issues on cluster.
+    other cluster problems, e.g. replication issues on instance.
 
 .. _metrics-luajit:
 

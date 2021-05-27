@@ -2,13 +2,13 @@ local utils = require('metrics.utils');
 local fun = require('fun')
 
 local function update_info_metrics()
-    local status, cartridge_issues = pcall(require, 'cartridge.issues')
+    local list_on_instance = rawget(_G, '__cartridge_issues_list_on_instance')
 
-    if status ~= true then
+    if not list_on_instance then
         return
     end
 
-    local issues = cartridge_issues.list_on_cluster()
+    local issues = list_on_instance()
 
     local levels = { 'warning', 'critical' }
 

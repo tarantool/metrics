@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - cartridge metrics role fails to start without http [#225](https://github.com/tarantool/metrics/issues/225)
 - quantile overflow after `fiber.yield()` [#235](https://github.com/tarantool/metrics/issues/235)
 
+### Changed
+- `tnt_cartridge_issues` gather only local issues [#211](https://github.com/tarantool/metrics/issues/211)
+
 ## [0.8.0] - 2021-04-13
 ### Added
 - New default metrics: cpu_user_time, cpu_system_time
