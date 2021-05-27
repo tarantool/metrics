@@ -83,6 +83,7 @@ g.test_graphite_format_observation_time_in_seconds = function()
 end
 
 g.test_graphite_sends_data_to_socket = function()
+    metrics.clear()
     local cnt = metrics.counter('test_cnt', 'test-cnt')
     cnt:inc(1)
     local port = 22003
