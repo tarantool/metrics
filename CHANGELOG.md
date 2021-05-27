@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - quantile overflow after `fiber.yield()` [#235](https://github.com/tarantool/metrics/issues/235)
 
 ### Changed
-- `tnt_cartridge_issues` gather only local issues [#211](https://github.com/tarantool/metrics/issues/211)
+- `tnt_cartridge_issues` gathers only local issues [#211](https://github.com/tarantool/metrics/issues/211)
 
 ## [0.8.0] - 2021-04-13
 ### Added
