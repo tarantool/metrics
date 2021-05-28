@@ -100,10 +100,9 @@ g.test_cartridge_issues_metric_warning = function()
         check_cartridge_less_250()
         local resp = main_server:http_request('get', '/metrics')
         local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[1]
-        t.assert_equals(issues_metric.value, 2, [[
-          Issues count is two cause cluster should has two replication issues:
-          replication from main to replica is stopped and
-          replication from replica to main is stopped.
+        t.assert_equals(issues_metric.value, 1, [[
+          Issues count is one cause main instance should has one replication issue:
+          replication from main to replica is stopped.
         ]])
         t.assert_equals(issues_metric.label_pairs.level, 'warning')
     end)
