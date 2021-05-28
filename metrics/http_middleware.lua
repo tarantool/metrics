@@ -15,6 +15,11 @@ export.DEFAULT_QUANTILES = {
     [0.99] = 0.01,
 }
 
+export.DEFAULT_SUMMARY_PARAMS = {
+    max_age_time = 60,
+    age_buckets_count = 5,
+}
+
 --- Build default histogram collector
 --
 -- @string[opt='histogram'] type_name `histogram` or `average` or `summary`
@@ -29,7 +34,7 @@ function export.build_default_collector(type_name, name, help)
     if type_name == 'histogram' then
         extra = {export.DEFAULT_HISTOGRAM_BUCKETS}
     elseif type_name == 'summary' then
-        extra = {export.DEFAULT_QUANTILES}
+        extra = {export.DEFAULT_QUANTILES, export.DEFAULT_SUMMARY_PARAMS}
     elseif type_name == 'average' then
         log.warn('Average collector is deprecated. Use summary collector instead.')
     else

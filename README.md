@@ -118,10 +118,11 @@ Summary is exposed as multiple numerical values:
 ```lua
 local metrics = require('metrics')
 
--- create a summary
+-- create a summary with a sliding window of 5 age buckets and 60s bucket lifetime
 local http_requests_latency = metrics.summary(
     'http_requests_latency', 'HTTP requests total',
-    {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}
+    {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+    {max_age_time = 60, age_buckets_count = 5}
 )
 
 -- somewhere in the HTTP requests middleware:
@@ -212,10 +213,10 @@ via configuration.
    local metrics = cartridge.service_get('metrics')
    ```
 
-5. There is an ability in Tarantool Cartridge >= '2.4.0' to set a zone for each 
-   server in cluster. If zone was set for the server 'zone' label for all metrics 
-   of this server will be added.
-   
+5. There is an ability in Tarantool Cartridge >= '2.4.0' to set a zone for each
+   server in a cluster. If a zone was set for the server 'zone' label will be added
+   for all metrics on this server.
+
 ## Next steps
 
 See:

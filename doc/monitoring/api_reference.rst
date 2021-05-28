@@ -162,12 +162,35 @@ Summary
 
 ..  function:: summary(name [, help, objectives])
 
-    Registers a new summary. Quantile computation is based on the algorithm `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
+    Registers a new summary. Quantile computation is based on the algorithm
+    `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
 
     :param string   name: Collector name. Must be unique.
     :param string   help: Help description.
-    :param table objectives: Quantiles to observe in the form ``{quantile = error, ... }``.
-                          For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``
+    :param table objectives: A list of 'targeted' φ-quantiles in the form ``{quantile = error, ... }``.
+        For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``.
+        A targeted φ-quantile is specified in the form of a φ-quantile and tolerated
+        error. For example a ``{[0.5] = 0.1}`` means that the median (= 50th
+        percentile) should be returned with 10 percent error. Note that
+        percentiles and quantiles are the same concept, except percentiles are
+        expressed as percentages. The φ-quantile must be in the interval [0, 1].
+        Note that a lower tolerated error for a φ-quantile results in higher
+        usage of resources (memory and CPU) to calculate the summary.
+
+    :param table params: Table of summary parameters, used for configuring sliding
+        window of time. 'Sliding window' consists of several buckets to store observations.
+        New observations are added to each bucket. After a time period, the 'head' bucket
+        (bucket from which observations are collected) is reset and the next bucket becomes a
+        new 'head'. I.e. each bucket will store observations for
+        ``max_age_time * age_buckets_count`` seconds before it will be reset.
+        ``max_age_time`` sets the duration of each bucket lifetime, i.e., how long
+        observations are kept before they are discarded, in seconds
+        ``age_buckets_count`` sets the number of buckets of the time window. It
+        determines the number of buckets used to exclude observations that are
+        older than ``max_age_time`` from the Summary. The value is
+        a trade-off between resources (memory and CPU for maintaining the bucket)
+        and how smooth the time window is moved.
+        Default value is `{max_age_time = math.huge, age_buckets_count = 1}`
 
     :return: Summary object
 
@@ -190,16 +213,23 @@ Summary
         Records a new value in a summary.
 
         :param number        num: Value to put in the data stream.
-        :param table label_pairs: Table containing label names as keys,
+        :param table label_pairs: A table containing label names as keys,
                                   label values as values (table).
                                   A new value is observed by all internal counters
                                   with these labels specified.
+                                  Label ``"quantile"`` are not allowed in ``summary``.
+                                  It will be added automatically.
+                                  If ``max_age_time`` and ``age_buckets_count`` are set,
+                                  the observed value will be added to each bucket.
 
     ..  method:: collect()
 
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``summary_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
+        If ``max_age_time`` and ``age_buckets_count`` are set, quantile observations
+        will be collect only from the head bucket in sliding window and not from every
+        bucket.
 
 .. _labels:
 
@@ -452,10 +482,11 @@ Using summaries:
 
     local metrics = require('metrics')
 
-    -- create a summary
+    -- create a summary with a window of 5 age buckets and 60s bucket lifetime
     local http_requests_latency = metrics.summary(
         'http_requests_latency', 'HTTP requests total',
-        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}
+        {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
+        {max_age_time = 60, age_buckets_count = 5}
     )
 
     -- somewhere in the HTTP requests middleware:

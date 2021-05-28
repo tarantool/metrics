@@ -284,6 +284,12 @@ function quantile.Reset(stream_obj)
     stream_obj.stream.n = 0
 	stream_obj.b_len = 0
 	stream_obj.stream.l_len = 0
+	for i = 1, stream_obj.__max_samples * 2 + 1 do
+        stream_obj.stream.l[i] = inf_obj
+	end
+	for i = 0, stream_obj.__max_samples - 1 do
+        stream_obj.b[i] = math.huge
+	end
 end
 
 return quantile
