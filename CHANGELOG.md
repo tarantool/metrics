@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- be gentle to http routes, don't leave gaps in the array
+  [#246](https://github.com/tarantool/metrics/issues/246)
+
 ## [0.9.0] - 2021-05-28
 ### Fixed
 - cartridge metrics role fails to start without http [#225](https://github.com/tarantool/metrics/issues/225)
