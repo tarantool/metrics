@@ -139,6 +139,17 @@ g.test_role_add_metrics_http_endpoint = function()
         }
     })
     t.assert_equals(resp.status, 200)
+
+    g.cluster.main_server.net_box:eval([[
+        local cartridge = require('cartridge')
+        local httpd = cartridge.service_get('httpd')
+        for i = 1, table.maxn(httpd.routes) do
+            if httpd.routes[i] == nil then
+                error(('There is a gap in httpd.route[%d]'):format(i))
+            end
+        end
+    ]])
+
     resp = server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 404)
     resp = server:http_request('get', '/new-metrics', {raise = false})

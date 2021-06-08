@@ -43,8 +43,16 @@ local function check_config(_)
 end
 
 local function delete_route(httpd, name)
-    httpd.routes[httpd.iroutes[name]] = nil
+    local route = assert(httpd.iroutes[name])
     httpd.iroutes[name] = nil
+    table.remove(httpd.routes, route)
+
+    -- Update httpd.iroutes numeration
+    for n, r in ipairs(httpd.routes) do
+        if r.name then
+            httpd.iroutes[r.name] = n
+        end
+    end
 end
 
 -- removes '/' from start and end of the path to avoid paths duplication
