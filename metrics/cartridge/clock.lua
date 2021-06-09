@@ -13,7 +13,9 @@ local function update_clock_metrics()
     if topology_cfg == nil then
         return
     end
-
+    if not topology.refine_servers_uri then
+        return
+    end
     local refined_uri_list = topology.refine_servers_uri(topology_cfg)
     for _, uuid, _ in fun.filter(topology.not_disabled, topology_cfg.servers) do
         table.insert(uri_list, refined_uri_list[uuid])
