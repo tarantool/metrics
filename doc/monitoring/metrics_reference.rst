@@ -221,7 +221,7 @@ Runtime
 Cartridge
 -------------------------------------------------------------------------------
 
-``tnt_cartridge_issues``—Number of
+``tnt_cartridge_issues``—number of
 :ref:`issues of instance <cartridge.issues>`.
 This metric always has label ``{level="critical"}``, where
 ``level`` is the level of the issue:
@@ -230,6 +230,13 @@ This metric always has label ``{level="critical"}``, where
     instance problems, for example when memory used ratio is more than 90%.
 *   ``warning`` level is associated with
     other cluster problems, e.g. replication issues on instance.
+
+``tnt_clock_delta``—value of clock difference.
+This metric always has label ``{delta="max"}``, where
+``delta`` is one of:
+
+*   ``max``—max clock difference of the instance.
+*   ``min``—min clock difference of the instance
 
 .. _metrics-luajit:
 

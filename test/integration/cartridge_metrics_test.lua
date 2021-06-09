@@ -133,3 +133,16 @@ g.test_cartridge_issues_metric_critical = function()
         t.assert_equals(issues_metric.label_pairs.level, 'critical')
     end)
 end
+
+g.test_clock_delta_metric_present = function()
+    upload_config()
+    local main_server = g.cluster:server('main')
+
+    t.helpers.retrying({}, function()
+        local resp = main_server:http_request('get', '/metrics')
+        local clock_delta_metrics = utils.find_metric('tnt_clock_delta', resp.json)
+        t.assert_equals(#clock_delta_metrics, 2)
+        t.assert_equals(clock_delta_metrics[1].label_pairs.delta, 'max')
+        t.assert_equals(clock_delta_metrics[2].label_pairs.delta, 'min')
+    end)
+end

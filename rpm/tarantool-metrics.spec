@@ -61,6 +61,7 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/cartridge.lua
 %dir %{luapkgdir}/metrics/cartridge
      %{luapkgdir}/metrics/cartridge/issues.lua
+     %{luapkgdir}/metrics/cartridge/clock.lua
 %dir %{luapkgdir}/metrics/psutils
      %{luapkgdir}/metrics/psutils/cpu.lua
      %{luapkgdir}/metrics/psutils/psutils_linux.lua
