@@ -79,21 +79,7 @@ end
 
 
 g.before_each(function()
-    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-    g.cluster = helpers.Cluster:new({
-        datadir = fio.tempdir(),
-        server_command = helpers.entrypoint('srv_basic'),
-        replicasets = {
-            {
-                uuid = helpers.uuid('a'),
-                roles = {},
-                servers = {
-                    {instance_uuid = helpers.uuid('a', 1), alias = 'main'},
-                },
-            },
-        },
-    })
-    g.cluster:start()
+    helpers.init_cluster(t, g)
 end)
 
 g.after_each( function()

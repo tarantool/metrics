@@ -1,6 +1,7 @@
 require('strict').on()
 
 local fio = require('fio')
+local utils = require('test.utils')
 local ok, cartridge_helpers = pcall(require, 'cartridge.test-helpers')
 if not ok then
     return nil
@@ -19,6 +20,54 @@ function helpers.entrypoint(name)
         error(path .. ': no such entrypoint', 2)
     end
     return path
+end
+
+function helpers.init_cluster(t, g)
+    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
+    g.cluster = helpers.Cluster:new({
+        datadir = fio.tempdir(),
+        server_command = helpers.entrypoint('srv_basic'),
+        replicasets = {
+            {
+                uuid = helpers.uuid('a'),
+                roles = {},
+                servers = {
+                    {instance_uuid = helpers.uuid('a', 1), alias = 'main'},
+                    {instance_uuid = helpers.uuid('b', 1), alias = 'replica'},
+                },
+            },
+        },
+    })
+    g.cluster:start()
+    return g.cluster
+end
+
+function helpers.upload_config(cluster)
+    return function()
+        local main_server = cluster:server('main')
+        main_server:upload_config({
+            metrics = {
+                export = {
+                    {
+                        path = '/health',
+                        format = 'health'
+                    },
+                    {
+                        path = '/metrics',
+                        format = 'json'
+                    },
+                },
+            }
+        })
+    end
+end
+
+function helpers.check_cartridge_version(version)
+    local t = require('luatest')
+    local cartridge_version = require('cartridge.VERSION')
+    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
+    t.skip_if(utils.is_version_less(cartridge_version, version),
+        'Cartridge version is must be v' .. version .. ' or greater')
 end
 
 return helpers

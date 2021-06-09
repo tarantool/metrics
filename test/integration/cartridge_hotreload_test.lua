@@ -6,26 +6,7 @@ local utils = require('test.utils')
 local helpers = require('test.helper')
 
 g.before_each(function()
-    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-    local cartridge_version = require('cartridge.VERSION')
-    t.skip_if(cartridge_version == 'unknown')
-    t.skip_if(utils.is_version_less(cartridge_version, '2.3.0'))
-    g.cluster = helpers.Cluster:new({
-        datadir = fio.tempdir(),
-        server_command = helpers.entrypoint('srv_basic'),
-        env = {TARANTOOL_ROLES_RELOAD_ALLOWED = 'true'},
-        replicasets = {
-            {
-                uuid = helpers.uuid('a'),
-                roles = {},
-                servers = {
-                    { instance_uuid = helpers.uuid('a', 1), alias = 'main' },
-                    { instance_uuid = helpers.uuid('b', 1), alias = 'replica' },
-                },
-            },
-        },
-    })
-    g.cluster:start()
+    helpers.init_cluster(t, g)
 end)
 
 g.after_each(function()
