@@ -5,61 +5,24 @@ local g = t.group()
 local utils = require('test.utils')
 local helpers = require('test.helper')
 
-g.before_each( function()
-    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-    g.cluster = helpers.Cluster:new({
-        datadir = fio.tempdir(),
-        server_command = helpers.entrypoint('srv_basic'),
-        replicasets = {
-            {
-                uuid = helpers.uuid('a'),
-                roles = {},
-                servers = {
-                    { instance_uuid = helpers.uuid('a', 1), alias = 'main' },
-                    { instance_uuid = helpers.uuid('b', 1), alias = 'replica' },
-                },
-            },
-        },
-    })
-    g.cluster:start()
-end )
+g.before_each(function()
+    helpers.init_cluster(t, g)
+end)
 
-g.after_each( function()
+g.after_each(function()
     g.cluster:stop()
     fio.rmtree(g.cluster.datadir)
-end )
-
-local function upload_config()
-    local main_server = g.cluster:server('main')
-    main_server:upload_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-            },
-        }
-    })
-end
-
-local function check_cartridge_version()
-    -- Issues introduced in Cartridge 2.0.2
-    local cartridge_version = require('cartridge.VERSION')
-    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.0.2 or greater')
-    t.skip_if(utils.is_version_less(cartridge_version, '2.0.2'), 'Cartridge version is must be v2.0.2 or greater')
-end
+end)
 
 local function check_cartridge_less_250()
-    -- Issues introduced in Cartridge 2.0.2
     local cartridge_version = require('cartridge.VERSION')
-    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.0.2 or greater')
+    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.5.0 or greater')
     t.skip_if(utils.is_version_greater(cartridge_version, '2.5.0'), 'Cartridge version is must be v2.5.0 or less')
 end
 
 g.test_cartridge_issues_present_on_healthy_cluster = function()
-    check_cartridge_version()
-    upload_config()
+    helpers.check_cartridge_version('2.0.2')
+    helpers.upload_config(g.cluster)
     local main_server = g.cluster:server('main')
     local resp = main_server:http_request('get', '/metrics')
     local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
@@ -75,11 +38,11 @@ g.test_cartridge_issues_present_on_healthy_cluster = function()
 end
 
 g.test_cartridge_issues_metric_warning = function()
-    check_cartridge_version()
+    helpers.check_cartridge_version('2.0.2')
 
     local main_server = g.cluster:server('main')
     local replica_server = g.cluster:server('replica')
-    upload_config()
+    helpers.upload_config(g.cluster)
 
     -- Stage replication issue "Duplicate key exists in unique index 'primary' in space '_space'"
     main_server.net_box:eval([[
@@ -109,8 +72,8 @@ g.test_cartridge_issues_metric_warning = function()
 end
 
 g.test_cartridge_issues_metric_critical = function()
-    check_cartridge_version()
-    upload_config()
+    helpers.check_cartridge_version('2.0.2')
+    helpers.upload_config(g.cluster)
     local main_server = g.cluster:server('main')
 
     main_server.net_box:eval([[
