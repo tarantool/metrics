@@ -22,9 +22,8 @@ function helpers.entrypoint(name)
     return path
 end
 
-function helpers.init_cluster(t, g)
-    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-    g.cluster = helpers.Cluster:new({
+function helpers.init_cluster()
+    local cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
         server_command = helpers.entrypoint('srv_basic'),
         replicasets = {
@@ -38,28 +37,26 @@ function helpers.init_cluster(t, g)
             },
         },
     })
-    g.cluster:start()
-    return g.cluster
+    cluster:start()
+    return cluster
 end
 
 function helpers.upload_config(cluster)
-    return function()
-        local main_server = cluster:server('main')
-        main_server:upload_config({
-            metrics = {
-                export = {
-                    {
-                        path = '/health',
-                        format = 'health'
-                    },
-                    {
-                        path = '/metrics',
-                        format = 'json'
-                    },
+    local main_server = cluster:server('main')
+    main_server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/health',
+                    format = 'health'
                 },
-            }
-        })
-    end
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+        }
+    })
 end
 
 function helpers.check_cartridge_version(version)

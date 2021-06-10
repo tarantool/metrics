@@ -17,7 +17,7 @@ local function set_export(cluster, export)
 end
 
 g.test_http_disabled = function()
-    local cluster = helpers.init_cluster(t, g)
+    local cluster = helpers.init_cluster()
     local server = cluster.main_server
 
     server.net_box:eval([[

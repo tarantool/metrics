@@ -79,7 +79,8 @@ end
 
 
 g.before_each(function()
-    helpers.init_cluster(t, g)
+    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
+    g.cluster = helpers.init_cluster()
 end)
 
 g.after_each( function()
