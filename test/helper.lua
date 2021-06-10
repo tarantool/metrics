@@ -2,6 +2,7 @@ require('strict').on()
 
 local fio = require('fio')
 local utils = require('test.utils')
+local t = require('luatest')
 local ok, cartridge_helpers = pcall(require, 'cartridge.test-helpers')
 if not ok then
     return nil
@@ -60,7 +61,6 @@ function helpers.upload_config(cluster)
 end
 
 function helpers.check_cartridge_version(version)
-    local t = require('luatest')
     local cartridge_version = require('cartridge.VERSION')
     t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
     t.skip_if(utils.is_version_less(cartridge_version, version),
