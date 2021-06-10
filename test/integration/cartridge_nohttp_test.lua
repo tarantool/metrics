@@ -17,6 +17,7 @@ local function set_export(cluster, export)
 end
 
 g.test_http_disabled = function()
+    t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     local cluster = helpers.init_cluster()
     local server = cluster.main_server
 
