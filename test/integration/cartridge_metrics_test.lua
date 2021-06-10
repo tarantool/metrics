@@ -135,7 +135,6 @@ g.test_cartridge_issues_metric_critical = function()
 end
 
 g.test_clock_delta_metric_present = function()
-    check_cartridge_version()
     upload_config()
     local main_server = g.cluster:server('main')
 
