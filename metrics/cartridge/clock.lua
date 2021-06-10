@@ -7,7 +7,7 @@ local function update_clock_metrics()
     local min_delta = 0
     local max_delta = 0
 
-    for _, member in pairs(membership.members()) do
+    for _, member in membership.pairs() do
         if member and member.status == 'alive' and member.clock_delta ~= nil then
             if member.clock_delta < min_delta then
                 min_delta = member.clock_delta
