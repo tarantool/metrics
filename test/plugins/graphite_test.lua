@@ -119,12 +119,13 @@ end
 g.test_graphite_kills_previous_fibers_on_init = function()
     mock_graphite_worker()
     mock_graphite_worker()
+    fiber.sleep(0.5) -- wait to kill previous fibers
     local workers_cnt = count_workers()
     t.assert_equals(workers_cnt, 2)
 
     graphite.init({})
 
-    fiber.sleep(0.5)
+    fiber.sleep(0.5) -- wait to kill previous fibers
     workers_cnt = count_workers()
     t.assert_equals(workers_cnt, 1)
 end
