@@ -33,6 +33,10 @@ g.before_all(function()
     metrics.enable_default_metrics();
 end)
 
+g.before_each(function()
+    metrics.clear()
+end)
+
 g.after_each(function()
     -- Delete all collectors and global labels
     metrics.clear()
@@ -83,7 +87,6 @@ g.test_graphite_format_observation_time_in_seconds = function()
 end
 
 g.test_graphite_sends_data_to_socket = function()
-    metrics.clear()
     local cnt = metrics.counter('test_cnt', 'test-cnt')
     cnt:inc(1)
     local port = 22003
@@ -97,6 +100,7 @@ g.test_graphite_sends_data_to_socket = function()
     local obs_table = graphite_obs:split(' ')
     t.assert_equals(obs_table[1], 'tarantool.test_cnt')
     t.assert_equals(obs_table[2], '1')
+    sock:close()
 end
 
 local function mock_graphite_worker()
