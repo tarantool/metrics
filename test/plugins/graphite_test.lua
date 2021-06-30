@@ -96,6 +96,7 @@ g.test_graphite_sends_data_to_socket = function()
     local obs_table = graphite_obs:split(' ')
     t.assert_equals(obs_table[1], 'tarantool.test_cnt')
     t.assert_equals(obs_table[2], '1')
+    sock:close()
 end
 
 local function mock_graphite_worker()
@@ -114,12 +115,13 @@ end
 g.test_graphite_kills_previous_fibers_on_init = function()
     mock_graphite_worker()
     mock_graphite_worker()
+    fiber.sleep(0.5) -- wait to kill previous fibers
     local workers_cnt = count_workers()
     t.assert_equals(workers_cnt, 2)
 
     graphite.init({})
 
-    fiber.sleep(0.5)
+    fiber.sleep(0.5) -- wait to kill previous fibers
     workers_cnt = count_workers()
     t.assert_equals(workers_cnt, 1)
 end
