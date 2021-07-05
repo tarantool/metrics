@@ -127,7 +127,6 @@ g.test_graphite_kills_previous_fibers_on_init = function()
     mock_graphite_worker()
     mock_graphite_worker()
     local workers_cnt = count_workers()
-    require'log'.error(workers_cnt)
     t.assert_equals(workers_cnt, 2)
 
     graphite.init({})
