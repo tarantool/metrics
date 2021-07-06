@@ -124,6 +124,11 @@ local function apply_default(paths)
             metrics_vars.current_paths[path] = format
         end
     end
+    for path, _ in pairs(metrics_vars.default or {}) do
+        if not paths[path] then
+            delete_route(httpd, path)
+        end
+    end
 end
 
 -- removes routes that changed in config and adds new routes
@@ -178,6 +183,4 @@ return setmetatable({
     validate_config = validate_config,
     apply_config = apply_config,
     set_export = set_export,
-    -- only for tests - don't forget to remove
-    vars = metrics_vars,
 }, { __index = metrics })
