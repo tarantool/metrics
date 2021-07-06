@@ -4,6 +4,8 @@ local metrics = require('metrics')
 local checks = require('checks')
 local log = require('log')
 
+local metrics_vars = require('cartridge.vars').new('metrics_vars')
+
 local handlers = {
     ['json'] = function(req)
         local json_exporter = require('metrics.plugins.json')
@@ -28,12 +30,6 @@ local function set_labels()
         zone = this_instance[1].zone
     end
     metrics.set_global_labels({alias = params.alias or params.instance_name, zone = zone})
-end
-
-local function init()
-    set_labels()
-    metrics.enable_default_metrics()
-    metrics.enable_cartridge_metrics()
 end
 
 local function check_config(_)
@@ -87,8 +83,8 @@ local function validate_config(conf_new)
     return validate_routes(conf_new.export)
 end
 
--- table to store enabled routes
-local current_paths = {}
+-- -- table to store enabled routes
+-- local current_paths = {}
 
 local function apply_routes(export)
     local httpd = cartridge.service_get('httpd')
@@ -97,16 +93,16 @@ local function apply_routes(export)
     end
     for _, exporter in ipairs(export) do
         local path, format = remove_side_slashes(exporter.path), exporter.format
-        if current_paths[path] ~= format then
-            if current_paths[path] then
+        if metrics_vars.current_paths[path] ~= format then
+            if metrics_vars.current_paths[path] then
                 delete_route(httpd, path)
             end
             httpd:route({method = 'GET', name = path, path = path}, handlers[format])
-            current_paths[path] = format
+            metrics_vars.current_paths[path] = format
         end
     end
     -- deletes paths that was enabled, but aren't in config now
-    for path, _ in pairs(current_paths) do
+    for path, _ in pairs(metrics_vars.current_paths) do
         local is_present = false
         for _, exporter in ipairs(export) do
             if path == remove_side_slashes(exporter.path) then
@@ -116,49 +112,93 @@ local function apply_routes(export)
         end
         if not is_present then
             delete_route(httpd, path)
-            current_paths[path] = nil
+            metrics_vars.current_paths[path] = nil
         end
     end
 end
 
-local metrics_config_present = false
+-- local metrics_config_present = false
+
+local function apply_default(paths)
+    local httpd = cartridge.service_get('httpd')
+    if httpd == nil then
+        return
+    end
+    for path, format in pairs(paths) do
+        if metrics_vars.current_paths[path] == nil then
+            httpd:route({method = 'GET', name = path, path = path}, handlers[format])
+            metrics_vars.current_paths[path] = format
+        end
+    end
+end
 
 -- removes routes that changed in config and adds new routes
 local function apply_config(conf)
     local metrics_conf = conf.metrics
     -- if metrics is not present in config then skip reconfiguring routes
     if metrics_conf == nil then
-        return
-    else
-        metrics_config_present = true
+        -- return
+        metrics_conf = {}
+    -- else
+    --     metrics_config_present = true
     end
-    if not next(metrics_conf.export) then
-        if next(current_paths) == nil then
-            return
-        end
-        metrics_config_present = false
-    end
+    metrics_conf.export = metrics_conf.export or {}
+    -- if not next(metrics_conf.export) then
+    --     if next(current_paths) == nil then
+    --         return
+    --     end
+    --     -- metrics_config_present = false
+    -- end
     set_labels()
     apply_routes(metrics_conf.export)
+    if metrics_vars.default then
+        apply_default(metrics_vars.default)
+    end
 end
 
-local function set_export(export)
-    if metrics_config_present then
-        log.warn("Metrics config is present, set_export doesn't apply")
-        return
+local function format_paths(export)
+    local paths = {}
+    for _, exporter in ipairs(export) do
+        paths[remove_side_slashes(exporter.path)] = exporter.format
     end
+    return paths
+end
+
+
+local function set_export(export)
+    -- if metrics_config_present then
+    --     log.warn("Metrics config is present, set_export doesn't apply")
+    --     return
+    -- end
     local ok, err = pcall(validate_routes, export)
     if ok then
-        apply_routes(export)
+        local paths = format_paths(export)
+        apply_default(paths)
+        metrics_vars.default = paths
     else
         error(err)
     end
+end
+
+local function init()
+    metrics_vars.current_paths = {}
+    set_labels()
+    metrics.enable_default_metrics()
+    metrics.enable_cartridge_metrics()
+    if metrics_vars.default then
+        apply_default(metrics_vars.default)
+    end
+end
+
+local function stop()
+    metrics_vars.current_paths = {}
 end
 
 return setmetatable({
     role_name = 'metrics',
     permanent = true,
     init = init,
+    stop = stop,
     validate_config = validate_config,
     apply_config = apply_config,
     set_export = set_export,
