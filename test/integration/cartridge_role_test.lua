@@ -281,7 +281,7 @@ g.test_empty_clusterwide_config_not_overrides_set_export = function()
     t.assert_equals(resp.status, 200)
 end
 
-g.test_non_empty_clusterwide_config_overrides_set_export = function()
+g.test_non_empty_clusterwide_config_combines_with_set_export = function()
     local server = g.cluster.main_server
     assert_upload_metrics_config('/metrics')
     assert_set_export('/new-metrics')
@@ -289,7 +289,7 @@ g.test_non_empty_clusterwide_config_overrides_set_export = function()
     local resp = server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
     resp = server:http_request('get', '/new-metrics', {raise = false})
-    t.assert_equals(resp.status, 404)
+    t.assert_equals(resp.status, 200)
 end
 
 g.test_set_export_from_require_role = function()

@@ -2,7 +2,6 @@ local cartridge = require('cartridge')
 local argparse = require('cartridge.argparse')
 local metrics = require('metrics')
 local checks = require('checks')
--- local log = require('log')
 
 local metrics_vars = require('cartridge.vars').new('metrics_vars')
 
@@ -83,9 +82,6 @@ local function validate_config(conf_new)
     return validate_routes(conf_new.export)
 end
 
--- -- table to store enabled routes
--- local current_paths = {}
-
 local function apply_routes(export)
     local httpd = cartridge.service_get('httpd')
     if httpd == nil then
@@ -117,8 +113,6 @@ local function apply_routes(export)
     end
 end
 
--- local metrics_config_present = false
-
 local function apply_default(paths)
     local httpd = cartridge.service_get('httpd')
     if httpd == nil then
@@ -134,21 +128,8 @@ end
 
 -- removes routes that changed in config and adds new routes
 local function apply_config(conf)
-    local metrics_conf = conf.metrics
-    -- if metrics is not present in config then skip reconfiguring routes
-    if metrics_conf == nil then
-        -- return
-        metrics_conf = {}
-    -- else
-    --     metrics_config_present = true
-    end
+    local metrics_conf = conf.metrics or {}
     metrics_conf.export = metrics_conf.export or {}
-    -- if not next(metrics_conf.export) then
-    --     if next(current_paths) == nil then
-    --         return
-    --     end
-    --     -- metrics_config_present = false
-    -- end
     set_labels()
     apply_routes(metrics_conf.export)
     if metrics_vars.default then
@@ -164,12 +145,7 @@ local function format_paths(export)
     return paths
 end
 
-
 local function set_export(export)
-    -- if metrics_config_present then
-    --     log.warn("Metrics config is present, set_export doesn't apply")
-    --     return
-    -- end
     local ok, err = pcall(validate_routes, export)
     if ok then
         local paths = format_paths(export)

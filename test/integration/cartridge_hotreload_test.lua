@@ -21,6 +21,9 @@ g.before_each( function()
         },
     })
     g.cluster:start()
+    local main_server = g.cluster:server('main')
+    t.skip_if(main_server.net_box:eval([[ return pcall(require, 'cartridge.roles') == false ]]))
+    t.skip_if(main_server.net_box:eval([[ return require('cartridge.roles').reload == nil ]]))
 end )
 
 g.after_each( function()
@@ -28,25 +31,35 @@ g.after_each( function()
     fio.rmtree(g.cluster.datadir)
 end )
 
--- local function upload_config()
---     local main_server = g.cluster:server('main')
---     main_server:upload_config({
---         metrics = {
---             export = {
---                 {
---                     path = '/health',
---                     format = 'health'
---                 },
---                 {
---                     path = '/metrics',
---                     format = 'json'
---                 },
---             },
---         }
---     })
--- end
+local function upload_config()
+    local main_server = g.cluster:server('main')
+    main_server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/health',
+                    format = 'health'
+                },
+                {
+                    path = '/new-metrics',
+                    format = 'json'
+                },
+            },
+        }
+    })
+end
 
-local function set_export(export)
+local function set_export()
+    local export = {
+        {
+            path = '/health',
+            format = 'health'
+        },
+        {
+            path = '/metrics',
+            format = 'json'
+        },
+    }
     local server = g.cluster.main_server
     return server.net_box:eval([[
         local cartridge = require('cartridge')
@@ -58,62 +71,59 @@ local function set_export(export)
     ]], {export})
 end
 
-g.test_cartridge_hotreload = function()
+local function reload_roles()
     local main_server = g.cluster:server('main')
-    t.skip_if(main_server.net_box:eval([[ return pcall(require, 'cartridge.roles') == false ]]))
-    t.skip_if(main_server.net_box:eval([[ return require('cartridge.roles').reload == nil ]]))
-
-    set_export({
-        {
-            path = '/health',
-            format = 'health'
-        },
-        {
-            path = '/metrics',
-            format = 'json'
-        },
-    })
-
-    main_server.net_box:eval([[
-        box.schema.space.create('test'):create_index('pkey')
-        box.schema.space.create('vinni_test', {engine='vinyl'}):create_index('pkey')
-        box.space.test:put{1, 1}
-        box.space.vinni_test:put{1, 1}
-    ]])
-
-    -- upload_config()
-    local resp = main_server:http_request('get', '/health')
-    t.assert_equals(resp.status, 200)
-
-    resp = main_server:http_request('get', '/metrics')
-    t.assert_str_contains(resp.body, '"test"')
-    t.assert_str_contains(resp.body, '"vinni_test"')
-
-    main_server = g.cluster:server('main')
-    resp = main_server:http_request('get', '/health')
-    t.assert_equals(resp.status, 200)
-
-    main_server = g.cluster:server('main')
     main_server.net_box:eval([[
         require('cartridge.roles').reload()
     ]])
-    -- require'log'.error(err)
-    -- assert(ok == true, tostring(err))
+end
 
-    main_server = g.cluster:server('main')
-    resp = main_server:http_request('get', '/health', {raise = false})
+g.test_cartridge_hotreload_set_export = function()
+    local main_server = g.cluster:server('main')
+    set_export()
+
+    local resp = main_server:http_request('get', '/metrics')
     t.assert_equals(resp.status, 200)
 
-    -- local replica = g.cluster:server('replica')
-    -- replica.net_box:eval([[
-    --     require('cartridge.roles').reload()
-    -- ]])
+    reload_roles()
 
-    -- replica = g.cluster:server('replica')
-    -- resp = replica:http_request('get', '/health')
-    -- t.assert_equals(resp.status, 200)
+    main_server = g.cluster:server('main')
+    resp = main_server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+end
+
+g.test_cartridge_hotreload_config = function()
+    local main_server = g.cluster:server('main')
+
+    upload_config()
+    local resp = main_server:http_request('get', '/new-metrics')
+    t.assert_equals(resp.status, 200)
+
+    reload_roles()
+
+    main_server = g.cluster:server('main')
+    resp = main_server:http_request('get', '/new-metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+end
+
+g.test_cartridge_hotreload_set_export_and_config = function()
+    local main_server = g.cluster:server('main')
+
+    set_export()
+
+    upload_config()
+    local resp = main_server:http_request('get', '/new-metrics')
+    t.assert_equals(resp.status, 200)
 
     resp = main_server:http_request('get', '/metrics')
-    t.assert_str_contains(resp.body, '"test"')
-    t.assert_str_contains(resp.body, '"vinni_test"')
+    t.assert_equals(resp.status, 200)
+
+    reload_roles()
+
+    main_server = g.cluster:server('main')
+    resp = main_server:http_request('get', '/new-metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+
+    resp = main_server:http_request('get', '/metrics')
+    t.assert_equals(resp.status, 200)
 end
