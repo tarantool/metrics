@@ -178,4 +178,6 @@ return setmetatable({
     validate_config = validate_config,
     apply_config = apply_config,
     set_export = set_export,
+    -- only for tests - don't forget to remove
+    vars = metrics_vars,
 }, { __index = metrics })
