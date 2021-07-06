@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- metrics registry refactoring to search with `O(1)`
+- metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)
 
 ### Fixed
 - be gentle to http routes, don't leave gaps in the array
