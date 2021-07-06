@@ -1,6 +1,6 @@
 #!/usr/bin/env tarantool
 
-require('strict').on()
+-- require('strict').on()
 
 local log = require('log')
 local errors = require('errors')
