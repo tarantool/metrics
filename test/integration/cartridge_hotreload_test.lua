@@ -8,7 +8,7 @@ g.before_each( function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     g.cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
-        server_command = helpers.entrypoint('srv_basic'),
+        server_command = helpers.entrypoint('srv_with_hotreload'),
         replicasets = {
             {
                 uuid = helpers.uuid('a'),
