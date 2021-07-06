@@ -231,13 +231,12 @@ This metric always has label ``{level="critical"}``, where
 *   ``warning`` level is associated with
     other cluster problems, e.g. replication issues on instance.
 
-``tnt_clock_delta``—value of clock difference.
-This metric always has label ``{delta="max"}``, where
-``delta`` is one of:
 
-*   ``max``—max clock difference of the instance.
-*   ``min``—min clock difference of the instance
+``tnt_clock_delta``—the clock drift across the cluster.
+This metric always has the label ``{delta="..."}``, which is one of:
 
+*   ``max``—the difference with the fastest clock (always positive),
+*   ``min``—the difference with the slowest clock (always negative).
 .. _metrics-luajit:
 
 -------------------------------------------------------------------------------
