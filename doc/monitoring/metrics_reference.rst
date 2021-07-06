@@ -378,7 +378,7 @@ efficient.
     above 5% indicates that vinyl is not healthy. At this moment you'll probably
     see a lot of other problems with vinyl.
 
-*   ``tnt_vinyl_tx_read_views``—the counter of read views, that is, transactions
+*   ``tnt_vinyl_tx_read_views``—the current number of read views, that is, transactions
     entered a read-only state to avoid conflict temporarily. Usually the value
     is ``0``. If it stays non-zero for a long time, it indicates of a memory leak.
 
