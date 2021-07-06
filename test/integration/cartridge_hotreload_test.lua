@@ -28,23 +28,23 @@ g.after_each( function()
     fio.rmtree(g.cluster.datadir)
 end )
 
-local function upload_config()
-    -- local main_server = g.cluster:server('main')
-    -- main_server:upload_config({
-    --     metrics = {
-    --         export = {
-    --             {
-    --                 path = '/health',
-    --                 format = 'health'
-    --             },
-    --             {
-    --                 path = '/metrics',
-    --                 format = 'json'
-    --             },
-    --         },
-    --     }
-    -- })
-end
+-- local function upload_config()
+--     local main_server = g.cluster:server('main')
+--     main_server:upload_config({
+--         metrics = {
+--             export = {
+--                 {
+--                     path = '/health',
+--                     format = 'health'
+--                 },
+--                 {
+--                     path = '/metrics',
+--                     format = 'json'
+--                 },
+--             },
+--         }
+--     })
+-- end
 
 local function set_export(export)
     local server = g.cluster.main_server
@@ -94,8 +94,8 @@ g.test_cartridge_hotreload = function()
     t.assert_equals(resp.status, 200)
 
     main_server = g.cluster:server('main')
-    local ok, err = main_server.net_box:eval([[
-        return require('cartridge.roles').reload()
+    main_server.net_box:eval([[
+        require('cartridge.roles').reload()
     ]])
     -- require'log'.error(err)
     -- assert(ok == true, tostring(err))

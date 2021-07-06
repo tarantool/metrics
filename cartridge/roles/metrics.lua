@@ -2,7 +2,7 @@ local cartridge = require('cartridge')
 local argparse = require('cartridge.argparse')
 local metrics = require('metrics')
 local checks = require('checks')
-local log = require('log')
+-- local log = require('log')
 
 local metrics_vars = require('cartridge.vars').new('metrics_vars')
 
