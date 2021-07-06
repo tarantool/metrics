@@ -1,10 +1,11 @@
-name: Update translation sources
+name: Update translations on the main branch
 
 on:
-  workflow_dispatch:
-  pull_request:
+  push:
     paths:
-      - 'doc/**.rst'
+      - 'doc/**/*'
+    branches:
+      - master
 jobs:
   autocommit-pot-files:
     runs-on: ubuntu-latest
@@ -13,13 +14,6 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v2
-      with:
-        ref: ${{ github.head_ref }}
-
-    - name: Setup tarantool
-      uses: tarantool/setup-tarantool@v1
-      with:
-        tarantool-version: '2.6'
 
     - name: Setup Python environment
       uses: actions/setup-python@v2
@@ -29,19 +23,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r doc/requirements.txt
 
-    - name: Update pot files
-      run: make update-pot
-
-    - name: Push Local Changes
-      uses: stefanzweifel/git-auto-commit-action@v4.9.2
-      with:
-        commit_message: "Update translation sources"
-        file_pattern: "*.pot"
+    - name: Build pot files
+      run: python -m sphinx . doc/locale/en -c doc -b gettext
 
     - name: Push Pot-files to crowdin
       uses: crowdin/github-action@1.1.0
       with:
+        config: 'doc/crowdin.yaml'
         upload_sources: true
+        upload_translations: true
+        import_eq_suggestions: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        CROWDIN_PERSONAL_TOKEN: ${{secrets.CROWDIN_PERSONAL_TOKEN}}

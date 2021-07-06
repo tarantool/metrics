@@ -2,7 +2,7 @@
 # https://support.crowdin.com/cli-tool-v3/#configuration
 
 "project_id" : "447876"
-"base_path" : "./doc/locale"
+"base_path" : "doc/locale"
 "base_url": "https://crowdin.com"
 "api_token_env": "CROWDIN_PERSONAL_TOKEN"
 
