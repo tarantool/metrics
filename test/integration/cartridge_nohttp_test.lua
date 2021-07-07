@@ -16,24 +16,9 @@ local function set_export(cluster, export)
     ]], {export})
 end
 
-
 g.test_http_disabled = function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-    local cluster = helpers.Cluster:new({
-        datadir = fio.tempdir(),
-        server_command = helpers.entrypoint('srv_basic'),
-        replicasets = {
-            {
-                uuid = helpers.uuid('a'),
-                roles = {},
-                servers = {
-                    {instance_uuid = helpers.uuid('a', 1), alias = 'main'},
-                },
-            },
-        },
-    })
-    cluster:start()
-
+    local cluster = helpers.init_cluster()
     local server = cluster.main_server
 
     server.net_box:eval([[
