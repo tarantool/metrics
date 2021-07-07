@@ -26,7 +26,7 @@ g.test_cartridge_hotreload = function()
         box.space.vinni_test:put{1, 1}
     ]])
 
-    helpers.upload_config(g.cluster)
+    helpers.upload_default_metrics_config(g.cluster)
     local resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 

@@ -22,8 +22,8 @@ local function check_cartridge_less_250()
 end
 
 g.test_cartridge_issues_present_on_healthy_cluster = function()
-    helpers.check_cartridge_version('2.0.2')
-    helpers.upload_config(g.cluster)
+    helpers.skip_cartridge_version_less('2.0.2')
+    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
     local resp = main_server:http_request('get', '/metrics')
     local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
@@ -39,11 +39,11 @@ g.test_cartridge_issues_present_on_healthy_cluster = function()
 end
 
 g.test_cartridge_issues_metric_warning = function()
-    helpers.check_cartridge_version('2.0.2')
+    helpers.skip_cartridge_version_less('2.0.2')
 
     local main_server = g.cluster:server('main')
     local replica_server = g.cluster:server('replica')
-    helpers.upload_config(g.cluster)
+    helpers.upload_default_metrics_config(g.cluster)
 
     -- Stage replication issue "Duplicate key exists in unique index 'primary' in space '_space'"
     main_server.net_box:eval([[
@@ -73,8 +73,8 @@ g.test_cartridge_issues_metric_warning = function()
 end
 
 g.test_cartridge_issues_metric_critical = function()
-    helpers.check_cartridge_version('2.0.2')
-    helpers.upload_config(g.cluster)
+    helpers.skip_cartridge_version_less('2.0.2')
+    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
 
     main_server.net_box:eval([[
