@@ -15,16 +15,16 @@ g.after_each(function()
 end)
 
 g.test_cartridge_health_handler = function()
-    helpers.check_cartridge_version('2.0.2')
-    helpers.upload_config(g.cluster)
+    helpers.skip_cartridge_version_less('2.0.2')
+    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
     local resp = main_server:http_request('get', '/health')
     t.assert_equals(resp.status, 200)
 end
 
 g.test_cartridge_health_fail_handler = function()
-    helpers.check_cartridge_version('2.0.2')
-    helpers.upload_config(g.cluster)
+    helpers.skip_cartridge_version_less('2.0.2')
+    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
     main_server.net_box:eval([[
         box.info = {

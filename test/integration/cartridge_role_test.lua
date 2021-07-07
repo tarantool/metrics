@@ -430,7 +430,7 @@ local function set_zones(zones)
     ]], {servers})
 end
 
-local function check_cartridge_version(version)
+local function skip_cartridge_version_less(version)
     local cartridge_version = require('cartridge.VERSION')
     t.skip_if(cartridge_version == 'unknown',
     'Cartridge version is unknown, must be 2.0.2 or greater')
@@ -439,7 +439,7 @@ local function check_cartridge_version(version)
 end
 
 g.test_zone_label_present = function()
-    check_cartridge_version('2.4.0')
+    skip_cartridge_version_less('2.4.0')
     local server = g.cluster.main_server
 
     local ok, err = set_zones({
@@ -459,7 +459,7 @@ g.test_zone_label_present = function()
 end
 
 g.test_zone_label_changes_in_runtime = function()
-    check_cartridge_version('2.4.0')
+    skip_cartridge_version_less('2.4.0')
     local server = g.cluster.main_server
     assert_upload_metrics_config('/metrics')
 

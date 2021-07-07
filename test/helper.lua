@@ -42,9 +42,8 @@ function helpers.init_cluster()
     return cluster
 end
 
-function helpers.upload_config(cluster)
-    local main_server = cluster:server('main')
-    main_server:upload_config({
+function helpers.upload_default_metrics_config(cluster)
+    cluster:upload_config({
         metrics = {
             export = {
                 {
@@ -60,7 +59,7 @@ function helpers.upload_config(cluster)
     })
 end
 
-function helpers.check_cartridge_version(version)
+function helpers.skip_cartridge_version_less(version)
     local cartridge_version = require('cartridge.VERSION')
     t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
     t.skip_if(utils.is_version_less(cartridge_version, version),
