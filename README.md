@@ -167,7 +167,7 @@ via configuration.
    ```
 
 3. To view metrics via API endpoints, use `set_export`.
-   **NOTE** that `set_export` has lower priority than clusterwide config and won't work if metrics config is present.
+   **NOTE** that `set_export` has lower priority than clusterwide config and could be overrided by the metrics config.
 
    ```lua
    local metrics = require('cartridge.roles.metrics')

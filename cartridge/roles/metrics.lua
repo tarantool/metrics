@@ -164,12 +164,13 @@ local function init()
 end
 
 local function stop()
-    for path, _ in pairs(metrics_vars.current_paths) do
-        local ok, err = pcall(delete_route, path)
-        if not ok then
-            log.error(err)
+    local httpd = cartridge.service_get('httpd')
+    if httpd ~= nil then
+        for path, _ in pairs(metrics_vars.current_paths) do
+            delete_route(httpd, path)
         end
     end
+
     metrics_vars.current_paths = {}
     metrics_vars.config = {}
 end
