@@ -14,6 +14,7 @@ local ok, err = errors.pcall('CartridgeCfgError', cartridge.cfg, {
     roles = {
         'cartridge.roles.metrics',
     },
+    roles_reload_allowed = os.getenv('TARANTOOL_ROLES_RELOAD_ALLOWED'),
 })
 if not ok then
     log.error('%s', err)

@@ -12,7 +12,7 @@ g.before_each(function()
     t.skip_if(utils.is_version_less(cartridge_version, '2.3.0'))
     g.cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
-        server_command = helpers.entrypoint('srv_with_hotreload'),
+        server_command = helpers.entrypoint('srv_basic'),
         replicasets = {
             {
                 uuid = helpers.uuid('a'),
@@ -23,6 +23,7 @@ g.before_each(function()
                 },
             },
         },
+        env = {TARANTOOL_ROLES_RELOAD_ALLOWED = 'true'},
     })
     g.cluster:start()
 end)
