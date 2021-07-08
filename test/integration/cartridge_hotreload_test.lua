@@ -87,7 +87,7 @@ g.test_cartridge_hotreload_set_export = function()
 
     set_export()
 
-    local resp = main_server:http_request('get', '/metrics', {raise = false})
+    resp = main_server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
     reload_roles()
