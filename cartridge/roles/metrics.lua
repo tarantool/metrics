@@ -110,7 +110,7 @@ local function apply_routes(paths)
     end
     -- deletes paths that was enabled, but aren't in config now
     for path, _ in pairs(metrics_vars.current_paths) do
-        if paths[path] == nil and metrics_vars.config[path] == nil then
+        if paths[path] == nil then
             delete_route(httpd, path)
         end
     end
@@ -136,18 +136,15 @@ local function set_export(export)
     local ok, err = pcall(validate_routes, export)
     if ok then
         local paths = format_paths(export)
-        local current_paths = table.copy(metrics_vars.current_paths)
-        for path, _ in pairs(metrics_vars.default) do
-            current_paths[path] = nil
-        end
+        local current_paths = table.copy(metrics_vars.config)
         for path, format in pairs(paths) do
             if current_paths[path] == nil then
                 current_paths[path] = format
             end
         end
-        metrics_vars.default = paths
         apply_routes(current_paths)
-        log.info('Default metrics paths is set')
+        metrics_vars.default = paths
+        log.info('Set default metrics endpoints')
     else
         error(err)
     end
@@ -157,7 +154,7 @@ local function init()
     set_labels()
     metrics.enable_default_metrics()
     metrics.enable_cartridge_metrics()
-    local current_paths = table.copy(metrics_vars.current_paths)
+    local current_paths = table.copy(metrics_vars.config)
     for path, format in pairs(metrics_vars.default) do
         if current_paths[path] == nil then
             current_paths[path] = format

@@ -132,6 +132,10 @@ g.test_role_add_metrics_http_endpoint = function()
         metrics = {
             export = {
                 {
+                    path = '/metrics-1',
+                    format = 'json'
+                },
+                {
                     path = '/metrics-2',
                     format = 'json'
                 },
@@ -151,7 +155,7 @@ g.test_role_add_metrics_http_endpoint = function()
     ]])
 
     resp = server:http_request('get', '/metrics-1', {raise = false})
-    t.assert_equals(resp.status, 404)
+    t.assert_equals(resp.status, 200)
     resp = server:http_request('get', '/metrics-2', {raise = false})
     t.assert_equals(resp.status, 200)
 
