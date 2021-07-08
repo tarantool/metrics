@@ -120,7 +120,7 @@ g.test_role_add_metrics_http_endpoint = function()
         metrics = {
             export = {
                 {
-                    path = '/metrics',
+                    path = '/metrics-1',
                     format = 'json'
                 },
             },
@@ -132,7 +132,7 @@ g.test_role_add_metrics_http_endpoint = function()
         metrics = {
             export = {
                 {
-                    path = '/new-metrics',
+                    path = '/metrics-2',
                     format = 'json'
                 },
             },
@@ -150,9 +150,9 @@ g.test_role_add_metrics_http_endpoint = function()
         end
     ]])
 
-    resp = server:http_request('get', '/metrics', {raise = false})
+    resp = server:http_request('get', '/metrics-1', {raise = false})
     t.assert_equals(resp.status, 404)
-    resp = server:http_request('get', '/new-metrics', {raise = false})
+    resp = server:http_request('get', '/metrics-2', {raise = false})
     t.assert_equals(resp.status, 200)
 
     resp = server:upload_config({
@@ -290,6 +290,121 @@ g.test_non_empty_clusterwide_config_combines_with_set_export = function()
     t.assert_equals(resp.status, 200)
     resp = server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 200)
+end
+
+g.test_role_change_format_from_config = function()
+    local server = g.cluster.main_server
+    local resp = server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics-1',
+                    format = 'json'
+                },
+            },
+        }
+    })
+    t.assert_equals(resp.status, 200)
+    resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '[')
+
+    resp = server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics-1',
+                    format = 'prometheus'
+                },
+            },
+        }
+    })
+    t.assert_equals(resp.status, 200)
+    resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '#')
+end
+
+g.test_role_change_format_from_set_export = function()
+    local server = g.cluster.main_server
+    set_export({
+        {
+            path = '/metrics-1',
+            format = 'json'
+        },
+    })
+    local resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '[')
+
+    set_export({
+        {
+            path = '/metrics-1',
+            format = 'prometheus'
+        },
+    })
+    t.assert_equals(resp.status, 200)
+    resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '#')
+end
+
+g.test_role_dont_change_format_from_set_export_to_config = function()
+    local server = g.cluster.main_server
+    local resp = server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics-1',
+                    format = 'json'
+                },
+            },
+        }
+    })
+    t.assert_equals(resp.status, 200)
+    resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '[')
+
+    set_export({
+        {
+            path = '/metrics-1',
+            format = 'prometheus'
+        },
+    })
+    t.assert_equals(resp.status, 200)
+    resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    -- format doesn't change
+    t.assert_equals(resp.body:sub(1,1), '[')
+end
+
+g.test_role_change_format_from_config_to_set_export = function()
+    local server = g.cluster.main_server
+    set_export({
+        {
+            path = '/metrics-1',
+            format = 'json'
+        },
+    })
+    local resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '[')
+
+    resp = server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics-1',
+                    format = 'prometheus'
+                },
+            },
+        }
+    })
+    t.assert_equals(resp.status, 200)
+    resp = server:http_request('get', '/metrics-1', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(resp.body:sub(1,1), '#')
 end
 
 g.test_set_export_from_require_role = function()

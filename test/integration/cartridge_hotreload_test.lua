@@ -13,6 +13,7 @@ g.before_each(function()
     g.cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
         server_command = helpers.entrypoint('srv_basic'),
+        env = {TARANTOOL_ROLES_RELOAD_ALLOWED = 'true'},
         replicasets = {
             {
                 uuid = helpers.uuid('a'),
@@ -23,7 +24,6 @@ g.before_each(function()
                 },
             },
         },
-        env = {TARANTOOL_ROLES_RELOAD_ALLOWED = 'true'},
     })
     g.cluster:start()
 end)
@@ -82,9 +82,12 @@ end
 
 g.test_cartridge_hotreload_set_export = function()
     local main_server = g.cluster:server('main')
+    local resp = main_server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+
     set_export()
 
-    local resp = main_server:http_request('get', '/metrics')
+    local resp = main_server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
     reload_roles()
@@ -114,10 +117,10 @@ g.test_cartridge_hotreload_set_export_and_config = function()
     set_export()
 
     upload_config()
-    local resp = main_server:http_request('get', '/new-metrics')
+    local resp = main_server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
-    resp = main_server:http_request('get', '/metrics')
+    resp = main_server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
     reload_roles()
@@ -126,6 +129,6 @@ g.test_cartridge_hotreload_set_export_and_config = function()
     resp = main_server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
-    resp = main_server:http_request('get', '/metrics')
+    resp = main_server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 end
