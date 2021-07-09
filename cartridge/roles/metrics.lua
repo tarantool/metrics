@@ -10,8 +10,7 @@ metrics_vars:new('default', {})
 metrics_vars:new('config', {})
 metrics_vars:new('default_labels', {})
 metrics_vars:new('custom_labels', {})
-
-local handlers = {
+metrics_vars:new('handlers', {
     ['json'] = function(req)
         local json_exporter = require('metrics.plugins.json')
         return req:render({ text = json_exporter.export() })
@@ -24,7 +23,7 @@ local handlers = {
         local http_handler = require('cartridge.health').is_healthy
         return http_handler(...)
     end,
-}
+})
 
 local function set_labels(custom_labels)
     custom_labels = custom_labels or {}
@@ -82,7 +81,7 @@ local function validate_routes(export)
     for _, v in ipairs(export) do
         v.path = remove_side_slashes(v.path)
         assert(type(v.path) == 'string', 'export.path must be string')
-        assert(handlers[v.format], 'format must be "json", "prometheus" or "health"')
+        assert(metrics_vars.handlers[v.format], 'format must be in handlers list')
         assert(paths[v.path] == nil, 'paths must be unique')
         paths[v.path] = true
     end
@@ -133,7 +132,7 @@ local function apply_routes(paths)
                 method = 'GET',
                 name = path,
                 path = path
-            }, handlers[format])
+            }, metrics_vars.handlers[format])
         end
     end
 
@@ -209,6 +208,16 @@ local function stop()
     metrics_vars.custom_labels = {}
 end
 
+local function add_custom_handlers(new_handlers)
+    for format, handler in pairs(new_handlers) do
+        assert(type(format) == 'string', 'keys of handlers table must be strings')
+        assert(type(handler) == 'function', 'handler must be a function')
+    end
+    for format, handler in pairs(new_handlers) do
+        metrics_vars.handlers[format] = handler
+    end
+end
+
 return setmetatable({
     role_name = 'metrics',
     permanent = true,
@@ -218,4 +227,5 @@ return setmetatable({
     apply_config = apply_config,
     set_export = set_export,
     set_default_labels = set_default_labels,
+    add_custom_handlers = add_custom_handlers,
 }, { __index = metrics })
