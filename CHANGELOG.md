@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)
+- `ipairs` instead of `pairs` while iteration in `histogram` [#196](https://github.com/tarantool/metrics/issues/196)
 
 ### Fixed
 - be gentle to http routes, don't leave gaps in the array
