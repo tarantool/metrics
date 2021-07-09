@@ -25,8 +25,7 @@ g.test_reload = function()
     )
     http_requests_latency:observe(10)
 
-    require('metrics.default_metrics.tarantool').enable()
-    require('metrics.tarantool.luajit').enable()
+    metrics.enable_default_metrics()
 
     for k, _ in pairs(package.loaded) do
         if k:find('metrics') ~= nil then
@@ -36,7 +35,5 @@ g.test_reload = function()
 
     metrics = require('metrics')
 
-    require('metrics.default_metrics.tarantool').enable()
-    require('metrics.tarantool.luajit').enable()
     metrics.enable_default_metrics()
 end
