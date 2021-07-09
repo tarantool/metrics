@@ -2,6 +2,7 @@ local metrics = require('metrics')
 
 local cartridge_metrics = {
     require('metrics.cartridge.issues'),
+    require('metrics.cartridge.clock'),
 }
 
 local function enable()
