@@ -490,3 +490,72 @@ g.test_zone_label_changes_in_runtime = function()
         )
     end
 end
+
+g.test_add_custom_labels = function()
+    local server = g.cluster.main_server
+    server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                system = 'some-system',
+                app_name = 'myapp',
+            }
+        }
+    })
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+    end
+end
+
+g.test_invalig_global_labels_format = function()
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = 'string',
+        }
+    }, 'bad argument')
+end
+
+g.test_invalig_global_labels_names = function()
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                zone = 'zone',
+            }
+        }
+    }, 'label name is not allowed to be "zone" or "alias"')
+
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                alias = 'alias',
+            }
+        }
+    }, 'label name is not allowed to be "zone" or "alias"')
+end
