@@ -163,6 +163,22 @@ g.test_summary_wrong_label = function()
         instance.observe, instance, 1, {quantile = 0.5})
 end
 
+g.test_create_summary_without_observations = function()
+    local ok, summary = pcall(metrics.summary, 'plain_summary')
+    t.assert(ok, summary)
+    summary:observe(0)
+
+    local summary_metrics = utils.find_metric('plain_summary_count', metrics.collect())
+    t.assert_equals(#summary_metrics, 1)
+
+    summary_metrics = utils.find_metric('plain_summary_sum', metrics.collect())
+    t.assert_equals(#summary_metrics, 1)
+
+    summary_metrics = utils.find_metric('plain_summary', metrics.collect())
+    t.assert_not(summary_metrics)
+
+end
+
 local test_data_wrong_input = {
     objectives = {error = 'Invalid value for objectives', input = {'summary', nil, {0.5, 0.9, 0.99}}},
     max_age = {error = 'Max age must be positive', input = {'summary', nil, {[0.5]=0.01}, {max_age_time = -1}}},

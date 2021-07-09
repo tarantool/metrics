@@ -17,9 +17,11 @@ function Summary:new(name, help, objectives, params)
     obj.age_buckets_count = params.age_buckets_count or 1
     obj.observations = {}
 
-    obj.quantiles = {}
-    for q, _ in pairs(objectives) do
-        table.insert(obj.quantiles, q)
+    if obj.objectives then
+        obj.quantiles = {}
+        for q, _ in pairs(objectives) do
+            table.insert(obj.quantiles, q)
+        end
     end
     return obj
 end
