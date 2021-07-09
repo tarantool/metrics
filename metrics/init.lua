@@ -111,9 +111,8 @@ return {
     register_callback = register_callback,
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
-    enable_default_metrics = function()
-        require('metrics.tarantool.luajit').enable()
-        require('metrics.default_metrics.tarantool').enable()
+    enable_default_metrics = function(include, exclude)
+        require('metrics.default_metrics.tarantool').enable(include, exclude)
     end,
     enable_cartridge_metrics = function()
         return require('metrics.cartridge').enable()

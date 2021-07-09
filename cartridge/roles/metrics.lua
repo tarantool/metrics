@@ -36,10 +36,15 @@ local function init()
     metrics.enable_cartridge_metrics()
 end
 
-local function check_config(_)
+local function check_config(config)
     checks({
         export = 'table',
+        include = '?table',
+        exclude = '?table',
     })
+    if config.include and config.exclude then
+        error("don't use exclude and include section together")
+    end
 end
 
 local function delete_route(httpd, name)
@@ -138,6 +143,10 @@ local function apply_config(conf)
         end
         metrics_config_present = false
     end
+    metrics.clear()
+    metrics.enable_default_metrics(metrics_conf.include, metrics_conf.exclude)
+    metrics.enable_cartridge_metrics()
+
     set_labels()
     apply_routes(metrics_conf.export)
 end
