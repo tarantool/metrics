@@ -21,6 +21,14 @@ g.after_each(function()
     metrics.clear()
 end)
 
+local function len(tbl)
+    local l = 0
+    for _ in pairs(tbl) do
+        l = l + 1
+    end
+    return l
+end
+
 g.test_counter = function()
     t.assert_error_msg_contains("bad argument #1 to counter (string expected, got nil)", function()
         metrics.counter()
@@ -38,7 +46,7 @@ g.test_counter = function()
     local collectors = metrics.collectors()
     local observations = metrics.collect()
     local obs = utils.find_obs('cnt', {}, observations)
-    t.assert_equals(#collectors, 1, 'counter seen as only collector')
+    t.assert_equals(len(collectors), 1, 'counter seen as only collector')
     t.assert_equals(obs.value, 8, '3 + 5 = 8 (via metrics.collectors())')
 
     t.assert_equals(c:collect()[1].value, 8, '3 + 5 = 8')
@@ -70,7 +78,7 @@ g.test_gauge = function()
     local collectors = metrics.collectors()
     local observations = metrics.collect()
     local obs = utils.find_obs('gauge', {}, observations)
-    t.assert_equals(#collectors, 1, 'gauge seen as only collector')
+    t.assert_equals(len(collectors), 1, 'gauge seen as only collector')
     t.assert_equals(obs.value, -2, '3 - 5 = -2 (via metrics.collectors())')
 
     t.assert_equals(gauge:collect()[1].value, -2, '3 - 5 = -2')
@@ -100,7 +108,7 @@ g.test_histogram = function()
     h:observe(5)
 
     local collectors = metrics.collectors()
-    t.assert_equals(#collectors, 1, 'histogram seen as only 1 collector')
+    t.assert_equals(len(collectors), 1, 'histogram seen as only 1 collector')
     local observations = metrics.collect()
     local obs_sum = utils.find_obs('hist_sum', {}, observations)
     local obs_count = utils.find_obs('hist_count', {}, observations)
@@ -117,7 +125,7 @@ g.test_histogram = function()
     h:observe(3, { foo = 'bar' })
 
     collectors = metrics.collectors()
-    t.assert_equals(#collectors, 1, 'still histogram seen as only 1 collector')
+    t.assert_equals(len(collectors), 1, 'still histogram seen as only 1 collector')
     observations = metrics.collect()
     obs_sum = utils.find_obs('hist_sum', { foo = 'bar' }, observations)
     obs_count = utils.find_obs('hist_count', { foo = 'bar' }, observations)
@@ -145,7 +153,7 @@ g.test_counter_cache = function()
     local collectors = metrics.collectors()
     local observations = metrics.collect()
     local obs = utils.find_obs('cnt', {}, observations)
-    t.assert_equals(#collectors, 2, 'counter_1 and counter_2 refer to the same object')
+    t.assert_equals(len(collectors), 2, 'counter_1 and counter_2 refer to the same object')
     t.assert_equals(obs.value, 8, '3 + 5 = 8')
     obs = utils.find_obs('cnt2', {}, observations)
     t.assert_equals(obs.value, 7, 'counter_3 is the only reference to cnt2')

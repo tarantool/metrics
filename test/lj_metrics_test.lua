@@ -50,5 +50,5 @@ g.test_lj_metrics = function()
         "lj_gc_steps_pause",
     }
 
-    t.assert_covers(lj_metrics, expected_lj_metrics)
+    t.assert_items_equals(lj_metrics, expected_lj_metrics)
 end
