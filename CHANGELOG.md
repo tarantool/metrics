@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - be gentle to http routes, don't leave gaps in the array
   [#246](https://github.com/tarantool/metrics/issues/246)
+- allow to create summary without observations [#265](https://github.com/tarantool/metrics/issues/265)
 
 ### Added
 - `tnt_clock_delta` metric to compute clock difference on instances
