@@ -119,7 +119,7 @@ via configuration.
 
 #. To view metrics via API endpoints, use ``set_export``.
 
-   **NOTE** that ``set_export`` has lower priority than clusterwide config and could be overrided by the metrics config.
+   **NOTE** that ``set_export`` has lower priority than clusterwide config and could be overriden by the metrics config.
 
    ..  code-block:: lua
 

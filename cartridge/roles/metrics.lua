@@ -99,21 +99,23 @@ local function apply_routes(paths)
     if httpd == nil then
         return
     end
-    for path, format in pairs(paths) do
-        if metrics_vars.current_paths[path] ~= format then
-            -- if format was changed then delete old path
-            if metrics_vars.current_paths[path] ~= nil then
-                delete_route(httpd, path)
-            end
-            httpd:route({method = 'GET', name = path, path = path}, handlers[format])
-        end
-    end
-    -- deletes paths that was enabled, but aren't in config now
-    for path, _ in pairs(metrics_vars.current_paths) do
-        if paths[path] == nil then
+
+    for path, format in pairs(metrics_vars.current_paths) do
+        if paths[path] ~= format then
             delete_route(httpd, path)
         end
     end
+
+    for path, format in pairs(paths) do
+        if metrics_vars.current_paths[path] ~= format then
+            httpd:route({
+                method = 'GET',
+                name = path,
+                path = path
+            }, handlers[format])
+        end
+    end
+
     metrics_vars.current_paths = paths
 end
 
