@@ -24,6 +24,9 @@ local function set_counter(name, description, value, labels)
 end
 
 local function update()
+    if not (has_mics_module and misc.getmetrics ~= nil) then
+        return
+    end
     -- Details: https://github.com/tarantool/doc/issues/1597
     local lj_metrics = misc.getmetrics()
     set_counter('gc_freed', 'Total amount of freed memory',
@@ -66,14 +69,6 @@ local function update()
         lj_metrics.gc_steps_pause)
 end
 
-local enable = function() end
-
-if has_mics_module and misc.getmetrics ~= nil then
-    enable = function()
-        metrics.register_callback(update)
-    end
-end
-
 return {
-    enable = enable,
+    update = update,
 }
