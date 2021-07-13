@@ -132,3 +132,24 @@ g.test_cartridge_hotreload_set_export_and_config = function()
     resp = main_server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 end
+
+g.test_cartridge_hotreload_set_labels = function()
+    local main_server = g.cluster:server('main')
+    main_server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+        app_name = 'myapp',
+    }})
+    reload_roles()
+
+    local resp = main_server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert(obs.label_pairs.alias ~= nil)
+    end
+end

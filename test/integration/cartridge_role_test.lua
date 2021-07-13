@@ -513,6 +513,79 @@ g.test_add_custom_labels = function()
     for _, obs in pairs(resp.json) do
         t.assert_equals(obs.label_pairs.system, 'some-system')
         t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert(obs.label_pairs.alias ~= nil)
+    end
+end
+
+g.test_add_custom_labels_with_set_labels = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+        app_name = 'myapp',
+    }})
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert(obs.label_pairs.alias ~= nil)
+    end
+end
+
+g.test_add_custom_labels_with_config_and_set_labels = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+    }})
+    server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                app_name = 'myapp',
+            }
+        }
+    })
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert(obs.label_pairs.alias ~= nil)
+    end
+end
+
+g.test_add_custom_labels_with_set_labels_overrides_default = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+    }})
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        app_name = 'myapp',
+    }})
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_not(obs.label_pairs.system)
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert(obs.label_pairs.alias ~= nil)
     end
 end
 

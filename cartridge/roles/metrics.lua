@@ -8,6 +8,7 @@ local metrics_vars = require('cartridge.vars').new('metrics_vars')
 metrics_vars:new('current_paths', {})
 metrics_vars:new('default', {})
 metrics_vars:new('config', {})
+metrics_vars:new('default_labels', {})
 
 local handlers = {
     ['json'] = function(req)
@@ -25,6 +26,7 @@ local handlers = {
 }
 
 local function set_labels(custom_labels)
+    custom_labels = custom_labels or {}
     local params, err = argparse.parse()
     assert(params, err)
     local this_instance = cartridge.admin_get_servers(box.info.uuid)
@@ -33,7 +35,10 @@ local function set_labels(custom_labels)
         zone = this_instance[1].zone
     end
     local labels = {alias = params.alias or params.instance_name, zone = zone}
-    for label, value in pairs(custom_labels or {}) do
+    for label, value in pairs(custom_labels) do
+        labels[label] = value
+    end
+    for label, value in pairs(metrics_vars.default_labels) do
         labels[label] = value
     end
     metrics.set_global_labels(labels)
@@ -137,7 +142,7 @@ end
 local function apply_config(conf)
     local metrics_conf = conf.metrics or {}
     metrics_conf.export = metrics_conf.export or {}
-    set_labels()
+    set_labels(metrics_conf['global-labels'] or {})
     local paths = format_paths(metrics_conf.export)
     metrics_vars.config = table.copy(paths)
     for path, format in pairs(metrics_vars.default) do
@@ -146,7 +151,6 @@ local function apply_config(conf)
         end
     end
     apply_routes(paths)
-    set_labels(metrics_conf['global-labels'])
 end
 
 local function set_export(export)
@@ -164,6 +168,16 @@ local function set_export(export)
         log.info('Set default metrics endpoints')
     else
         error(err)
+    end
+end
+
+local function set_default_labels(default_labels)
+    local ok, err = pcall(validate_global_labels, default_labels)
+    if ok then
+        metrics_vars.default_labels = default_labels
+        set_labels()
+    else
+        error(err, 0)
     end
 end
 
@@ -200,4 +214,5 @@ return setmetatable({
     validate_config = validate_config,
     apply_config = apply_config,
     set_export = set_export,
+    set_default_labels = set_default_labels,
 }, { __index = metrics })

@@ -201,3 +201,20 @@ via configuration.
    .. image:: images/role-config.png
       :align: center
 
+#. To set custom global labels, you may use the following configuration.
+
+   ..  code-block:: yaml
+
+       metrics:
+         export:
+         - path: '/metrics'
+           format: 'json'
+         global-labels:
+           my-custom-label: label-value
+
+   **OR** use ``set_labels`` function in ``init.lua``.
+
+   ..  code-block:: lua
+
+       local metrics = require('cartridge.roles.metrics')
+       metrics.set_labels({ ['my-custom-label'] = 'label-value'} )

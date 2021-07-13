@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `tnt_clock_delta` metric to compute clock difference on instances
+- set custom global labels in config and with `set_labels` function [#259](https://github.com/tarantool/metrics/issues/259)
 
 ## [0.9.0] - 2021-05-28
 ### Fixed
