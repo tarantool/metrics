@@ -119,7 +119,7 @@ via configuration.
 
 #. To view metrics via API endpoints, use ``set_export``.
 
-   **NOTE** that ``set_export`` has lower priority than clusterwide config and won't work if metrics config is present.
+   **NOTE** that ``set_export`` has lower priority than clusterwide config and could be overriden by the metrics config.
 
    ..  code-block:: lua
 
@@ -178,8 +178,8 @@ via configuration.
        local cartridge = require('cartridge')
        local metrics = cartridge.service_get('metrics')
 
-#. There is an ability in Tarantool Cartridge >= ``'2.4.0'`` to set a zone for each 
-   server in cluster. If zone was set for the server ``'zone'`` label for all metrics 
+#. There is an ability in Tarantool Cartridge >= ``'2.4.0'`` to set a zone for each
+   server in cluster. If zone was set for the server ``'zone'`` label for all metrics
    of this server will be added.
 
 #. To change metrics HTTP path in **runtime**, you may use the following configuration
