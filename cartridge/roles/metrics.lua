@@ -9,6 +9,7 @@ metrics_vars:new('current_paths', {})
 metrics_vars:new('default', {})
 metrics_vars:new('config', {})
 metrics_vars:new('default_labels', {})
+metrics_vars:new('custom_labels', {})
 
 local handlers = {
     ['json'] = function(req)
@@ -35,13 +36,14 @@ local function set_labels(custom_labels)
         zone = this_instance[1].zone
     end
     local labels = {alias = params.alias or params.instance_name, zone = zone}
-    for label, value in pairs(custom_labels) do
-        labels[label] = value
-    end
     for label, value in pairs(metrics_vars.default_labels) do
         labels[label] = value
     end
+    for label, value in pairs(custom_labels) do
+        labels[label] = value
+    end
     metrics.set_global_labels(labels)
+    metrics_vars.custom_labels = custom_labels
 end
 
 local function check_config(_)
@@ -142,7 +144,7 @@ end
 local function apply_config(conf)
     local metrics_conf = conf.metrics or {}
     metrics_conf.export = metrics_conf.export or {}
-    set_labels(metrics_conf['global-labels'] or {})
+    set_labels(metrics_conf['global-labels'])
     local paths = format_paths(metrics_conf.export)
     metrics_vars.config = table.copy(paths)
     for path, format in pairs(metrics_vars.default) do
@@ -175,14 +177,14 @@ local function set_default_labels(default_labels)
     local ok, err = pcall(validate_global_labels, default_labels)
     if ok then
         metrics_vars.default_labels = default_labels
-        set_labels()
+        set_labels(metrics_vars.custom_labels)
     else
         error(err, 0)
     end
 end
 
 local function init()
-    set_labels()
+    set_labels(metrics_vars.custom_labels)
     metrics.enable_default_metrics()
     metrics.enable_cartridge_metrics()
     local current_paths = table.copy(metrics_vars.config)
@@ -204,6 +206,7 @@ local function stop()
 
     metrics_vars.current_paths = {}
     metrics_vars.config = {}
+    metrics_vars.custom_labels = {}
 end
 
 return setmetatable({
