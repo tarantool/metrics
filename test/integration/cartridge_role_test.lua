@@ -490,3 +490,181 @@ g.test_zone_label_changes_in_runtime = function()
         )
     end
 end
+
+g.test_add_custom_labels = function()
+    local server = g.cluster.main_server
+    server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                system = 'some-system',
+                app_name = 'myapp',
+            }
+        }
+    })
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert_equals(obs.label_pairs.alias, 'main')
+    end
+end
+
+g.test_add_custom_labels_with_set_labels = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+        app_name = 'myapp',
+    }})
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert_equals(obs.label_pairs.alias, 'main')
+    end
+end
+
+g.test_add_custom_labels_with_set_labels_and_config = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+        source = 'api',
+    }})
+    server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                app_name = 'myapp',
+                source = 'config',
+            }
+        }
+    })
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert_equals(obs.label_pairs.source, 'config')
+        t.assert_equals(obs.label_pairs.alias, 'main')
+    end
+end
+
+g.test_add_custom_labels_with_config_and_set_labels = function()
+    local server = g.cluster.main_server
+    server:upload_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                app_name = 'myapp',
+                source = 'config',
+            }
+        }
+    })
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+        source = 'api',
+    }})
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_equals(obs.label_pairs.system, 'some-system')
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert_equals(obs.label_pairs.source, 'config')
+        t.assert_equals(obs.label_pairs.alias, 'main')
+    end
+end
+
+g.test_add_custom_labels_with_set_labels_overrides_default = function()
+    local server = g.cluster.main_server
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        system = 'some-system',
+    }})
+    server.net_box:eval([[
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels(...)
+    ]], {{
+        app_name = 'myapp',
+    }})
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+    for _, obs in pairs(resp.json) do
+        t.assert_not(obs.label_pairs.system)
+        t.assert_equals(obs.label_pairs.app_name, 'myapp')
+        t.assert_equals(obs.label_pairs.alias, 'main')
+    end
+end
+
+g.test_invalig_global_labels_format = function()
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = 'string',
+        }
+    }, 'bad argument')
+end
+
+g.test_invalig_global_labels_names = function()
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                zone = 'zone',
+            }
+        }
+    }, 'label name is not allowed to be "zone" or "alias"')
+
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                alias = 'alias',
+            }
+        }
+    }, 'label name is not allowed to be "zone" or "alias"')
+end

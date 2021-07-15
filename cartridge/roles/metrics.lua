@@ -8,6 +8,8 @@ local metrics_vars = require('cartridge.vars').new('metrics_vars')
 metrics_vars:new('current_paths', {})
 metrics_vars:new('default', {})
 metrics_vars:new('config', {})
+metrics_vars:new('default_labels', {})
+metrics_vars:new('custom_labels', {})
 
 local handlers = {
     ['json'] = function(req)
@@ -24,7 +26,8 @@ local handlers = {
     end,
 }
 
-local function set_labels()
+local function set_labels(custom_labels)
+    custom_labels = custom_labels or {}
     local params, err = argparse.parse()
     assert(params, err)
     local this_instance = cartridge.admin_get_servers(box.info.uuid)
@@ -32,12 +35,21 @@ local function set_labels()
     if this_instance and this_instance[1] then
         zone = this_instance[1].zone
     end
-    metrics.set_global_labels({alias = params.alias or params.instance_name, zone = zone})
+    local labels = {alias = params.alias or params.instance_name, zone = zone}
+    for label, value in pairs(metrics_vars.default_labels) do
+        labels[label] = value
+    end
+    for label, value in pairs(custom_labels) do
+        labels[label] = value
+    end
+    metrics.set_global_labels(labels)
+    metrics_vars.custom_labels = custom_labels
 end
 
 local function check_config(_)
     checks({
         export = 'table',
+        ['global-labels'] = '?table',
     })
 end
 
@@ -85,13 +97,22 @@ local function format_paths(export)
     return paths
 end
 
+local function validate_global_labels(custom_labels)
+    custom_labels = custom_labels or {}
+    for label, _ in pairs(custom_labels) do
+        assert(type(label) == 'string', 'label name must me string')
+        assert(label ~= 'zone' and label ~= 'alias', 'custom label name is not allowed to be "zone" or "alias"')
+    end
+    return true
+end
+
 local function validate_config(conf_new)
     conf_new = conf_new.metrics
     if conf_new == nil then
         return true
     end
     check_config(conf_new)
-    return validate_routes(conf_new.export)
+    return validate_routes(conf_new.export) and validate_global_labels(conf_new['global-labels'])
 end
 
 local function apply_routes(paths)
@@ -123,7 +144,7 @@ end
 local function apply_config(conf)
     local metrics_conf = conf.metrics or {}
     metrics_conf.export = metrics_conf.export or {}
-    set_labels()
+    set_labels(metrics_conf['global-labels'])
     local paths = format_paths(metrics_conf.export)
     metrics_vars.config = table.copy(paths)
     for path, format in pairs(metrics_vars.default) do
@@ -152,8 +173,18 @@ local function set_export(export)
     end
 end
 
+local function set_default_labels(default_labels)
+    local ok, err = pcall(validate_global_labels, default_labels)
+    if ok then
+        metrics_vars.default_labels = default_labels
+        set_labels(metrics_vars.custom_labels)
+    else
+        error(err, 0)
+    end
+end
+
 local function init()
-    set_labels()
+    set_labels(metrics_vars.custom_labels)
     metrics.enable_default_metrics()
     metrics.enable_cartridge_metrics()
     local current_paths = table.copy(metrics_vars.config)
@@ -175,6 +206,7 @@ local function stop()
 
     metrics_vars.current_paths = {}
     metrics_vars.config = {}
+    metrics_vars.custom_labels = {}
 end
 
 return setmetatable({
@@ -185,4 +217,5 @@ return setmetatable({
     validate_config = validate_config,
     apply_config = apply_config,
     set_export = set_export,
+    set_default_labels = set_default_labels,
 }, { __index = metrics })
