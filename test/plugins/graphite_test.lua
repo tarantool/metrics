@@ -40,9 +40,20 @@ end)
 g.after_each(function()
     -- Delete all collectors and global labels
     metrics.clear()
+    -- kill previous grapite worker
     fun.iter(fiber.info()):
         filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
         each(function(x) fiber.kill(x) end)
+    local now = os.time()
+    -- wait until killed
+    while fun.iter(fiber.info()):
+        filter(function(_, x) return x.name == 'metrics_graphite_worker' end):length() > 0
+    do
+        if os.time() - now > 30 then
+            error('Unable to kill graphite_worker fiber')
+        end
+        fiber.yield()
+    end
 end)
 
 g.test_graphite_format_observation_removes_ULL_suffix = function()
@@ -124,7 +135,6 @@ g.test_graphite_kills_previous_fibers_on_init = function()
 
     graphite.init({})
 
-    fiber.sleep(0.5)
     workers_cnt = count_workers()
     t.assert_equals(workers_cnt, 1)
 end

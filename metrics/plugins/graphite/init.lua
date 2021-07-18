@@ -12,6 +12,7 @@ local DEFAULT_PREFIX = 'tarantool'
 local DEFAULT_HOST = '127.0.0.1'
 local DEFAULT_PORT = 2003
 local DEFAULT_SEND_INTERVAL = 2
+local DEFAULT_INIT_TIMEOUT = 30
 
 -- Constants
 local LABELS_SEP = ';'
@@ -61,7 +62,8 @@ function graphite.init(opts)
         prefix = '?string',
         host = '?string',
         port = '?number',
-        send_interval = '?number'
+        send_interval = '?number',
+        init_timeout = '?number',
     }
 
     local sock = socket('AF_INET', 'SOCK_DGRAM', 'udp')
@@ -71,10 +73,22 @@ function graphite.init(opts)
     local host = opts.host or DEFAULT_HOST
     local port = opts.port or DEFAULT_PORT
     local send_interval = opts.send_interval or DEFAULT_SEND_INTERVAL
+    local init_timeout = opts.init_timeout or DEFAULT_INIT_TIMEOUT
 
     fun.iter(fiber.info()):
         filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
         each(function(x) fiber.kill(x) end)
+
+    local now = os.time()
+
+    while fun.iter(fiber.info()):
+        filter(function(_, x) return x.name == 'metrics_graphite_worker' end):length() > 0
+    do
+        if os.time() - now > init_timeout then
+            error('Unable to kill graphite_worker fiber')
+        end
+        fiber.yield()
+    end
 
     fiber.create(graphite_worker, {
         prefix = prefix,

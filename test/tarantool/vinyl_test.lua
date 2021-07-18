@@ -11,15 +11,18 @@ g.after_each(function()
     metrics.clear()
 end)
 
+g.before_each(function()
+    -- Enable default metrics collections
+    metrics.enable_default_metrics()
+end)
+
 g.before_all(function()
+    box.cfg{}
     local s_vinyl = box.schema.space.create(
         'test_space',
         {if_not_exists = true, engine = 'vinyl'})
     s_vinyl:create_index('pk', {if_not_exists = true})
     metrics.clear()
-
-    -- Enable default metrics collections
-    metrics.enable_default_metrics()
 end)
 
 g.test_vinyl_metrics_present = function()
