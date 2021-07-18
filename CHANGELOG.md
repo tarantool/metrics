@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2021-07-15
 ### Changed
 - metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)
 - `ipairs` instead of `pairs` while iteration in `histogram` [#196](https://github.com/tarantool/metrics/issues/196)
@@ -17,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - allow to create summary without observations [#265](https://github.com/tarantool/metrics/issues/265)
 
 ### Added
-- `tnt_clock_delta` metric to compute clock difference on instances
+- `tnt_clock_delta` metric to compute clock difference on instances [#232](https://github.com/tarantool/metrics/issues/232)
 - set custom global labels in config and with `set_labels` function [#259](https://github.com/tarantool/metrics/issues/259)
 
 ## [0.9.0] - 2021-05-28
