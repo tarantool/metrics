@@ -1,5 +1,9 @@
 local utils = require('metrics.utils')
-local membership = require('membership')
+local ok, membership = pcall(require, 'membership')
+
+if not ok then
+    return { update = function() end }
+end
 
 -- from https://github.com/tarantool/cartridge/blob/cc607f5a6508449608f3953a3f93669e8c8c4ab0/cartridge/issues.lua#L375
 local function update_clock_metrics()
