@@ -14,22 +14,38 @@ local default_metrics = {
     cpu = require('metrics.default_metrics.tarantool.cpu'),
     vinyl = require('metrics.tarantool.vinyl'),
     luajit = require('metrics.tarantool.luajit'),
+    cartridge_issues = require('metrics.cartridge.issues'),
+    clock = require('metrics.cartridge.clock'),
 }
 
 local function enable(include, exclude)
+    include = include or {}
+    exclude = exclude or {}
+
     local exclude_map = {}
-    for _, name in ipairs(exclude or {}) do
+    for _, name in ipairs(exclude) do
         exclude_map[name] = true
     end
-    if include then
-        for _, name in ipairs(include) do
-            metrics.register_callback(default_metrics[name].update)
-        end
-    else
-        for name, metric in pairs(default_metrics) do
-            if not exclude_map[name] then
-                metrics.register_callback(metric.update)
+    local include_map = {}
+    for _, name in ipairs(include) do
+        include_map[name] = true
+    end
+
+    for name, value in pairs(default_metrics) do
+        if #include > 0 then
+            if include_map[name] ~= nil then
+                metrics.register_callback(value.update)
+            else
+                metrics.unregister_callback(value.update)
             end
+        elseif #exclude > 0 then
+            if exclude_map[name] ~= nil then
+                metrics.unregister_callback(value.update)
+            else
+                metrics.register_callback(value.update)
+            end
+        else
+            metrics.register_callback(value.update)
         end
     end
 end

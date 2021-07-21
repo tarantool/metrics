@@ -70,6 +70,14 @@ function Registry:register_callback(callback)
     end
 end
 
+function Registry:unregister_callback(callback)
+    for i, registered_callback in ipairs(self.callbacks) do
+        if registered_callback == callback then
+            table.remove(self.callbacks, i)
+        end
+    end
+end
+
 function Registry:set_labels(label_pairs)
     self.label_pairs = table.copy(label_pairs)
 end

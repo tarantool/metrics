@@ -1,6 +1,7 @@
 -- vim: ts=4:sw=4:sts=4:expandtab
 
 local checks = require('checks')
+local log = require('log')
 
 local Registry = require('metrics.registry')
 
@@ -21,6 +22,10 @@ end
 
 local function register_callback(...)
     return registry:register_callback(...)
+end
+
+local function unregister_callback(...)
+    return registry:unregister_callback(...)
 end
 
 local function invoke_callbacks()
@@ -109,12 +114,14 @@ return {
     clear = clear,
     collectors = collectors,
     register_callback = register_callback,
+    unregister_callback = unregister_callback,
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
     enable_default_metrics = function(include, exclude)
         require('metrics.default_metrics.tarantool').enable(include, exclude)
     end,
     enable_cartridge_metrics = function()
+        log.warn('metrics.enable_cartridge_metrics() is deprecated. Use metrics.enable_default_metrics() instead.')
         return require('metrics.cartridge').enable()
     end,
     http_middleware = require('metrics.http_middleware'),

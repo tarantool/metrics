@@ -266,15 +266,33 @@ You can also set global labels by calling
 Metrics functions
 -------------------------------------------------------------------------------
 
-..  function:: enable_default_metrics()
+..  function:: enable_default_metrics(include, exclude)
 
-    Enables Tarantool metrics collections. See :ref:`metrics reference <metrics-reference>`
-    for details.
+    Enables Tarantool metrics collections.
 
-..  function:: enable_cartridge_metrics()
+    :param table include: Table containing names of default metrics which you need to enable.
 
-    Enables Cartridge metrics collections. See :ref:`metrics reference <metrics-cartridge>`
-    for details.
+    :param table exclude: Table containing names of default metrics which you need to exclude.
+
+    Default metrics names:
+
+    * "network"
+    * "operations"
+    * "system"
+    * "replicas"
+    * "info"
+    * "slab"
+    * "runtime"
+    * "memory"
+    * "spaces"
+    * "fibers"
+    * "cpu"
+    * "vinyl"
+    * "luajit"
+    * "cartridge_issues"
+    * "clock"
+
+    See :ref:`metrics reference <metrics-reference>` for details.
 
 ..  function:: metrics.set_global_labels(label_pairs)
 
@@ -300,6 +318,15 @@ Metrics functions
     :param function callback: Function which takes no parameters.
 
     Most common usage is for gauge metrics updates.
+
+..  function:: unregister_callback(callback)
+
+    Unregisters a function ``callback`` which will be called right before metrics
+    collection on plugin export.
+
+    :param function callback: Function which takes no parameters.
+
+    Most common usage is for unregister enabled callbacks.
 
 .. _collecting-http-statistics:
 

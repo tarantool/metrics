@@ -157,9 +157,7 @@ local function apply_config(conf)
         end
     end
     apply_routes(paths)
-    metrics.clear()
     metrics.enable_default_metrics(metrics_conf.include, metrics_conf.exclude)
-    metrics.enable_cartridge_metrics()
     set_labels(metrics_conf['global-labels'])
 end
 
@@ -194,7 +192,6 @@ end
 local function init()
     set_labels(metrics_vars.custom_labels)
     metrics.enable_default_metrics()
-    metrics.enable_cartridge_metrics()
     local current_paths = table.copy(metrics_vars.config)
     for path, format in pairs(metrics_vars.default) do
         if current_paths[path] == nil then
