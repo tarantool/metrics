@@ -99,7 +99,7 @@ g.test_cartridge_issues_metric_critical = function()
 end
 
 g.test_clock_delta_metric_present = function()
-    upload_config()
+    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
 
     t.helpers.retrying({}, function()

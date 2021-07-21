@@ -1,7 +1,6 @@
 local fio = require('fio')
 local t = require('luatest')
 local g = t.group()
-local utils = require('test.utils')
 
 local helpers = require('test.helper')
 
