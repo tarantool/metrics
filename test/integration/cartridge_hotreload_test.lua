@@ -6,6 +6,7 @@ local helpers = require('test.helper')
 
 g.before_each(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
+    helpers.skip_cartridge_version_less('2.3.0')
     g.cluster = helpers.init_cluster()
 end)
 
