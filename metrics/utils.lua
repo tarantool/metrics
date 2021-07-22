@@ -9,6 +9,7 @@ end
 local function set_gauge(name, description, value, labels)
     local gauge = metrics.gauge(prefix_name(name), description)
     gauge:set(value, labels or {})
+    return gauge
 end
 
 local function box_is_configured()

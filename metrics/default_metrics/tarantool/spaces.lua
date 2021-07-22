@@ -1,5 +1,7 @@
 local utils = require('metrics.utils')
 
+local collectors_list = {}
+
 local function update_spaces_metrics()
     if not utils.box_is_configured() then
         return
@@ -19,7 +21,8 @@ local function update_spaces_metrics()
                 if type(space_id) == 'number' then
                     local l = table.copy(labels)
                     l.index_name = i.name
-                    utils.set_gauge('space_index_bsize', 'Index bsize', i:bsize(), l)
+                    collectors_list.space_index_bsize =
+                        utils.set_gauge('space_index_bsize', 'Index bsize', i:bsize(), l)
                     total = total + i:bsize()
                 end
             end
@@ -29,18 +32,21 @@ local function update_spaces_metrics()
 
                 labels.engine = 'memtx'
 
-                utils.set_gauge('space_len' , 'Space length', sp:len(), labels)
+                collectors_list.space_len =
+                    utils.set_gauge('space_len' , 'Space length', sp:len(), labels)
 
-                utils.set_gauge('space_bsize', 'Space bsize', sp_bsize, labels)
+                collectors_list.space_bsize =
+                    utils.set_gauge('space_bsize', 'Space bsize', sp_bsize, labels)
 
-                utils.set_gauge('space_total_bsize', 'Space total bsize', sp_bsize + total, labels)
+                collectors_list.space_total_bsize =
+                    utils.set_gauge('space_total_bsize', 'Space total bsize', sp_bsize + total, labels)
 
             else
                 labels.engine = 'vinyl'
 
                 local include_vinyl_count = rawget(_G, 'include_vinyl_count') or false
                 if include_vinyl_count then
-                    utils.set_gauge( 'space_count', 'Space count', sp:count(), labels)
+                    collectors_list.space_count = utils.set_gauge('space_count', 'Space count', sp:count(), labels)
                 end
             end
         end
@@ -49,4 +55,5 @@ end
 
 return {
     update = update_spaces_metrics,
+    list = collectors_list,
 }

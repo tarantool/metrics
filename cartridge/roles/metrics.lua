@@ -54,7 +54,7 @@ local function check_config(config)
         exclude = '?table',
     })
     if config.include and config.exclude then
-        error("don't use exclude and include section together")
+        error("don't use exclude and include sections together", 0)
     end
 end
 

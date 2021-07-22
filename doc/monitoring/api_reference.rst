@@ -266,7 +266,7 @@ You can also set global labels by calling
 Metrics functions
 -------------------------------------------------------------------------------
 
-..  function:: enable_default_metrics(include, exclude)
+..  function:: enable_default_metrics([include, exclude])
 
     Enables Tarantool metrics collections.
 

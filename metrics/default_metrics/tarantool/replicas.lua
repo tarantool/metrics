@@ -1,5 +1,6 @@
 local utils = require('metrics.utils')
 
+local collectors_list = {}
 
 local function update_replicas_metrics()
     if not utils.box_is_configured() then
@@ -13,7 +14,8 @@ local function update_replicas_metrics()
             local replication_info = current_box_info.replication[k]
             if replication_info then
                 local lsn = replication_info.lsn
-                utils.set_gauge('replication_replica_' .. k .. '_lsn', 'lsn for replica ' .. k, lsn - v)
+                local metric_name = 'replication_replica_' .. k .. '_lsn'
+                collectors_list[metric_name] = utils.set_gauge(metric_name, 'lsn for replica ' .. k, lsn - v)
             end
         end
     else
@@ -21,10 +23,11 @@ local function update_replicas_metrics()
             if v.downstream ~= nil and v.downstream.vclock ~= nil then
                 local lsn = v.downstream.vclock[current_box_info.id]
                 if lsn ~= nil and current_box_info.lsn ~= nil then
-                    utils.set_gauge(
-                            'replication_master_' .. k .. '_lsn',
-                            'lsn for master ' .. k,
-                            current_box_info.lsn - lsn
+                    local metric_name = 'replication_master_' .. k .. '_lsn'
+                    collectors_list[metric_name] = utils.set_gauge(
+                        metric_name,
+                        'lsn for master ' .. k,
+                        current_box_info.lsn - lsn
                     )
                 end
             end
@@ -33,5 +36,6 @@ local function update_replicas_metrics()
 end
 
 return {
-    update = update_replicas_metrics
+    update = update_replicas_metrics,
+    list = collectors_list,
 }

@@ -249,4 +249,4 @@ via configuration.
          - luajit
          - memory
 
-   You can see list of defaul metrics in :ref:`API reference <metrics-functions>`.
+   You can see full list of default metrics in :ref:`API reference <metrics-functions>`.
