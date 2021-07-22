@@ -175,7 +175,7 @@ g.test_validate_config_invalid_export_format = function()
                 },
             },
         }
-    }, 'format must be in handlers list')
+    }, 'format must be  "json", "prometheus" or "health", or in custom handlers list')
 end
 
 g.test_validate_config_duplicate_paths = function()
@@ -260,7 +260,7 @@ g.test_set_export_validates_input = function()
             format = 'invalid-format'
         },
     })
-    t.assert_str_icontains(err, 'format must be in handlers list')
+    t.assert_str_icontains(err, 'format must be  "json", "prometheus" or "health", or in custom handlers list')
 end
 
 g.test_empty_clusterwide_config_not_overrides_set_export = function()
@@ -686,27 +686,15 @@ end
 
 g.test_override_default_handler = function()
     local server = g.cluster.main_server
-    server.net_box:eval([[
+    local err = server.net_box:eval([[
         local json = require('json')
         local metrics = require('cartridge.roles.metrics')
-        metrics.add_custom_handlers({
+        local ok, err = pcall(metrics.add_custom_handlers({
             health = function()
                 return {body = json.encode({healthy = true})}
             end
-        })
+        }))
+        return err
     ]])
-    server:upload_config({
-        metrics = {
-            export = {
-                {
-                    path = '/health',
-                    format = 'health'
-                },
-            },
-        }
-    })
-
-    local resp = server:http_request('get', '/health', {raise = false})
-    t.assert_equals(resp.status, 200)
-    t.assert_equals(resp.json, {healthy = true})
+    t.assert_equals(err, 'shit')
 end

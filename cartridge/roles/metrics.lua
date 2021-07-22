@@ -10,6 +10,7 @@ metrics_vars:new('default', {})
 metrics_vars:new('config', {})
 metrics_vars:new('default_labels', {})
 metrics_vars:new('custom_labels', {})
+
 metrics_vars:new('handlers', {
     ['json'] = function(req)
         local json_exporter = require('metrics.plugins.json')
@@ -81,7 +82,8 @@ local function validate_routes(export)
     for _, v in ipairs(export) do
         v.path = remove_side_slashes(v.path)
         assert(type(v.path) == 'string', 'export.path must be string')
-        assert(metrics_vars.handlers[v.format], 'format must be in handlers list')
+        assert(metrics_vars.handlers[v.format],
+            'format must be  "json", "prometheus" or "health", or in custom handlers list')
         assert(paths[v.path] == nil, 'paths must be unique')
         paths[v.path] = true
     end
@@ -182,6 +184,30 @@ local function set_default_labels(default_labels)
     end
 end
 
+local default_handlers_name = {
+    health = true,
+    prometheus = true,
+    json = true,
+}
+
+local function set_custom_handlers(new_handlers)
+    for format, handler in pairs(new_handlers) do
+        assert(type(format) == 'string', 'keys of handlers table must be strings')
+        assert(type(handler) == 'function', 'handler must be a function')
+        if default_handlers_name[format] then
+            error('Custom handler format must not be a "health", "prometheus" or "json"', 0)
+        end
+    end
+    for format, handler in pairs(new_handlers) do
+        metrics_vars.handlers[format] = handler
+    end
+    for format, _ in pairs(metrics_vars.handlers) do
+        if not default_handlers_name[format] and not new_handlers[format] then
+            metrics_vars.handlers[format] = nil
+        end
+    end
+end
+
 local function init()
     set_labels(metrics_vars.custom_labels)
     metrics.enable_default_metrics()
@@ -208,16 +234,6 @@ local function stop()
     metrics_vars.custom_labels = {}
 end
 
-local function add_custom_handlers(new_handlers)
-    for format, handler in pairs(new_handlers) do
-        assert(type(format) == 'string', 'keys of handlers table must be strings')
-        assert(type(handler) == 'function', 'handler must be a function')
-    end
-    for format, handler in pairs(new_handlers) do
-        metrics_vars.handlers[format] = handler
-    end
-end
-
 return setmetatable({
     role_name = 'metrics',
     permanent = true,
@@ -227,5 +243,5 @@ return setmetatable({
     apply_config = apply_config,
     set_export = set_export,
     set_default_labels = set_default_labels,
-    add_custom_handlers = add_custom_handlers,
+    set_custom_handlers = set_custom_handlers,
 }, { __index = metrics })
