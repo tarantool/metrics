@@ -1,7 +1,6 @@
 local cartridge = require('cartridge')
 local argparse = require('cartridge.argparse')
 local metrics = require('metrics')
-local checks = require('checks')
 local log = require('log')
 
 local metrics_vars = require('cartridge.vars').new('metrics_vars')
@@ -46,18 +45,6 @@ local function set_labels(custom_labels)
     metrics_vars.custom_labels = custom_labels
 end
 
-local function check_config(config)
-    checks({
-        export = 'table',
-        ['global-labels'] = '?table',
-        include = '?table',
-        exclude = '?table',
-    })
-    if config.include and config.exclude then
-        error("don't use exclude and include sections together", 0)
-    end
-end
-
 local function delete_route(httpd, name)
     local route = assert(httpd.iroutes[name])
     httpd.iroutes[name] = nil
@@ -85,10 +72,16 @@ end
 local function validate_routes(export)
     local paths = {}
     for _, v in ipairs(export) do
+        if type(v.path) ~= 'string' then
+            error('path must be a string', 0)
+        end
+        if not handlers[v.format] then
+            error('format must be "json", "prometheus" or "health"', 0)
+        end
         v.path = remove_side_slashes(v.path)
-        assert(type(v.path) == 'string', 'export.path must be string')
-        assert(handlers[v.format], 'format must be "json", "prometheus" or "health"')
-        assert(paths[v.path] == nil, 'paths must be unique')
+        if paths[v.path] ~= nil then
+            error('paths must be unique', 0)
+        end
         paths[v.path] = true
     end
     return true
@@ -105,8 +98,12 @@ end
 local function validate_global_labels(custom_labels)
     custom_labels = custom_labels or {}
     for label, _ in pairs(custom_labels) do
-        assert(type(label) == 'string', 'label name must me string')
-        assert(label ~= 'zone' and label ~= 'alias', 'custom label name is not allowed to be "zone" or "alias"')
+        if type(label) ~= 'string' then
+            error('label name must me string', 0)
+        end
+        if label == 'zone' or label == 'alias' then
+            error('custom label name is not allowed to be "zone" or "alias"', 0)
+        end
     end
     return true
 end
@@ -116,7 +113,20 @@ local function validate_config(conf_new)
     if conf_new == nil then
         return true
     end
-    check_config(conf_new)
+    if type(conf_new) ~= 'table' then
+        error('config must be a key-value list', 0)
+    end
+    if conf_new.metrics ~= nil then
+        error([["metrics" section is already present as a name of "metrics.yml"]]..
+            [[don't use it as a top-level section name]], 0)
+    end
+
+    if type(conf_new.export or {}) ~= 'table' then
+        error('export section must be an array', 0)
+    end
+    if type(conf_new['global-labels'] or {}) ~= 'table' then
+        error('global-labels section must be a key-value list', 0)
+    end
     return validate_routes(conf_new.export) and validate_global_labels(conf_new['global-labels'])
 end
 
