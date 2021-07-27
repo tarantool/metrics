@@ -10,6 +10,7 @@ metrics_vars:new('default', {})
 metrics_vars:new('config', {})
 metrics_vars:new('default_labels', {})
 metrics_vars:new('custom_labels', {})
+metrics_vars:new('custom_handlers_setup', false)
 
 metrics_vars:new('handlers', {
     ['json'] = function(req)
@@ -191,6 +192,9 @@ local default_handlers_name = {
 }
 
 local function set_custom_handlers(new_handlers)
+    if metrics_vars.custom_handlers_setup == true then
+        error('Custom handlers have already been setup')
+    end
     for format, handler in pairs(new_handlers) do
         assert(type(format) == 'string', 'keys of handlers table must be strings')
         assert(type(handler) == 'function', 'handler must be a function')
@@ -206,6 +210,7 @@ local function set_custom_handlers(new_handlers)
             metrics_vars.handlers[format] = nil
         end
     end
+    metrics_vars.custom_handlers_setup = true
 end
 
 local function init()

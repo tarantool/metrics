@@ -32,3 +32,10 @@ metrics.set_export({
         format = 'json'
     },
 })
+
+metrics.set_custom_handlers({
+    custom_format = function()
+        metrics.invoke_callbacks()
+        return {body = require('json').encode(metrics.collect())}
+    end
+})

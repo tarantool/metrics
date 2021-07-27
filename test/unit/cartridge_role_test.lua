@@ -44,3 +44,25 @@ for test_name, params in pairs(label_tests) do
         t.assert_equals(alias_label, params.alias or params.instance_name)
     end
 end
+
+g.test_override_default_handler_fails = function()
+
+end
+
+local set_custom_handlers_errors = {
+    wrong_format = {args = { health = function() end },
+        err = 'Custom handler format must not be a "health", "prometheus" or "json"'},
+    wrong_handler = {args = { custom_handler = 'function() end' }, err = 'handler must be a function'},
+    wrong_table_format = {args = { function() end }, err = 'keys of handlers table must be strings'},
+}
+
+for test_name, params in pairs(set_custom_handlers_errors) do
+    g['set_custom_handlers_' .. test_name] = function()
+        metrics = require('cartridge.roles.metrics')
+        t.assert_error_msg_contains(
+            params.err,
+            metrics.set_custom_handlers,
+            params.args
+        )
+    end
+end

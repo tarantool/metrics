@@ -658,22 +658,12 @@ end
 
 g.test_add_custom_handler = function()
     local server = g.cluster.main_server
-    server.net_box:eval([[
-        local json = require('json')
-        local metrics = require('cartridge.roles.metrics')
-        metrics.add_custom_handlers({
-            metrics_count = function()
-                metrics.invoke_callbacks()
-                return {body = json.encode({metrics_count = #metrics.collect()})}
-            end
-        })
-    ]])
     server:upload_config({
         metrics = {
             export = {
                 {
                     path = '/metrics',
-                    format = 'metrics_count'
+                    format = 'custom_format' -- custom format from entrypoint
                 },
             },
         }
@@ -681,7 +671,6 @@ g.test_add_custom_handler = function()
 
     local resp = server:http_request('get', '/metrics', {raise = false})
     t.assert_equals(resp.status, 200)
-    t.assert_equals(type(resp.json.metrics_count), 'number')
 end
 
 g.test_override_default_handler = function()
@@ -689,12 +678,12 @@ g.test_override_default_handler = function()
     local err = server.net_box:eval([[
         local json = require('json')
         local metrics = require('cartridge.roles.metrics')
-        local ok, err = pcall(metrics.add_custom_handlers({
+        local ok, err = pcall(metrics.set_custom_handlers, {
             health = function()
                 return {body = json.encode({healthy = true})}
             end
-        }))
+        })
         return err
     ]])
-    t.assert_equals(err, 'shit')
+    t.assert_str_icontains(err, 'Custom handlers have already been setup')
 end

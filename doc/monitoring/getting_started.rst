@@ -218,3 +218,15 @@ via configuration.
 
        local metrics = require('cartridge.roles.metrics')
        metrics.set_labels({ ['my-custom-label'] = 'label-value'} )
+
+#. To set custom handlers, you may use the ``set_custom_handlers`` function.
+   You may use it only once, in your ``init.lua`` file.
+
+   ..  code-block:: lua
+
+       local metrics = require('cartridge.roles.metrics')
+       metrics.set_custom_handlers({ custom_handler =
+           function(...)
+               -- your metrics exporter
+           end
+       })
