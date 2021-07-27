@@ -720,7 +720,7 @@ g.test_exclude_metrics = function()
     t.assert_equals(resp.status, 200)
 
     local metrics_cnt = #resp.json
-    t.assert_gt(metrics_cnt, 0)
+    t.assert(metrics_cnt >= 0)
     local vinyl_metrics = fun.iter(resp.json):filter(function(x)
         return x.metric_name:find('tnt_vinyl')
     end):length()
@@ -777,7 +777,7 @@ g.test_exclude_after_include = function()
     t.assert_equals(resp.status, 200)
 
     metrics_cnt = #resp.json
-    t.assert_gt(metrics_cnt, 0)
+    t.assert(metrics_cnt >= 0)
     vinyl_metrics = fun.iter(resp.json):filter(function(x)
         return x.metric_name:find('tnt_vinyl')
     end):length()
