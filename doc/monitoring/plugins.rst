@@ -177,9 +177,9 @@ Import the JSON plugin:
 
         Values can be ``+-math.huge``, ``math.huge * 0``. Then:
 
-        * ``math.inf`` is serialized to ``"inf"``
-        * ``-math.inf`` is serialized to ``"-inf"``
-        * ``nan`` is serialized to ``"nan"``
+        * ``math.huge`` is serialized to ``"inf"``
+        * ``-math.huge`` is serialized to ``"-inf"``
+        * ``math.huge * 0`` is serialized to ``"nan"``
 
     **Example**
 
