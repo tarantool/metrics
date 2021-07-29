@@ -6,14 +6,30 @@ local g = t.group('quantile')
 
 local q = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
 
-local function getPerc(x, p)
-	local k = math.modf(#x * p)
-	return x[k]
+-- Tests from
+-- https://github.com/beorn7/perks/blob/37c8de3658fcb183f997c4e13e8337516ab753e6/quantile/stream_test.go#L98
+
+local function getPerc(x, p, eps)
+	local low = math.ceil(#x * (p - eps)) + 1
+    if low < 1 then
+        low = 1
+    end
+    local upper = math.ceil(#x * (p + eps)) + 1
+    if upper > #x then
+        upper = #x
+    end
+
+	return x[low], x[upper]
 end
 
 local x = {}
-for _ = 1, 10^4  do
-    local m = math.random()
+math.randomseed(0)
+for i = 1, 10^4 + 100 do
+    local m = math.random() * 10^6
+    -- Add 5% asymmetric outliers.
+    if i % 20 == 0 then
+		m = m^2 + 1
+    end
     table.insert(x, m)
     quantile.Insert(q, m)
 end
@@ -21,9 +37,10 @@ end
 table.sort(x)
 
 local function assert_quantile(quan)
-    local w = getPerc(x, quan)
+    local wlow, wupper = getPerc(x, quan, 0.01)
     local d = quantile.Query(q, quan)
-    t.assert(math.abs(w-d)/w < 0.05)
+    t.assert_le(wlow, d)
+    t.assert_le(d, wupper)
 end
 
 g.test_query_05 = function()
