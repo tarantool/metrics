@@ -175,7 +175,7 @@ g.test_validate_config_invalid_export_format = function()
                 },
             },
         }
-    }, 'format must be  "json", "prometheus" or "health", or in custom handlers list')
+    }, 'format must be "json", "prometheus" or "health", or in custom handlers list')
 end
 
 g.test_validate_config_duplicate_paths = function()
@@ -260,7 +260,7 @@ g.test_set_export_validates_input = function()
             format = 'invalid-format'
         },
     })
-    t.assert_str_icontains(err, 'format must be  "json", "prometheus" or "health", or in custom handlers list')
+    t.assert_str_icontains(err, 'format must be "json", "prometheus" or "health", or in custom handlers list')
 end
 
 g.test_empty_clusterwide_config_not_overrides_set_export = function()
@@ -656,7 +656,7 @@ g.test_invalig_global_labels_names = function()
     }, 'label name is not allowed to be "zone" or "alias"')
 end
 
-g.test_add_custom_handler = function()
+g.test_add_custom_handler_with_config = function()
     local server = g.cluster.main_server
     server:upload_config({
         metrics = {
@@ -673,17 +673,15 @@ g.test_add_custom_handler = function()
     t.assert_equals(resp.status, 200)
 end
 
-g.test_override_default_handler = function()
+g.test_add_custom_handler_with_set_export = function()
     local server = g.cluster.main_server
-    local err = server.net_box:eval([[
-        local json = require('json')
-        local metrics = require('cartridge.roles.metrics')
-        local ok, err = pcall(metrics.set_custom_handlers, {
-            health = function()
-                return {body = json.encode({healthy = true})}
-            end
-        })
-        return err
-    ]])
-    t.assert_str_icontains(err, 'Custom handlers have already been setup')
+    set_export({
+        {
+            path = '/metrics',
+            format = 'custom_format' -- custom format from entrypoint
+        },
+    })
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
 end
