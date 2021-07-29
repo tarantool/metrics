@@ -165,7 +165,7 @@ g.test_validate_config_invalid_export_section = function()
         metrics = {
             export = '/metrics',
         },
-    }, 'export section must be an array')
+    }, 'export section must be a table')
 end
 
 g.test_validate_config_invalid_top_level_section = function()
@@ -636,7 +636,7 @@ g.test_invalig_global_labels_format = function()
             },
             ['global-labels'] = 'string',
         }
-    }, 'global-labels section must be a key-value list')
+    }, 'global-labels section must be a table')
 end
 
 g.test_invalig_global_labels_names = function()

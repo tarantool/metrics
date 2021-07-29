@@ -71,16 +71,16 @@ end
 
 local function validate_routes(export)
     local paths = {}
-    for _, v in ipairs(export) do
+    for i, v in ipairs(export) do
         if type(v.path) ~= 'string' then
-            error('path must be a string', 0)
+            error(('metrics.export[%d]: path must be a string'):format(i), 0)
         end
         if not handlers[v.format] then
-            error('format must be "json", "prometheus" or "health"', 0)
+            error(('metrics.export[%d]: format must be "json", "prometheus" or "health"'):format(i), 0)
         end
         v.path = remove_side_slashes(v.path)
         if paths[v.path] ~= nil then
-            error('paths must be unique', 0)
+            error(('metrics.export[%d]: paths must be unique'):format(i), 0)
         end
         paths[v.path] = true
     end
@@ -99,7 +99,7 @@ local function validate_global_labels(custom_labels)
     custom_labels = custom_labels or {}
     for label, _ in pairs(custom_labels) do
         if type(label) ~= 'string' then
-            error('label name must me string', 0)
+            error('label name must be a string', 0)
         end
         if label == 'zone' or label == 'alias' then
             error('custom label name is not allowed to be "zone" or "alias"', 0)
@@ -114,7 +114,7 @@ local function validate_config(conf_new)
         return true
     end
     if type(conf_new) ~= 'table' then
-        error('config must be a key-value list', 0)
+        error('config must be a table', 0)
     end
     if conf_new.metrics ~= nil then
         error([["metrics" section is already present as a name of "metrics.yml"]]..
@@ -122,10 +122,13 @@ local function validate_config(conf_new)
     end
 
     if type(conf_new.export or {}) ~= 'table' then
-        error('export section must be an array', 0)
+        error('export section must be a table', 0)
     end
     if type(conf_new['global-labels'] or {}) ~= 'table' then
-        error('global-labels section must be a key-value list', 0)
+        error('global-labels section must be a table', 0)
+    end
+    if conf_new.exclude ~= nil and conf_new.include ~= nil then
+        error("don't use exclude and include sections together", 0)
     end
     return validate_routes(conf_new.export) and validate_global_labels(conf_new['global-labels'])
 end
