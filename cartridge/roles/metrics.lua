@@ -149,6 +149,7 @@ end
 local function apply_config(conf)
     local metrics_conf = conf.metrics or {}
     metrics_conf.export = metrics_conf.export or {}
+    set_labels(metrics_conf['global-labels'])
     local paths = format_paths(metrics_conf.export)
     metrics_vars.config = table.copy(paths)
     for path, format in pairs(metrics_vars.default) do
@@ -158,7 +159,6 @@ local function apply_config(conf)
     end
     apply_routes(paths)
     metrics.enable_default_metrics(metrics_conf.include, metrics_conf.exclude)
-    set_labels(metrics_conf['global-labels'])
 end
 
 local function set_export(export)

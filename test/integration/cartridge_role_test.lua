@@ -671,66 +671,6 @@ g.test_invalig_global_labels_names = function()
     }, 'label name is not allowed to be "zone" or "alias"')
 end
 
-g.test_include_metrics = function()
-    local server = g.cluster.main_server
-    server:upload_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-            },
-            include = {
-                'vinyl', 'luajit',
-            }
-        }
-    })
-
-    local resp = server:http_request('get', '/metrics', {raise = false})
-    t.assert_equals(resp.status, 200)
-
-    local metrics_cnt = #resp.json
-    local vinyl_metrics = fun.iter(resp.json):filter(function(x)
-        return x.metric_name:find('tnt_vinyl')
-    end):length()
-    local lj_metrics = fun.iter(resp.json):filter(function(x)
-        return x.metric_name:find('lj_')
-    end):length()
-    t.assert_equals(metrics_cnt, vinyl_metrics + lj_metrics)
-end
-
-g.test_exclude_metrics = function()
-    local server = g.cluster.main_server
-    server:upload_config({
-        metrics = {
-            export = {
-                {
-                    path = '/metrics',
-                    format = 'json'
-                },
-            },
-            exclude = {
-                'vinyl', 'luajit',
-            }
-        }
-    })
-
-    local resp = server:http_request('get', '/metrics', {raise = false})
-    t.assert_equals(resp.status, 200)
-
-    local metrics_cnt = #resp.json
-    t.assert(metrics_cnt >= 0)
-    local vinyl_metrics = fun.iter(resp.json):filter(function(x)
-        return x.metric_name:find('tnt_vinyl')
-    end):length()
-    t.assert_equals(vinyl_metrics, 0)
-    local lj_metrics = fun.iter(resp.json):filter(function(x)
-        return x.metric_name:find('lj_')
-    end):length()
-    t.assert_equals(lj_metrics, 0)
-end
-
 g.test_exclude_after_include = function()
     local server = g.cluster.main_server
     server:upload_config({
