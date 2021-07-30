@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)
 - `ipairs` instead of `pairs` while iteration in `histogram` [#196](https://github.com/tarantool/metrics/issues/196)
 - `set_export` function provide default metrics config to make role reloadable [#248](https://github.com/tarantool/metrics/issues/248)
+- metrics registry refactoring to add and remove callbacks with `O(1)` [#276](https://github.com/tarantool/metrics/issues/276)
 
 ### Fixed
 - be gentle to http routes, don't leave gaps in the array
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - set custom global labels in config and with `set_labels` function [#259](https://github.com/tarantool/metrics/issues/259)
 - allow to include and exclude default metrics in config and in `enable_default_metrics` function
   [#222](https://github.com/tarantool/metrics/issues/222)
+- `unregister_callback` function [#262](https://github.com/tarantool/metrics/issues/262)
 
 ### Deprecated
 - `enable_cartridge_metrics` function
