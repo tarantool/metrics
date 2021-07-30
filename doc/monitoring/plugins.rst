@@ -136,14 +136,6 @@ To start automatically exporting the current values of all
 
     Exported metric name is sent in the format ``<prefix>.<metric_name>``.
 
-    .. NOTE::
-
-        ``graphite.init()`` function creates fiber with name 'metrics_graphite_worker'
-        and kills all previously started fibers with that name, but those fibers
-        will be killed only after the next yield. Make sure that you're calling
-        ``graphite.init()`` only once.
-
-
 .. _json:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

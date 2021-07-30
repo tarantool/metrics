@@ -43,6 +43,7 @@ g.after_each(function()
     fun.iter(fiber.info()):
         filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
         each(function(x) fiber.kill(x) end)
+    fiber.yield() -- let cancelled fibers disappear from fiber.info()
 end)
 
 g.test_graphite_format_observation_removes_ULL_suffix = function()
@@ -106,7 +107,7 @@ end
 local function mock_graphite_worker()
     fiber.create(function()
         fiber.name('metrics_graphite_worker')
-        while true do fiber.sleep(0.01) end
+        fiber.sleep(math.huge)
     end)
 end
 
@@ -117,15 +118,12 @@ local function count_workers()
 end
 
 g.test_graphite_kills_previous_fibers_on_init = function()
+    t.assert_equals(count_workers(), 0)
     mock_graphite_worker()
     mock_graphite_worker()
-    fiber.sleep(0.5) -- wait to kill previous fibers
-    local workers_cnt = count_workers()
-    t.assert_equals(workers_cnt, 2)
+    t.assert_equals(count_workers(), 2)
 
     graphite.init({})
-
-    fiber.sleep(0.5) -- wait to kill previous fibers
-    workers_cnt = count_workers()
-    t.assert_equals(workers_cnt, 1)
+    fiber.yield() -- let cancelled fibers disappear from fiber.info()
+    t.assert_equals(count_workers(), 1)
 end
