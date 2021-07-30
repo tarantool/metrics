@@ -19,9 +19,13 @@ local default_metrics = {
 }
 
 local function delete_collectors(list)
+    if list == nil then
+        return
+    end
     for _, collector in pairs(list) do
         metrics.registry:unregister(collector)
     end
+    table.clear(list)
 end
 
 local function enable(include, exclude)

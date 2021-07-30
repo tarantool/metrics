@@ -11,7 +11,7 @@ local function update_memory_metrics()
         local i = box.info.memory()
         for k, v in pairs(i) do
             local metric_name = 'info_memory_' .. k
-            collectors_list[metric_name] = utils.set_gauge(metric_name, 'Memory' .. k, v)
+            collectors_list[metric_name] = utils.set_gauge(metric_name, 'Memory ' .. k, v)
         end
     end
 end
