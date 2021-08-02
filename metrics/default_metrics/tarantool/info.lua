@@ -1,4 +1,6 @@
-local utils = require('metrics.utils');
+local utils = require('metrics.utils')
+
+local collectors_list = {}
 
 local function update_info_metrics()
     if not utils.box_is_configured() then
@@ -7,8 +9,8 @@ local function update_info_metrics()
 
     local info = box.info()
 
-    utils.set_gauge('info_lsn', 'Tarantool lsn', info.lsn)
-    utils.set_gauge('info_uptime', 'Tarantool uptime', info.uptime)
+    collectors_list.info_lsn = utils.set_gauge('info_lsn', 'Tarantool lsn', info.lsn)
+    collectors_list.info_uptime = utils.set_gauge('info_uptime', 'Tarantool uptime', info.uptime)
 
     for k, v in ipairs(info.vclock) do
         utils.set_gauge('info_vclock', 'VClock', v, {id = k})
@@ -16,11 +18,14 @@ local function update_info_metrics()
 
     for k, v in ipairs(info.replication) do
         if v.upstream ~= nil then
-            utils.set_gauge('replication_' .. k .. '_lag', 'Replication lag for instance ' .. k, v.upstream.lag)
+            local metric_name = 'replication_' .. k .. '_lag'
+            collectors_list[metric_name] =
+                utils.set_gauge(metric_name, 'Replication lag for instance ' .. k, v.upstream.lag)
         end
     end
 end
 
 return {
     update = update_info_metrics,
+    list = collectors_list,
 }

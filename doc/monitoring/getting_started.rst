@@ -217,4 +217,36 @@ via configuration.
    ..  code-block:: lua
 
        local metrics = require('cartridge.roles.metrics')
-       metrics.set_labels({ ['my-custom-label'] = 'label-value'} )
+       metrics.set_labels({ ['my-custom-label'] = 'label-value' })
+
+#. To choose which default metrics are exported, you may use the following configuration.
+
+   When you add include section, only metrics from this section are exported:
+
+   ..  code-block:: yaml
+
+       metrics:
+         export:
+         - path: '/metrics'
+           format: 'json'
+         # export only vinyl, luajit and memory metrics:
+         include:
+         - vinyl
+         - luajit
+         - memory
+
+   When you add exclude section, metrics from this section are removed from default metrics list:
+
+   ..  code-block:: yaml
+
+       metrics:
+         export:
+         - path: '/metrics'
+           format: 'json'
+         # export all metrics except vinyl, luajit and memory:
+         exclude:
+         - vinyl
+         - luajit
+         - memory
+
+   You can see full list of default metrics in :ref:`API reference <metrics-functions>`.

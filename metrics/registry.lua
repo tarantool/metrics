@@ -43,7 +43,7 @@ function Registry:unregister(collector)
 end
 
 function Registry:invoke_callbacks()
-    for _, registered_callback in ipairs(self.callbacks) do
+    for registered_callback, _ in pairs(self.callbacks) do
         registered_callback()
     end
 end
@@ -59,15 +59,11 @@ function Registry:collect()
 end
 
 function Registry:register_callback(callback)
-    local found = false
-    for _, registered_callback in ipairs(self.callbacks) do
-        if registered_callback == callback then
-            found = true
-        end
-    end
-    if not found then
-        table.insert(self.callbacks, callback)
-    end
+    self.callbacks[callback] = true
+end
+
+function Registry:unregister_callback(callback)
+    self.callbacks[callback] = nil
 end
 
 function Registry:set_labels(label_pairs)

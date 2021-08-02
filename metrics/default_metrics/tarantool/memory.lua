@@ -1,5 +1,7 @@
 local utils = require('metrics.utils')
 
+local collectors_list = {}
+
 local function update_memory_metrics()
     if not utils.box_is_configured() then
         return
@@ -8,11 +10,13 @@ local function update_memory_metrics()
     if box.info.memory ~= nil then
         local i = box.info.memory()
         for k, v in pairs(i) do
-            utils.set_gauge('info_memory_' .. k, 'Memory' .. k, v)
+            local metric_name = 'info_memory_' .. k
+            collectors_list[metric_name] = utils.set_gauge(metric_name, 'Memory ' .. k, v)
         end
     end
 end
 
 return {
-    update = update_memory_metrics
+    update = update_memory_metrics,
+    list = collectors_list,
 }

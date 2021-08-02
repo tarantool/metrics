@@ -46,11 +46,16 @@ local function set_labels(custom_labels)
     metrics_vars.custom_labels = custom_labels
 end
 
-local function check_config(_)
+local function check_config(config)
     checks({
         export = 'table',
         ['global-labels'] = '?table',
+        include = '?table',
+        exclude = '?table',
     })
+    if config.include and config.exclude then
+        error("don't use exclude and include sections together", 0)
+    end
 end
 
 local function delete_route(httpd, name)
@@ -153,6 +158,7 @@ local function apply_config(conf)
         end
     end
     apply_routes(paths)
+    metrics.enable_default_metrics(metrics_conf.include, metrics_conf.exclude)
 end
 
 local function set_export(export)
@@ -186,7 +192,6 @@ end
 local function init()
     set_labels(metrics_vars.custom_labels)
     metrics.enable_default_metrics()
-    metrics.enable_cartridge_metrics()
     local current_paths = table.copy(metrics_vars.config)
     for path, format in pairs(metrics_vars.default) do
         if current_paths[path] == nil then
