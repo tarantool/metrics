@@ -2,8 +2,22 @@ local t = require('luatest')
 
 local fun = require('fun')
 local metrics = require('metrics')
+local fio = require('fio')
 
 local utils = {}
+
+local tempdir = fio.tempdir()
+t.after_suite(function()
+    fio.rmtree(tempdir)
+end)
+
+function utils.init()
+    box.cfg{
+        memtx_dir = tempdir,
+        vinyl_dir = tempdir,
+        wal_dir = tempdir,
+    }
+end
 
 function utils.find_obs(metric_name, label_pairs, observations)
     for _, obs in pairs(observations) do
@@ -70,6 +84,14 @@ function utils.is_version_greater(ver_str, reference_ver_str)
     else
         return false
     end
+end
+
+function utils.len(tbl)
+    local l = 0
+    for _ in pairs(tbl) do
+        l = l + 1
+    end
+    return l
 end
 
 return utils

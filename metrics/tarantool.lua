@@ -1,21 +1,21 @@
 local metrics = require('metrics')
 
 local default_metrics = {
-    network             = require('metrics.default_metrics.tarantool.network'),
-    operations          = require('metrics.default_metrics.tarantool.operations'),
-    system              = require('metrics.default_metrics.tarantool.system'),
-    replicas            = require('metrics.default_metrics.tarantool.replicas'),
-    info                = require('metrics.default_metrics.tarantool.info'),
-    slab                = require('metrics.default_metrics.tarantool.slab'),
-    runtime             = require('metrics.default_metrics.tarantool.runtime'),
-    memory              = require('metrics.default_metrics.tarantool.memory'),
-    spaces              = require('metrics.default_metrics.tarantool.spaces'),
-    fibers              = require('metrics.default_metrics.tarantool.fibers'),
-    cpu                 = require('metrics.default_metrics.tarantool.cpu'),
+    network             = require('metrics.tarantool.network'),
+    operations          = require('metrics.tarantool.operations'),
+    system              = require('metrics.tarantool.system'),
+    replicas            = require('metrics.tarantool.replicas'),
+    info                = require('metrics.tarantool.info'),
+    slab                = require('metrics.tarantool.slab'),
+    runtime             = require('metrics.tarantool.runtime'),
+    memory              = require('metrics.tarantool.memory'),
+    spaces              = require('metrics.tarantool.spaces'),
+    fibers              = require('metrics.tarantool.fibers'),
+    cpu                 = require('metrics.tarantool.cpu'),
     vinyl               = require('metrics.tarantool.vinyl'),
     luajit              = require('metrics.tarantool.luajit'),
     cartridge_issues    = require('metrics.cartridge.issues'),
-    clock               = require('metrics.cartridge.clock'),
+    clock               = require('metrics.tarantool.clock'),
 }
 
 local function delete_collectors(list)

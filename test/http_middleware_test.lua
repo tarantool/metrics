@@ -14,6 +14,7 @@ end)
 
 g.after_all(function()
     http_middleware.set_default_collector(nil)
+    metrics.clear()
 end)
 
 local function merge(...)

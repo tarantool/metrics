@@ -10,12 +10,10 @@ local fiber = require('fiber')
 local fun = require('fun')
 local socket = require('socket')
 local graphite = require('metrics.plugins.graphite')
+local utils = require('test.utils')
 
 g.before_all(function()
-    box.cfg{}
-    box.schema.user.grant(
-        'guest', 'read,write,execute', 'universe', nil, {if_not_exists = true}
-    )
+    utils.init()
     local s = box.schema.space.create(
         'random_space_for_graphite',
         {if_not_exists = true})
@@ -30,7 +28,7 @@ g.before_all(function()
     metrics.clear()
 
     -- Enable default metrics collections
-    metrics.enable_default_metrics();
+    metrics.enable_default_metrics()
 end)
 
 g.before_each(function()

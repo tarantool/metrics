@@ -2,15 +2,12 @@
 
 local t = require('luatest')
 local g = t.group('cpu_metric')
-local cpu = require('metrics.default_metrics.tarantool.cpu')
+local cpu = require('metrics.tarantool.cpu')
 local utils = require('test.utils')
 
 local metrics = require('metrics')
 
-g.before_all(function()
-    box.cfg{}
-    metrics.clear()
-end)
+g.before_all(utils.init)
 
 g.after_each(function()
     -- Delete all collectors and global labels
@@ -18,7 +15,6 @@ g.after_each(function()
 end)
 
 g.test_cpu = function()
-    metrics.clear()
     metrics.enable_default_metrics()
     cpu.update()
     local default_metrics = metrics.collect()

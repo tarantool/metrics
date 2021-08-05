@@ -6,15 +6,7 @@ local g = t.group('collectors')
 local metrics = require('metrics')
 local utils = require('test.utils')
 
-g.before_all(function()
-    box.cfg{}
-    box.schema.user.grant(
-        'guest', 'read,write,execute', 'universe', nil, {if_not_exists = true}
-    )
-
-    -- Delete all previous collectors and global labels
-    metrics.clear()
-end)
+g.before_all(utils.init)
 
 g.after_each(function()
     -- Delete all collectors and global labels
@@ -309,4 +301,20 @@ g.test_collector_reset = function()
     t.assert_equals(c:collect()[1].value, 1)
     c:reset()
     t.assert_equals(c:collect()[1].value, 0)
+end
+
+g.test_default_metrics_clear = function()
+    metrics.clear()
+    metrics.enable_default_metrics()
+    t.assert_equals(#metrics.collect(), 0)
+
+    metrics.invoke_callbacks()
+    t.assert(#metrics.collect() > 0)
+
+    metrics.clear()
+    t.assert_equals(#metrics.collect(), 0)
+
+    metrics.enable_default_metrics()
+    metrics.invoke_callbacks()
+    t.assert(#metrics.collect() > 0)
 end

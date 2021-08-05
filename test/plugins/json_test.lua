@@ -8,15 +8,7 @@ local metrics = require('metrics')
 local json = require('json')
 local utils = require('test.utils')
 
-g.before_all(function()
-    box.cfg{}
-    box.schema.user.grant(
-        'guest', 'read,write,execute', 'universe', nil, {if_not_exists = true}
-    )
-
-    -- Delete all previous collectors and global labels
-    metrics.clear()
-end)
+g.before_all(utils.init)
 
 g.after_each(function()
     -- Delete all collectors and global labels
@@ -80,7 +72,7 @@ g.test_histogram = function()
     local obs_bucket_2 = utils.find_obs('hist_bucket', { le = 2 }, observations)
     local obs_bucket_4 = utils.find_obs('hist_bucket', { le = 4 }, observations)
     local obs_bucket_inf = utils.find_obs('hist_bucket', { le = tostring(metrics.INF) }, observations)
-    t.assert_equals(#observations, 5, '<name>_sum, <name>_count, and <name>_bucket with 3 labelpairs')
+    t.assert_equals(#observations, 5, '<name>_sum, <name>_count, and <name>_bucket with 3 label_pairs')
     t.assert_equals(obs_sum.value, 8, '3 + 5 = 8')
     t.assert_equals(obs_count.value, 2, '2 observed values')
     t.assert_equals(obs_bucket_2.value, 0, 'bucket 2 has no values')
