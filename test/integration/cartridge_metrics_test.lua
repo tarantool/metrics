@@ -8,6 +8,7 @@ local helpers = require('test.helper')
 g.before_each(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     g.cluster = helpers.init_cluster()
+    helpers.upload_default_metrics_config(g.cluster)
 end)
 
 g.after_each(function()
@@ -15,15 +16,8 @@ g.after_each(function()
     fio.rmtree(g.cluster.datadir)
 end)
 
-local function check_cartridge_less_250()
-    local cartridge_version = require('cartridge.VERSION')
-    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v2.5.0 or greater')
-    t.skip_if(utils.is_version_greater(cartridge_version, '2.5.0'), 'Cartridge version is must be v2.5.0 or less')
-end
-
 g.test_cartridge_issues_present_on_healthy_cluster = function()
     helpers.skip_cartridge_version_less('2.0.2')
-    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
     local resp = main_server:http_request('get', '/metrics')
     local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
@@ -40,10 +34,9 @@ end
 
 g.test_cartridge_issues_metric_warning = function()
     helpers.skip_cartridge_version_less('2.0.2')
-
+    helpers.skip_cartridge_version_greater('2.5.0')
     local main_server = g.cluster:server('main')
     local replica_server = g.cluster:server('replica')
-    helpers.upload_default_metrics_config(g.cluster)
 
     -- Stage replication issue "Duplicate key exists in unique index 'primary' in space '_space'"
     main_server.net_box:eval([[
@@ -61,7 +54,6 @@ g.test_cartridge_issues_metric_warning = function()
     ]])
 
     t.helpers.retrying({}, function()
-        check_cartridge_less_250()
         local resp = main_server:http_request('get', '/metrics')
         local issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)[1]
         t.assert_equals(issues_metric.value, 1, [[
@@ -74,7 +66,6 @@ end
 
 g.test_cartridge_issues_metric_critical = function()
     helpers.skip_cartridge_version_less('2.0.2')
-    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
 
     main_server.net_box:eval([[
@@ -99,7 +90,6 @@ g.test_cartridge_issues_metric_critical = function()
 end
 
 g.test_clock_delta_metric_present = function()
-    helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server('main')
 
     t.helpers.retrying({}, function()

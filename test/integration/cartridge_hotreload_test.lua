@@ -4,13 +4,13 @@ local g = t.group()
 
 local helpers = require('test.helper')
 
-g.before_each(function()
+g.before_all(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     helpers.skip_cartridge_version_less('2.3.0')
     g.cluster = helpers.init_cluster()
 end)
 
-g.after_each(function()
+g.after_all(function()
     g.cluster:stop()
     fio.rmtree(g.cluster.datadir)
 end)

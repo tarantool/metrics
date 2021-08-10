@@ -7,6 +7,7 @@ local ok, cartridge_helpers = pcall(require, 'cartridge.test-helpers')
 if not ok then
     return nil
 end
+local cartridge_version = require('cartridge.VERSION')
 local helpers = table.copy(cartridge_helpers)
 
 helpers.project_root = fio.dirname(debug.sourcedir())
@@ -60,9 +61,14 @@ function helpers.upload_default_metrics_config(cluster)
 end
 
 function helpers.skip_cartridge_version_less(version)
-    local cartridge_version = require('cartridge.VERSION')
     t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
     t.skip_if(utils.is_version_less(cartridge_version, version),
+        'Cartridge version is must be v' .. version .. ' or greater')
+end
+
+function helpers.skip_cartridge_version_greater(version)
+    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
+    t.skip_if(utils.is_version_greater(cartridge_version, version),
         'Cartridge version is must be v' .. version .. ' or greater')
 end
 
