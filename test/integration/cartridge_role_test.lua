@@ -42,6 +42,11 @@ local function assert_counter(name)
         end
     end
     t.assert(counter_present)
+    g.cluster.main_server.net_box:eval([[
+        local cartridge = require('cartridge')
+        local metrics = cartridge.service_get('metrics')
+        metrics.registry:unregister(metrics.counter(...))
+    ]], {name})
 end
 
 local function assert_bad_config(config, error)
@@ -79,20 +84,29 @@ local function assert_upload_metrics_config(path)
 end
 
 
-g.before_each(function()
+g.before_all(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     g.cluster = helpers.init_cluster()
 end)
 
-g.after_each( function()
+g.after_all(function()
     g.cluster:stop()
     fio.rmtree(g.cluster.datadir)
-end )
+end)
 
-g.after_all = function()
-    g.cluster:stop()
-    fio.rmtree(g.cluster.datadir)
-end
+g.before_each(function ()
+    g.cluster.main_server:upload_config({metrics = { export = {}}})
+    set_export({
+        {
+            path = '/metrics',
+            format = 'json',
+        },
+        {
+            path = '/health',
+            format = 'health',
+        },
+    })
+end)
 
 g.test_role_enabled = function()
     local resp = g.cluster.main_server.net_box:eval([[
