@@ -9,4 +9,8 @@ function Counter:inc(num, label_pairs)
     Shared.inc(self, num, label_pairs)
 end
 
+function Counter:reset(label_pairs)
+    Shared.set(self, 0, label_pairs)
+end
+
 return Counter

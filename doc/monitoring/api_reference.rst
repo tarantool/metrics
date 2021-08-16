@@ -69,6 +69,10 @@ Counter
 
         Removes an observation with ``label_pairs``.
 
+    .. method:: reset(label_pairs)
+
+        Set an observation under ``label_pairs`` to 0.
+
         :param table label_pairs: Table containing label names as keys,
                                   label values as values.
 
