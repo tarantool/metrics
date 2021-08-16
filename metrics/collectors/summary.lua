@@ -86,6 +86,16 @@ function Summary:observe(num, label_pairs)
     end
 end
 
+function Summary:remove(label_pairs)
+    assert(label_pairs, 'label pairs is a required parameter')
+    self.count_collector:remove(label_pairs)
+    self.sum_collector:remove(label_pairs)
+    if self.objectives then
+        local key = self.make_key(label_pairs)
+        self.observations[key] = nil
+    end
+end
+
 function Summary:collect_quantiles()
     if not self.objectives or next(self.observations) == nil then
         return {}

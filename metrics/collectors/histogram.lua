@@ -61,6 +61,18 @@ function Histogram:observe(num, label_pairs)
     end
 end
 
+function Histogram:remove(label_pairs)
+    assert(label_pairs, 'label pairs is a required parameter')
+    self.count_collector:remove(label_pairs)
+    self.sum_collector:remove(label_pairs)
+
+    for _, bucket in ipairs(self.buckets) do
+        local bkt_label_pairs = table.deepcopy(label_pairs)
+        bkt_label_pairs.le = bucket
+        self.bucket_collector:remove(bkt_label_pairs)
+    end
+end
+
 function Histogram:collect()
     local result = {}
     for _, obs in ipairs(self.count_collector:collect()) do

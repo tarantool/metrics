@@ -65,6 +65,13 @@ Counter
 
         :rtype: table
 
+    .. method:: remove(label_pairs)
+
+        Removes an observation with ``label_pairs``.
+
+        :param table label_pairs: Table containing label names as keys,
+                                  label values as values.
+
 .. _gauge:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,6 +108,10 @@ Gauge
         Returns an array of ``observation`` objects for the given gauge.
         For ``observation`` description, see
         :ref:`counter_obj:collect() <counter-collect>`.
+
+    ..  method:: remove(label_pairs)
+
+        Same as Counter ``remove()``.
 
 .. _histogram:
 
@@ -153,6 +164,11 @@ Histogram
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``histogram_obj``. For ``observation`` description,
         see :ref:`counter_obj:collect() <counter-collect>`.
+
+    ..  method:: remove(label_pairs)
+
+        Same as Counter ``remove()``.
+
 
 .. _summary:
 
@@ -230,6 +246,10 @@ Summary
         If ``max_age_time`` and ``age_buckets_count`` are set, quantile observations
         will be collect only from the head bucket in sliding window and not from every
         bucket.
+
+    ..  method:: remove(label_pairs)
+
+        Same as Counter ``remove()``.
 
 .. _labels:
 
