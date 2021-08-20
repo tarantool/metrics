@@ -268,3 +268,38 @@ g.test_global_labels = function()
         { le = metrics.INF, alias = 'another alias', nlabel = 3 }, observations)
     t.assert_equals(obs_bucket_inf_hist_2.value, 1, "bucket +inf has 1 value: 2; observation global label has changed")
 end
+
+
+g.test_counter_remove_metric_by_label = function()
+    local c = metrics.counter('cnt')
+
+    c:inc(1, {label = 1})
+    c:inc(1, {label = 2})
+
+    utils.assert_observations(c:collect(), {
+        {'cnt', 1, {label = 1}},
+        {'cnt', 1, {label = 2}},
+    })
+
+    c:remove({label = 1})
+    utils.assert_observations(c:collect(), {
+        {'cnt', 1, {label = 2}},
+    })
+end
+
+g.test_gauge_remove_metric_by_label = function()
+    local c = metrics.gauge('gauge')
+
+    c:set(1, {label = 1})
+    c:set(1, {label = 2})
+
+    utils.assert_observations(c:collect(), {
+        {'gauge', 1, {label = 1}},
+        {'gauge', 1, {label = 2}},
+    })
+
+    c:remove({label = 1})
+    utils.assert_observations(c:collect(), {
+        {'gauge', 1, {label = 2}},
+    })
+end

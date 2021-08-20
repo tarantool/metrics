@@ -202,3 +202,32 @@ for case_name, test_data in pairs(test_data_wrong_input) do
         t.assert_error_msg_contains(test_data.error, metrics.summary, unpack(test_data.input))
     end
 end
+
+g.test_remove_metric_by_label = function()
+    local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+    instance:observe(3, {tag = 'a'})
+    instance:observe(6, {tag = 'b'})
+
+    utils.assert_observations(instance:collect(), {
+        {'latency_count', 1, {tag = 'a'}},
+        {'latency_count', 1, {tag = 'b'}},
+        {'latency_sum', 3, {tag = 'a'}},
+        {'latency_sum', 6, {tag = 'b'}},
+        {'latency', 3, {quantile = 0.5, tag = 'a'}},
+        {'latency', 3, {quantile = 0.9, tag = 'a'}},
+        {'latency', 3, {quantile = 0.99, tag = 'a'}},
+        {'latency', 6, {quantile = 0.5, tag = 'b'}},
+        {'latency', 6, {quantile = 0.9, tag = 'b'}},
+        {'latency', 6, {quantile = 0.99, tag = 'b'}},
+    })
+
+    instance:remove({tag = 'b'})
+
+    utils.assert_observations(instance:collect(), {
+        {'latency_count', 1, {tag = 'a'}},
+        {'latency_sum', 3, {tag = 'a'}},
+        {'latency', 3, {quantile = 0.5, tag = 'a'}},
+        {'latency', 3, {quantile = 0.9, tag = 'a'}},
+        {'latency', 3, {quantile = 0.99, tag = 'a'}},
+    })
+end

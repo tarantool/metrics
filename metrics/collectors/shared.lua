@@ -14,6 +14,7 @@ function Shared:new_class(kind, method_names)
     table.insert(method_names, 'make_key')
     table.insert(method_names, 'append_global_labels')
     table.insert(method_names, 'collect')
+    table.insert(method_names, 'remove')
     local methods = {}
     for _, name in pairs(method_names) do
         methods[name] = self[name]
@@ -46,6 +47,13 @@ function Shared.make_key(label_pairs)
     end
     table.sort(parts)
     return table.concat(parts, '\t')
+end
+
+function Shared:remove(label_pairs)
+    assert(label_pairs, 'label pairs is a required parameter')
+    local key = self.make_key(label_pairs)
+    self.observations[key] = nil
+    self.label_pairs[key] = nil
 end
 
 function Shared:set(num, label_pairs)
