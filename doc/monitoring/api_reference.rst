@@ -46,7 +46,9 @@ Counter
 
         :param number        num: Increase value.
         :param table label_pairs: Table containing label names as keys,
-                                  label values as values.
+                                  label values as values. Note that both
+                                  labels names and values in label_pairs
+                                  are treated as strings.
 
     .. _counter-collect:
 
@@ -70,7 +72,9 @@ Counter
         Removes an observation with ``label_pairs``.
 
         :param table label_pairs: Table containing label names as keys,
-                                  label values as values.
+                                  label values as values. Note that both
+                                  labels names and values in label_pairs
+                                  are treated as strings.
 
 .. _gauge:
 
@@ -157,7 +161,9 @@ Histogram
         :param table label_pairs: Table containing label names as keys,
                                   label values as values (table).
                                   A new value is observed by all internal counters
-                                  with these labels specified.
+                                  with these labels specified. Note that both
+                                  labels names and values in label_pairs
+                                  are treated as strings.
 
     .. method:: collect()
 
@@ -237,6 +243,8 @@ Summary
                                   It will be added automatically.
                                   If ``max_age_time`` and ``age_buckets_count`` are set,
                                   the observed value will be added to each bucket.
+                                  Note that both labels names and values in label_pairs
+                                  are treated as strings.
 
     ..  method:: collect()
 
@@ -314,7 +322,7 @@ Metrics functions
 
     See :ref:`metrics reference <metrics-reference>` for details.
 
-..  function:: metrics.set_global_labels(label_pairs)
+..  function:: set_global_labels(label_pairs)
 
     Set global labels that will be added to every observation.
 
@@ -329,6 +337,11 @@ Metrics functions
     Observation ``label_pairs`` has priority over global labels:
     if you pass ``label_pairs`` to an observation method with the same key as
     some global label, the method argument value will be used.
+
+    Note that both labels names and values in label_pairs are treated as strings.
+..  function:: collect()
+
+    Collect observations from each collector.
 
 ..  function:: register_callback(callback)
 
