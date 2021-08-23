@@ -348,6 +348,68 @@ Metrics functions
 
     Most common usage is for unregister enabled callbacks.
 
+.. _metrics-role-functions:
+
+-------------------------------------------------------------------------------
+Metrics role API
+-------------------------------------------------------------------------------
+
+Functions to call with ``metrics = require('cartridge.roles.metrics')`` in ``init.lua``
+
+..  function:: set_export(export)
+
+    :param table export: Table containing path and format of exporting metrics.
+
+    Configure endpoints of metrics role:
+
+    ..  code-block:: lua
+
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_export({
+            {
+                path = '/path_for_json_metrics',
+                format = 'json'
+            },
+            {
+                path = '/path_for_prometheus_metrics',
+                format = 'prometheus'
+            },
+            {
+                path = '/health',
+                format = 'health'
+            }
+        })
+
+    You can add several entry points of the same format by different paths,
+    like this:
+
+    ..  code-block:: lua
+
+    metrics.set_export({
+        {
+            path = '/path_for_json_metrics',
+            format = 'json'
+        },
+        {
+            path = '/another_path_for_json_metrics',
+            format = 'json'
+        },
+    })
+
+..  function:: set_default_labels(label_pairs)
+
+    Add default global labels. Note that both
+    labels names and values in label_pairs
+    are treated as strings.
+
+    :param table label_pairs: Table containing label names as string keys,
+    label values as values (table).
+
+    ..  code-block:: lua
+
+    local metrics = require('cartridge.roles.metrics')
+    metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
+
 .. _collecting-http-statistics:
 
 -------------------------------------------------------------------------------
