@@ -1,4 +1,3 @@
-local log = require('log')
 local export = {}
 
 export.DEFAULT_HISTOGRAM_BUCKETS = {
@@ -22,7 +21,7 @@ export.DEFAULT_SUMMARY_PARAMS = {
 
 --- Build default histogram collector
 --
--- @string[opt='histogram'] type_name `histogram` or `average` or `summary`
+-- @string[opt='histogram'] type_name `histogram` or `summary`
 -- @string[opt='http_server_requests'] name
 -- @string[opt='HTTP Server Requests'] help
 -- @return collector
@@ -35,8 +34,6 @@ function export.build_default_collector(type_name, name, help)
         extra = {export.DEFAULT_HISTOGRAM_BUCKETS}
     elseif type_name == 'summary' then
         extra = {export.DEFAULT_QUANTILES, export.DEFAULT_SUMMARY_PARAMS}
-    elseif type_name == 'average' then
-        log.warn('Average collector is deprecated. Use summary collector instead.')
     else
         error('Unknown collector type_name: ' .. tostring(type_name))
     end

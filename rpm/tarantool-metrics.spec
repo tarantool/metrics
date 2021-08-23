@@ -32,7 +32,6 @@ cp -rv cartridge %{br_luapkgdir}
      %{luapkgdir}/metrics/quantile.lua
 %dir %{luapkgdir}/metrics/collectors
      %{luapkgdir}/metrics/collectors/counter.lua
-     %{luapkgdir}/metrics/collectors/average.lua
      %{luapkgdir}/metrics/collectors/gauge.lua
      %{luapkgdir}/metrics/collectors/histogram.lua
      %{luapkgdir}/metrics/collectors/summary.lua

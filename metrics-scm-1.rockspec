@@ -27,7 +27,6 @@ build = {
         ['metrics.quantile']                = 'metrics/quantile.lua',
         ['metrics.http_middleware']         = 'metrics/http_middleware.lua',
         ['metrics.collectors.shared']       = 'metrics/collectors/shared.lua',
-        ['metrics.collectors.average']      = 'metrics/collectors/average.lua',
         ['metrics.collectors.summary']      = 'metrics/collectors/summary.lua',
         ['metrics.collectors.counter']      = 'metrics/collectors/counter.lua',
         ['metrics.collectors.gauge']        = 'metrics/collectors/gauge.lua',
