@@ -25,53 +25,8 @@ cp -rv metrics %{br_luapkgdir}
 cp -rv cartridge %{br_luapkgdir}
 
 %files
-%dir %{luapkgdir}/metrics
-     %{luapkgdir}/metrics/init.lua
-     %{luapkgdir}/metrics/http_middleware.lua
-     %{luapkgdir}/metrics/registry.lua
-     %{luapkgdir}/metrics/quantile.lua
-%dir %{luapkgdir}/metrics/collectors
-     %{luapkgdir}/metrics/collectors/counter.lua
-     %{luapkgdir}/metrics/collectors/gauge.lua
-     %{luapkgdir}/metrics/collectors/histogram.lua
-     %{luapkgdir}/metrics/collectors/summary.lua
-     %{luapkgdir}/metrics/collectors/shared.lua
-%dir %{luapkgdir}/metrics/plugins
-%dir %{luapkgdir}/metrics/plugins/prometheus
-     %{luapkgdir}/metrics/plugins/prometheus/init.lua
-%dir %{luapkgdir}/metrics/plugins/graphite
-     %{luapkgdir}/metrics/plugins/graphite/init.lua
-%dir %{luapkgdir}/metrics/plugins/json
-     %{luapkgdir}/metrics/plugins/json/init.lua
-%dir %{luapkgdir}/metrics/default_metrics
-%dir %{luapkgdir}/metrics/default_metrics/tarantool
-     %{luapkgdir}/metrics/default_metrics/tarantool/fibers.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/info.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/init.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/memory.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/network.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/operations.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/replicas.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/runtime.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/slab.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/spaces.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/system.lua
-     %{luapkgdir}/metrics/default_metrics/tarantool/cpu.lua
-     %{luapkgdir}/metrics/cartridge.lua
-%dir %{luapkgdir}/metrics/cartridge
-     %{luapkgdir}/metrics/cartridge/issues.lua
-     %{luapkgdir}/metrics/cartridge/clock.lua
-%dir %{luapkgdir}/metrics/psutils
-     %{luapkgdir}/metrics/psutils/cpu.lua
-     %{luapkgdir}/metrics/psutils/psutils_linux.lua
-     %{luapkgdir}/metrics/utils.lua
-%dir %{luapkgdir}/metrics/tarantool
-     %{luapkgdir}/metrics/tarantool/luajit.lua
-     %{luapkgdir}/metrics/tarantool/vinyl.lua
-%dir %{luapkgdir}/cartridge
-     %{luapkgdir}/cartridge/health.lua
-%dir %{luapkgdir}/cartridge/roles
-     %{luapkgdir}/cartridge/roles/metrics.lua
+     %{luapkgdir}/metrics
+     %{luapkgdir}/cartridge
 
 %doc README.md
 %doc doc/monitoring/getting_started.rst
