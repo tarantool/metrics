@@ -269,7 +269,6 @@ g.test_global_labels = function()
     t.assert_equals(obs_bucket_inf_hist_2.value, 1, "bucket +inf has 1 value: 2; observation global label has changed")
 end
 
-
 g.test_counter_remove_metric_by_label = function()
     local c = metrics.counter('cnt')
 
@@ -302,4 +301,12 @@ g.test_gauge_remove_metric_by_label = function()
     utils.assert_observations(c:collect(), {
         {'gauge', 1, {label = 2}},
     })
+end
+
+g.test_collector_reset = function()
+    local c = metrics.counter('cnt', 'some counter')
+    c:inc()
+    t.assert_equals(c:collect()[1].value, 1)
+    c:reset()
+    t.assert_equals(c:collect()[1].value, 0)
 end
