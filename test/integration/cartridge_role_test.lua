@@ -7,18 +7,6 @@ local g = t.group()
 local utils = require('test.utils')
 local helpers = require('test.helper')
 
-local function set_export(export)
-    local server = g.cluster.main_server
-    return server.net_box:eval([[
-        local cartridge = require('cartridge')
-        local metrics = cartridge.service_get('metrics')
-        local _, err = pcall(
-            metrics.set_export, ...
-        )
-        return err
-    ]], {export})
-end
-
 local function assert_counter(name)
     local server = g.cluster.main_server
     g.cluster.main_server.net_box:eval([[
@@ -59,7 +47,7 @@ local function assert_bad_config(config, error)
 end
 
 local function assert_set_export(path)
-    local ret = set_export({
+    local ret = helpers.set_export(g.cluster, {
         {
             path = path,
             format = 'json',
@@ -96,7 +84,7 @@ end)
 
 g.before_each(function ()
     g.cluster.main_server:upload_config({metrics = { export = {}}})
-    set_export({
+    helpers.set_export(g.cluster, {
         {
             path = '/metrics',
             format = 'json',
@@ -242,7 +230,7 @@ end
 
 g.test_set_export_add_metrics_http_endpoint = function()
     local server = g.cluster.main_server
-    local ret = set_export({
+    local ret = helpers.set_export(g.cluster, {
         {
             path = '/metrics',
             format = 'json',
@@ -250,7 +238,7 @@ g.test_set_export_add_metrics_http_endpoint = function()
     })
     t.assert_not(ret)
     assert_counter('test-set')
-    ret = set_export({
+    ret = helpers.set_export(g.cluster, {
         {
             path = '/new-metrics',
             format = 'json',
@@ -262,14 +250,14 @@ g.test_set_export_add_metrics_http_endpoint = function()
     resp = server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
-    ret = set_export({})
+    ret = helpers.set_export(g.cluster, {})
     t.assert_not(ret)
     resp = server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 404)
 end
 
 g.test_set_export_validates_input = function()
-    local err = set_export({
+    local err = helpers.set_export(g.cluster, {
         {
             path = '/valid-path',
             format = 'invalid-format'
@@ -333,7 +321,7 @@ end
 
 g.test_role_change_format_from_set_export = function()
     local server = g.cluster.main_server
-    set_export({
+    helpers.set_export(g.cluster, {
         {
             path = '/metrics-1',
             format = 'json'
@@ -343,7 +331,7 @@ g.test_role_change_format_from_set_export = function()
     t.assert_equals(resp.status, 200)
     t.assert_equals(resp.body:sub(1,1), '[')
 
-    set_export({
+    helpers.set_export(g.cluster, {
         {
             path = '/metrics-1',
             format = 'prometheus'
@@ -372,7 +360,7 @@ g.test_role_dont_change_format_from_set_export_to_config = function()
     t.assert_equals(resp.status, 200)
     t.assert_equals(resp.body:sub(1,1), '[')
 
-    set_export({
+    helpers.set_export(g.cluster, {
         {
             path = '/metrics-1',
             format = 'prometheus'
@@ -387,7 +375,7 @@ end
 
 g.test_role_change_format_from_config_to_set_export = function()
     local server = g.cluster.main_server
-    set_export({
+    helpers.set_export(g.cluster, {
         {
             path = '/metrics-1',
             format = 'json'

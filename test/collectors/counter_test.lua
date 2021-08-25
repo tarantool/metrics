@@ -60,3 +60,28 @@ g.test_counter_cache = function()
     obs = utils.find_obs('cnt2', {}, observations)
     t.assert_equals(obs.value, 7, 'counter_3 is the only reference to cnt2')
 end
+
+g.test_counter_reset = function()
+    local c = metrics.counter('cnt', 'some counter')
+    c:inc()
+    t.assert_equals(c:collect()[1].value, 1)
+    c:reset()
+    t.assert_equals(c:collect()[1].value, 0)
+end
+
+g.test_counter_remove_metric_by_label = function()
+    local c = metrics.counter('cnt')
+
+    c:inc(1, {label = 1})
+    c:inc(1, {label = 2})
+
+    utils.assert_observations(c:collect(), {
+        {'cnt', 1, {label = 1}},
+        {'cnt', 1, {label = 2}},
+    })
+
+    c:remove({label = 1})
+    utils.assert_observations(c:collect(), {
+        {'cnt', 1, {label = 2}},
+    })
+end

@@ -58,24 +58,3 @@ g.test_number_value_serialization = function()
     t.assert_equals(float_obs.value, 0.333, 'check float')
     t.assert_equals(int_obs.value, 10, 'check int')
 end
-
-g.test_histogram = function()
-    local h = metrics.histogram('hist', 'some histogram', {2, 4})
-
-    h:observe(3)
-    h:observe(5)
-
-    local observations = json.decode(json_exporter.export())
-
-    local obs_sum = utils.find_obs('hist_sum', {}, observations)
-    local obs_count = utils.find_obs('hist_count', {}, observations)
-    local obs_bucket_2 = utils.find_obs('hist_bucket', { le = 2 }, observations)
-    local obs_bucket_4 = utils.find_obs('hist_bucket', { le = 4 }, observations)
-    local obs_bucket_inf = utils.find_obs('hist_bucket', { le = tostring(metrics.INF) }, observations)
-    t.assert_equals(#observations, 5, '<name>_sum, <name>_count, and <name>_bucket with 3 label_pairs')
-    t.assert_equals(obs_sum.value, 8, '3 + 5 = 8')
-    t.assert_equals(obs_count.value, 2, '2 observed values')
-    t.assert_equals(obs_bucket_2.value, 0, 'bucket 2 has no values')
-    t.assert_equals(obs_bucket_4.value, 1, 'bucket 4 has 1 value: 3')
-    t.assert_equals(obs_bucket_inf.value, 2, 'bucket +inf has 2 values: 3, 5')
-end

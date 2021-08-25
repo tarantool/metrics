@@ -42,3 +42,20 @@ g.test_gauge = function()
 
     t.assert_equals(gauge:collect()[1].value, -7, '-8 + (-1) - (-2)')
 end
+
+g.test_gauge_remove_metric_by_label = function()
+    local c = metrics.gauge('gauge')
+
+    c:set(1, {label = 1})
+    c:set(1, {label = 2})
+
+    utils.assert_observations(c:collect(), {
+        {'gauge', 1, {label = 1}},
+        {'gauge', 1, {label = 2}},
+    })
+
+    c:remove({label = 1})
+    utils.assert_observations(c:collect(), {
+        {'gauge', 1, {label = 2}},
+    })
+end
