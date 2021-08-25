@@ -16,13 +16,17 @@ local default_metrics = {
     luajit              = require('metrics.tarantool.luajit'),
     cartridge_issues    = require('metrics.cartridge.issues'),
     clock               = require('metrics.cartridge.clock'),
+    event_loop          = require('metrics.tarantool.event_loop'),
 }
 
 local function delete_collectors(list)
     if list == nil then
         return
     end
-    for _, collector in pairs(list) do
+    for name, collector in pairs(list) do
+        if name == 'event_loop' then
+            require'log'.error('unreguster event_loop')
+        end
         metrics.registry:unregister(collector)
     end
     table.clear(list)
