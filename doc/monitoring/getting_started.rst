@@ -212,12 +212,12 @@ via configuration.
          global-labels:
            my-custom-label: label-value
 
-   **OR** use ``set_labels`` function in ``init.lua``.
+   **OR** use ``set_default_labels`` function in ``init.lua``.
 
    ..  code-block:: lua
 
        local metrics = require('cartridge.roles.metrics')
-       metrics.set_labels({ ['my-custom-label'] = 'label-value' })
+       metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
 #. To choose which default metrics are exported, you may use the following configuration.
 
