@@ -402,16 +402,16 @@ Functions to call with ``metrics = require('cartridge.roles.metrics')`` in ``ini
 
     ..  code-block:: lua
 
-    metrics.set_export({
-        {
-            path = '/path_for_json_metrics',
-            format = 'json'
-        },
-        {
-            path = '/another_path_for_json_metrics',
-            format = 'json'
-        },
-    })
+        metrics.set_export({
+            {
+                path = '/path_for_json_metrics',
+                format = 'json'
+            },
+            {
+                path = '/another_path_for_json_metrics',
+                format = 'json'
+            },
+        })
 
 ..  function:: set_default_labels(label_pairs)
 
@@ -424,8 +424,8 @@ Functions to call with ``metrics = require('cartridge.roles.metrics')`` in ``ini
 
     ..  code-block:: lua
 
-    local metrics = require('cartridge.roles.metrics')
-    metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
+        local metrics = require('cartridge.roles.metrics')
+        metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
 .. _collecting-http-statistics:
 
