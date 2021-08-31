@@ -14,6 +14,7 @@ end)
 
 g.after_all(function()
     http_middleware.set_default_collector(nil)
+    metrics.clear()
 end)
 
 local function merge(...)
@@ -40,17 +41,6 @@ g.test_build_default_collector_histogram = function()
     t.assert_equals(collector.name, 'custom_name')
     t.assert_equals(collector.help, 'custom_help')
     t.assert_equals(collector.buckets, http_middleware.DEFAULT_HISTOGRAM_BUCKETS)
-end
-
-g.test_build_default_collector_average = function()
-    local collector = http_middleware.build_default_collector('average')
-    t.assert_equals(collector.kind, 'average')
-    t.assert_equals(collector.name, 'http_server_request_latency')
-    t.assert_equals(collector.help, 'HTTP Server Request Latency')
-    collector = http_middleware.build_default_collector('average', 'custom_name', 'custom_help')
-    t.assert_equals(collector.kind, 'average')
-    t.assert_equals(collector.name, 'custom_name')
-    t.assert_equals(collector.help, 'custom_help')
 end
 
 g.test_build_default_collector_summary = function()

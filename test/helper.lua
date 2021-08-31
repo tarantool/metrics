@@ -60,6 +60,18 @@ function helpers.upload_default_metrics_config(cluster)
     })
 end
 
+function helpers.set_export(cluster, export)
+    local server = cluster.main_server
+    return server.net_box:eval([[
+        local cartridge = require('cartridge')
+        local metrics = cartridge.service_get('metrics')
+        local _, err = pcall(
+            metrics.set_export, ...
+        )
+        return err
+    ]], {export})
+end
+
 function helpers.skip_cartridge_version_less(version)
     t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
     t.skip_if(utils.is_version_less(cartridge_version, version),

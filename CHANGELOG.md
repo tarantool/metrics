@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - collector's method `remove` to clear observations with given label pairs [#263](https://github.com/tarantool/metrics/issues/263)
 - `counter:reset()` method [#260](https://github.com/tarantool/metrics/issues/260)
 
+### Removed
+- Average collector
+
 ## [0.10.0] - 2021-08-03
 ### Changed
 - metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)

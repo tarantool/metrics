@@ -31,8 +31,9 @@ test_with_coverage_report: .rocks
 
 .PHONY: test_promtool
 test_promtool: .rocks
-	tarantool test/promtool_test.lua
+	tarantool test/promtool.lua
 	cat prometheus-input | promtool check metrics
+	rm prometheus-input
 
 update-pot:
 	sphinx-build doc/monitoring doc/locale/en/ -c doc/ -d doc/.doctrees -b gettext

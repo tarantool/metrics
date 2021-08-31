@@ -118,7 +118,7 @@ return {
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
     enable_default_metrics = function(include, exclude)
-        require('metrics.default_metrics.tarantool').enable(include, exclude)
+        require('metrics.tarantool').enable(include, exclude)
     end,
     enable_cartridge_metrics = function()
         log.warn('metrics.enable_cartridge_metrics() is deprecated. Use metrics.enable_default_metrics() instead.')

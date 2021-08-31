@@ -7,12 +7,10 @@ local g = t.group('prometheus_plugin')
 
 local metrics = require('metrics')
 local http_handler = require('metrics.plugins.prometheus').collect_http
+local utils = require('test.utils')
 
 g.before_all(function()
-    box.cfg{}
-    box.schema.user.grant(
-        'guest', 'read,write,execute', 'universe', nil, {if_not_exists = true}
-    )
+    utils.init()
     local s = box.schema.space.create(
         'random_space_for_prometheus',
         {if_not_exists = true})
@@ -23,11 +21,8 @@ g.before_all(function()
         {if_not_exists = true, engine = 'vinyl'})
     s_vinyl:create_index('pk', {if_not_exists = true})
 
-    -- Delete all previous collectors and global labels
-    metrics.clear()
-
     -- Enable default metrics collections
-    metrics.enable_default_metrics();
+    metrics.enable_default_metrics()
 
     g.prometheus_metrics = http_handler().body
 end)

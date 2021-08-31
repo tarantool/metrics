@@ -5,6 +5,7 @@ local g = t.group()
 
 local metrics = require('metrics')
 local fun = require('fun')
+local utils = require('test.utils')
 
 g.after_each(function()
     -- Delete all collectors and global labels
@@ -12,17 +13,12 @@ g.after_each(function()
 end)
 
 g.before_each(function()
-    -- Enable default metrics collections
-    metrics.enable_default_metrics()
-end)
-
-g.before_all(function()
-    box.cfg{}
+    utils.init()
     local s_vinyl = box.schema.space.create(
         'test_space',
         {if_not_exists = true, engine = 'vinyl'})
     s_vinyl:create_index('pk', {if_not_exists = true})
-    metrics.clear()
+    metrics.enable_default_metrics()
 end)
 
 g.test_vinyl_metrics_present = function()
@@ -30,5 +26,6 @@ g.test_vinyl_metrics_present = function()
     local metrics_cnt = fun.iter(metrics.collect()):filter(function(x)
         return x.metric_name:find('tnt_vinyl')
     end):length()
+    require'log'.error(metrics.collect())
     t.assert_equals(metrics_cnt, 19)
 end
