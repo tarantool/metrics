@@ -667,6 +667,19 @@ g.test_invalig_global_labels_names = function()
             }
         }
     }, 'label name is not allowed to be "zone" or "alias"')
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                [1] = 'my-label',
+            }
+        }
+    }, 'label name must be a string, got number')
 end
 
 g.test_exclude_after_include = function()

@@ -72,6 +72,12 @@ end
 local function validate_routes(export)
     local paths = {}
     for i, v in ipairs(export) do
+        if v.path == nil then
+            error(('metrics.export[%d]: missing path'):format(i), 0)
+        end
+        if v.format == nil then
+            error(('metrics.export[%d]: missing format'):format(i), 0)
+        end
         if type(v.path) ~= 'string' then
             error(('metrics.export[%d]: path must be a string'):format(i), 0)
         end
@@ -99,10 +105,12 @@ local function validate_global_labels(custom_labels)
     custom_labels = custom_labels or {}
     for label, _ in pairs(custom_labels) do
         if type(label) ~= 'string' then
-            error('label name must be a string', 0)
+            error(('metrics.global-labels[%s]: global label name must be a string, got %s'):
+                format(tostring(label), type(label)), 0)
         end
         if label == 'zone' or label == 'alias' then
-            error('custom label name is not allowed to be "zone" or "alias"', 0)
+            error(('metrics.global-labels[%s]: global label name is not allowed to be "zone" or "alias"'):
+                format(tostring(label)), 0)
         end
     end
     return true
@@ -130,6 +138,7 @@ local function validate_config(conf_new)
     if conf_new.exclude ~= nil and conf_new.include ~= nil then
         error("don't use exclude and include sections together", 0)
     end
+
     return validate_routes(conf_new.export) and validate_global_labels(conf_new['global-labels'])
 end
 
