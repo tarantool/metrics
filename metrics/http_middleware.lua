@@ -71,6 +71,9 @@ end
 -- ... arguments for pcall to instrument
 function export.observe(collector, route, ...)
     return collector:observe_latency(function(ok, result)
+        if result == nil then
+            error("incorrect http handler", 0)
+        end
         return {
             path = route.path,
             method = route.method,
