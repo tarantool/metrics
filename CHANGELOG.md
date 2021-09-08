@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Average collector
 
+### Fixed
+- Throw an error when http_middelware is processing a wrong handler [#199](https://github.com/tarantool/metrics/issues/199)
+
 ## [0.10.0] - 2021-08-03
 ### Changed
 - metrics registry refactoring to search with `O(1)` [#188](https://github.com/tarantool/metrics/issues/188)
