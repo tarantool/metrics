@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Throw an error when http_middelware is processing a wrong handler [#199](https://github.com/tarantool/metrics/issues/199)
+- cartridge issues metric fails before cartridge.cfg() call [#298](https://github.com/tarantool/metrics/issues/298)
 
 ## [0.10.0] - 2021-08-03
 ### Changed

@@ -5,6 +5,7 @@ local g = t.group()
 
 g.before_all = function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
+    helpers.skip_cartridge_version_less('2.0.2')
 end
 
 g.test_cartridge_issues_before_cartridge_cfg = function()
