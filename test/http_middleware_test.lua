@@ -156,7 +156,10 @@ g.test_v1_wrong_handler = function()
         -- we forget to return result!
         -- return result
     end
-    t.assert_error_msg_contains('incorrect http handler', http_middleware.v1(handler, observer), request)
+    t.assert_error_msg_contains(
+        'incorrect http handler for POST /some/path: expecting return response object',
+        http_middleware.v1(handler, observer), request
+    )
 end
 
 g.test_v2_middleware = function()
@@ -197,5 +200,8 @@ g.test_v2_wrong_handler = function()
     local response = client:request(route.method, 'http://127.0.0.1:12345' .. route.path)
     httpd:stop()
     t.assert_equals(response.status, 500)
-    t.assert_str_contains(response.body, 'incorrect http handler')
+    t.assert_str_contains(
+        response.body,
+        'incorrect http handler for POST /some/path: expecting return response object'
+    )
 end
