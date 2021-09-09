@@ -2,6 +2,11 @@ local utils = require('metrics.utils')
 
 local collectors_list = {}
 
+local read_only_status = {
+    [true] = 1,
+    [false] = 0,
+}
+
 local function update_info_metrics()
     if not utils.box_is_configured() then
         return
@@ -23,6 +28,8 @@ local function update_info_metrics()
                 utils.set_gauge(metric_name, 'Replication lag for instance ' .. k, v.upstream.lag)
         end
     end
+
+    collectors_list.read_only = utils.set_gauge('read_only', 'Is instance read only', read_only_status[info.ro])
 end
 
 return {

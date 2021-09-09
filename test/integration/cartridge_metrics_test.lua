@@ -100,3 +100,16 @@ g.test_clock_delta_metric_present = function()
         t.assert_equals(clock_delta_metrics[2].label_pairs.delta, 'min')
     end)
 end
+
+g.test_read_only = function()
+    local main_server = g.cluster:server('main')
+
+    local resp = main_server:http_request('get', '/metrics')
+    local read_only = utils.find_metric('tnt_read_only', resp.json)
+    t.assert_equals(read_only[1].value, 0)
+
+    local replica_server = g.cluster:server('replica')
+    resp = replica_server:http_request('get', '/metrics')
+    read_only = utils.find_metric('tnt_read_only', resp.json)
+    t.assert_equals(read_only[1].value, 1)
+end
