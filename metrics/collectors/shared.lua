@@ -87,11 +87,14 @@ local function observe_latency_tail(collector, label_pairs, start_time, ok, resu
     if type(label_pairs) == 'function' then
         label_pairs = label_pairs(ok, result, ...)
     end
-    xpcall(function()
-        collector:observe(latency, label_pairs) end,
-    function(err)
-        log.error(debug.traceback('Saving metrics failed: ' .. tostring(err)))
-    end)
+    xpcall(
+        function()
+            collector:observe(latency, label_pairs)
+        end,
+        function(err)
+            log.error(debug.traceback('Saving metrics failed: ' .. tostring(err)))
+        end
+    )
     if not ok then
         error(result)
     end
@@ -104,6 +107,7 @@ end
 --      If function is given its called with the results of pcall.
 -- @param fn function for pcall to instrument
 -- ... - args for function fn
+-- @return value from fn
 function Shared:observe_latency(label_pairs, fn, ...)
     return observe_latency_tail(self, label_pairs, clock.monotonic(), pcall(fn, ...))
 end

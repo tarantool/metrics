@@ -69,6 +69,7 @@ end
 -- @string route.path
 -- @string route.method
 -- ... arguments for pcall to instrument
+-- @return value from observable function
 function export.observe(collector, route, ...)
     return collector:observe_latency(function(ok, result)
         return {
