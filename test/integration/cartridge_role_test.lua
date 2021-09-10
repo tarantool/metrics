@@ -165,7 +165,16 @@ g.test_validate_config_invalid_export_section = function()
         metrics = {
             export = '/metrics',
         },
-    }, 'bad argument')
+    }, 'export section must be a table')
+end
+
+g.test_validate_config_invalid_top_level_section = function()
+    assert_bad_config({
+        metrics = {
+            metrics = {},
+        },
+    }, [["metrics" section is already present as a name of "metrics.yml"]]..
+    [[don't use it as a top-level section name]])
 end
 
 g.test_validate_config_invalid_export_format = function()
@@ -627,7 +636,7 @@ g.test_invalig_global_labels_format = function()
             },
             ['global-labels'] = 'string',
         }
-    }, 'bad argument')
+    }, 'global-labels section must be a table')
 end
 
 g.test_invalig_global_labels_names = function()
@@ -658,6 +667,19 @@ g.test_invalig_global_labels_names = function()
             }
         }
     }, 'label name is not allowed to be "zone" or "alias"')
+    assert_bad_config({
+        metrics = {
+            export = {
+                {
+                    path = '/metrics',
+                    format = 'json'
+                },
+            },
+            ['global-labels'] = {
+                [1] = 'my-label',
+            }
+        }
+    }, 'label name must be a string, got number')
 end
 
 g.test_exclude_after_include = function()
