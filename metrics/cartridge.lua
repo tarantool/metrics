@@ -2,7 +2,6 @@ local metrics = require('metrics')
 
 local cartridge_metrics = {
     require('metrics.cartridge.issues'),
-    require('metrics.tarantool.clock'),
 }
 
 local function enable()

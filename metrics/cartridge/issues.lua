@@ -3,14 +3,18 @@ local fun = require('fun')
 
 local collectors_list = {}
 
-local function update_info_metrics()
+local function update()
     local list_on_instance = rawget(_G, '__cartridge_issues_list_on_instance')
 
     if not list_on_instance then
         return
     end
 
-    local issues = list_on_instance()
+    local ok, issues = pcall(list_on_instance)
+
+    if not ok then
+        return
+    end
 
     local levels = { 'warning', 'critical' }
 
@@ -22,6 +26,6 @@ local function update_info_metrics()
 end
 
 return {
-    update = update_info_metrics,
+    update = update,
     list = collectors_list,
 }
