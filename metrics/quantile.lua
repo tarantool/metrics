@@ -1,4 +1,5 @@
 local ffi = require('ffi')
+local const = require('metrics.const')
 
 local quantile = {}
 
@@ -270,6 +271,10 @@ function quantile.Query(stream_obj, q)
 		-- Fast path when there hasn't been enough data for a flush;
 		-- this also yields better accuracy for small sets of data.
 		local l = stream_obj.b_len
+		if l == 0 then
+			return const.NAN
+		end
+
 		local i = math.modf(l * q)
 		stream_obj:maybe_sort()
 		return stream_obj.b[i]

@@ -146,7 +146,7 @@ g.test_query_on_empty_quantile = function()
 
     local res = quantile.Query(emptyQuantile, 0.99)
 
-    t.assert_equals(res, math.huge)
+    t.assert_nan(res)
 end
 
 g.test_reset = function()
@@ -156,12 +156,12 @@ g.test_reset = function()
     end
 
     local res = quantile.Query(Quantile, 0.99)
-    t.assert_not_equals(res, math.huge)
+    t.assert_not_nan(res)
 
     quantile.Reset(Quantile)
 
     res = quantile.Query(Quantile, 0.99)
-    t.assert_equals(res, math.huge)
+    t.assert_nan(res)
 end
 
 g.test_quantile_insert_works_after_reset = function()
