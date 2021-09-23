@@ -257,7 +257,7 @@ Summary
         see :ref:`counter_obj:collect() <counter-collect>`.
         If ``max_age_time`` and ``age_buckets_count`` are set, quantile observations
         will be collect only from the head bucket in sliding window and not from every
-        bucket.
+        bucket. If there was no observations returns NaN in values.
 
     ..  method:: remove(label_pairs)
 

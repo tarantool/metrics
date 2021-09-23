@@ -146,7 +146,7 @@ g.test_query_on_empty_quantile = function()
 
     local res = quantile.Query(emptyQuantile, 0.99)
 
-    t.assert_equals(res, math.huge)
+    t.assert_nan(res)
 end
 
 g.test_reset = function()
@@ -156,12 +156,12 @@ g.test_reset = function()
     end
 
     local res = quantile.Query(Quantile, 0.99)
-    t.assert_not_equals(res, math.huge)
+    t.assert_not_nan(res)
 
     quantile.Reset(Quantile)
 
     res = quantile.Query(Quantile, 0.99)
-    t.assert_equals(res, math.huge)
+    t.assert_nan(res)
 end
 
 g.test_quantile_insert_works_after_reset = function()
@@ -173,4 +173,18 @@ g.test_quantile_insert_works_after_reset = function()
 
     local res = quantile.Query(Quantile, 0.5)
     t.assert_not_equals(res, math.huge)
+end
+
+g.test_quantile_values_present_after_buffer_flush = function()
+    local Quantile = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 10)
+
+    for _ = 1, 10 do
+        quantile.Insert(Quantile, math.random())
+    end
+
+    t.assert(Quantile:flushed())
+    -- buffer now is flushed
+
+    local res = quantile.Query(Quantile, 0.5)
+    t.assert_not_nan(res)
 end

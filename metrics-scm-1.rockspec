@@ -31,6 +31,7 @@ build = {
         ['metrics.collectors.counter']      = 'metrics/collectors/counter.lua',
         ['metrics.collectors.gauge']        = 'metrics/collectors/gauge.lua',
         ['metrics.collectors.histogram']    = 'metrics/collectors/histogram.lua',
+        ['metrics.const']                   = 'metrics/const.lua',
         ['metrics.plugins.graphite']        = 'metrics/plugins/graphite.lua',
         ['metrics.plugins.prometheus']      = 'metrics/plugins/prometheus.lua',
         ['metrics.plugins.json']            = 'metrics/plugins/json.lua',

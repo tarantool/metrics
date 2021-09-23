@@ -3,6 +3,7 @@
 local checks = require('checks')
 local log = require('log')
 
+local Const = require('metrics.const')
 local Registry = require('metrics.registry')
 
 local Counter = require('metrics.collectors.counter')
@@ -108,8 +109,8 @@ return {
     histogram = histogram,
     summary = summary,
 
-    INF = math.huge,
-    NAN = math.huge * 0,
+    INF = Const.INF,
+    NAN = Const.NAN,
 
     clear = clear,
     collectors = collectors,
