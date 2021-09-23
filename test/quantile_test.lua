@@ -10,7 +10,7 @@ local q = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
 -- https://github.com/beorn7/perks/blob/37c8de3658fcb183f997c4e13e8337516ab753e6/quantile/stream_test.go#L98
 
 local function getPerc(x, p, eps)
-	local low = math.ceil(#x * (p - eps)) + 1
+    local low = math.ceil(#x * (p - eps)) + 1
     if low < 1 then
         low = 1
     end
@@ -19,7 +19,7 @@ local function getPerc(x, p, eps)
         upper = #x
     end
 
-	return x[low], x[upper]
+    return x[low], x[upper]
 end
 
 local x = {}
@@ -28,7 +28,7 @@ for i = 1, 10^4 + 100 do
     local m = math.random() * 10^6
     -- Add 5% asymmetric outliers.
     if i % 20 == 0 then
-		m = m^2 + 1
+        m = m^2 + 1
     end
     table.insert(x, m)
     quantile.Insert(q, m)
