@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.11.0] - 2021-09-23
 ### Added
 - collector's method `remove` to clear observations with given label pairs [#263](https://github.com/tarantool/metrics/issues/263)
 - `counter:reset()` method [#260](https://github.com/tarantool/metrics/issues/260)
