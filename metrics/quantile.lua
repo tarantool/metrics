@@ -271,6 +271,8 @@ function quantile.Query(stream_obj, q)
 		-- Fast path when there hasn't been enough data for a flush;
 		-- this also yields better accuracy for small sets of data.
 		local l = stream_obj.b_len
+
+		-- if buffer is empty and wasn't flushed yet then quantile value is NaN
 		if l == 0 then
 			return const.NAN
 		end
