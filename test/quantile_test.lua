@@ -175,7 +175,7 @@ g.test_quantile_insert_works_after_reset = function()
     t.assert_not_equals(res, math.huge)
 end
 
-g.test_quantile_full_buffer = function()
+g.test_quantile_values_present_after_buffer_flush = function()
     local Quantile = quantile.NewTargeted({[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}, 10)
 
     for _ = 1, 10 do
