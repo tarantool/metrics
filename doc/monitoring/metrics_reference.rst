@@ -16,6 +16,8 @@ General instance information:
 
 * ``tnt_info_uptime``—time in seconds since instance has started.
 
+* ``tnt_read_only``—is instance in read only mode (value is 1 if true and 0 if false).
+
 .. _memory-general:
 
 -------------------------------------------------------------------------------
