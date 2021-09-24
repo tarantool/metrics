@@ -35,12 +35,6 @@ Enable default Tarantool metrics such as network, memory, operations, etc:
 
     metrics.enable_default_metrics()
 
-If you use Cartridge, enable Cartridge metrics:
-
-.. code-block:: lua
-
-    metrics.enable_cartridge_metrics()
-
 Initialize the Prometheus Exporter, or export metrics in any other format:
 
 .. code-block:: lua
@@ -62,6 +56,55 @@ Initialize the Prometheus Exporter, or export metrics in any other format:
 Now you can use the HTTP API endpoint ``/metrics`` to collect your metrics
 in the Prometheus format. If you need your custom metrics, see the
 :ref:`API reference <metrics-api-reference>`.
+
+.. _metrics-http
+-------------------------------------------------------------------------------
+Collect HTTP metrics
+-------------------------------------------------------------------------------
+
+To enable collection of HTTP metrics, you need to create collector
+
+Using HTTP v1:
+
+.. code-block:: lua
+
+    local httpd = require('http.server').new(ip, port)
+
+    -- Create summary latency collector
+    local collector = metrics.http_middleware.build_default_collector('summary')
+
+    -- Set route handler with summary latency collection
+    httpd:route({ path = '/path-1', method = 'POST' }, metrics.http_middleware.v1(handler_1, collector))
+    httpd:route({ path = '/path-2', method = 'GET' }, metrics.http_middleware.v1(handler_2, collector))
+
+    -- Start HTTP routing
+    httpd:start()
+
+Using HTTP v2:
+
+
+.. code-block:: lua
+
+    local httpd = require('http.server').new(ip, port)
+    local router = require('http.router').new()
+
+    router:route({ path = '/path-1', method = 'POST' }, handler_1)
+    router:route({ path = '/path-2', method = 'GET' }, handler_2)
+
+    -- Create summary latency collector
+    local collector = metrics.http_middleware.build_default_collector('summary')
+
+    -- Set router summary latency collection middleware
+    router:use(metrics.http_middleware.v2(collector), { name = 'latency_instrumentation' })
+
+    -- Start HTTP routing using configured router
+    httpd:set_router(router)
+    httpd:start()
+
+Note that you need only one collector to collect all http metrics.
+If youre using default Grafana-dashboard (link) dont change collector name and description,
+otherwise you wont see your metrics on charts
+
 
 .. _instance-health-check:
 

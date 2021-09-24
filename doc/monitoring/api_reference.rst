@@ -343,9 +343,41 @@ Metrics functions
     some global label, the method argument value will be used.
 
     Note that both labels names and values in label_pairs are treated as strings.
+
 ..  function:: collect()
 
     Collect observations from each collector.
+
+..  class:: registry
+
+    ..  method:: unregister(collector)
+
+        Removes collector from registry
+
+        :param table collector: collector that has to be removed
+
+        Example:
+
+        ..  code-block:: lua
+            local collector = metrics.gauge('some-gauge')
+
+            -- after some time we don't need it anymore
+
+            metrics.registry:unregister(collector)
+
+    ..  method:: find(kind, name)
+
+        Finds collector in registry
+
+        :param string kind: collector kind ('counter', 'gauge', 'histogram' or 'summary')
+        :param string name: collector name
+
+        Example:
+
+        ..  code-block:: lua
+            local collector = metrics.gauge('some-gauge')
+
+            collector = metrics.registry:find('gauge', 'some-gauge')
 
 ..  function:: register_callback(callback)
 
@@ -356,6 +388,15 @@ Metrics functions
 
     Most common usage is for gauge metrics updates.
 
+    Example:
+
+    ..  code-block:: lua
+
+        metrics.register_callback(function()
+            local cpu_metrics = require('metrics.psutils.cpu')
+            cpu_metrics.update()
+        end)
+
 ..  function:: unregister_callback(callback)
 
     Unregisters a function ``callback`` which will be called right before metrics
@@ -364,6 +405,26 @@ Metrics functions
     :param function callback: Function which takes no parameters.
 
     Most common usage is for unregister enabled callbacks.
+
+    Example:
+
+    ..  code-block:: lua
+
+        local cpu_callback = function()
+            local cpu_metrics = require('metrics.psutils.cpu')
+            cpu_metrics.update()
+        end
+
+        metrics.register_callback(cpu_callback)
+
+        -- after some time we dont need that callback anymore
+
+        metrics.unregister_callback(cpu_callback)
+
+..  function: invoke_callbacks()
+
+    Invokes all registered callbacks. Needs to be called before each export.
+    If youre using one of default exporters, invoke_callbacks function will be called by exporter
 
 .. _metrics-role-functions:
 
