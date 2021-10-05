@@ -354,7 +354,7 @@ Metrics functions
 
         Removes collector from registry
 
-        :param table collector: collector that has to be removed
+        :param collector_obj collector: collector that has to be removed
 
         Example:
 
@@ -371,6 +371,10 @@ Metrics functions
 
         :param string kind: collector kind ('counter', 'gauge', 'histogram' or 'summary')
         :param string name: collector name
+
+        :return: Collector object or nil
+
+        :rtype: collector_obj
 
         Example:
 
@@ -403,8 +407,6 @@ Metrics functions
     collection on plugin export.
 
     :param function callback: Function which takes no parameters.
-
-    Most common usage is for unregister enabled callbacks.
 
     Example:
 
@@ -645,7 +647,7 @@ Using gauges:
     -- register a lazy gauge value update
     -- this will be called whenever the export is invoked in any plugins
     metrics.register_callback(function()
-        local current_cpu_usage = math.random()
+        local current_cpu_usage = some_cpu_collect_function()
         cpu_usage_gauge:set(current_cpu_usage, {app = 'tarantool'})
     end)
 
@@ -654,13 +656,18 @@ Using histograms:
 ..  code-block:: lua
 
     local metrics = require('metrics')
-
+    local fiber = require('fiber')
     -- create a histogram
     local http_requests_latency_hist = metrics.histogram(
         'http_requests_latency', 'HTTP requests total', {2, 4, 6})
 
     -- somewhere in the HTTP requests middleware:
-    local latency = math.random(1, 10)
+
+    local t0 = fiber.clock()
+    observable_function()
+    local t1 = fiber.clock()
+
+    local latency = t1 - t0
     http_requests_latency_hist:observe(latency)
 
 Using summaries:
@@ -668,6 +675,7 @@ Using summaries:
 ..  code-block:: lua
 
     local metrics = require('metrics')
+    local fiber = require('fiber')
 
     -- create a summary with a window of 5 age buckets and 60s bucket lifetime
     local http_requests_latency = metrics.summary(
@@ -677,5 +685,9 @@ Using summaries:
     )
 
     -- somewhere in the HTTP requests middleware:
-    local latency = math.random(1, 10)
+    local t0 = fiber.clock()
+    observable_function()
+    local t1 = fiber.clock()
+
+    local latency = t1 - t0
     http_requests_latency:observe(latency)

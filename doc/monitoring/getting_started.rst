@@ -82,7 +82,6 @@ Using HTTP v1:
 
 Using HTTP v2:
 
-
 .. code-block:: lua
 
     local httpd = require('http.server').new(ip, port)
@@ -102,7 +101,7 @@ Using HTTP v2:
     httpd:start()
 
 Note that you need only one collector to collect all http metrics.
-If youre using default Grafana-dashboard (link) dont change collector name and description,
+If youre using default Grafana-dashboard (link) dont change collector name,
 otherwise you wont see your metrics on charts
 
 
