@@ -423,7 +423,7 @@ Metrics functions
 
 ..  function: invoke_callbacks()
 
-    Invokes all registered callbacks. Needs to be called before each export.
+    Invokes all registered callbacks. Needs to be called before each collect.
     If youre using one of default exporters, invoke_callbacks function will be called by exporter
 
 .. _metrics-role-functions:
