@@ -1,32 +1,28 @@
-.. _metrics-api-reference:
+..  _metrics-api-reference:
 
-===============================================================================
 API reference
-===============================================================================
+=============
 
 .. _collectors:
 
--------------------------------------------------------------------------------
 Collectors
--------------------------------------------------------------------------------
+----------
 
 An application using the ``metrics`` module has 4 primitives (called "collectors")
 at its disposal:
 
-*  :ref:`Counter <counter>`
-*  :ref:`Gauge <gauge>`
-*  :ref:`Histogram <histogram>`
-*  :ref:`Summary <summary>`
+..  contents::
+    :local:
+    :depth: 1
 
 A collector represents one or more observations that are changing over time.
 
 ..  module:: metrics
 
-.. _counter:
+..  _counter:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Counter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+counter
+~~~~~~~
 
 ..  function:: counter(name [, help])
 
@@ -37,9 +33,9 @@ Counter
     :return: Counter object
     :rtype: counter_obj
 
-.. class:: counter_obj
+..  class:: counter_obj
 
-    .. method:: inc(num, label_pairs)
+    ..  method:: inc(num, label_pairs)
 
         Increments an observation under ``label_pairs``.
         If ``label_pairs`` didn't exist before, this creates it.
@@ -50,9 +46,9 @@ Counter
                                   labels names and values in label_pairs
                                   are treated as strings.
 
-    .. _counter-collect:
+    ..  _counter-collect:
 
-    .. method:: collect()
+    ..  method:: collect()
 
         :return: Array of ``observation`` objects for the given counter.
 
@@ -67,11 +63,11 @@ Counter
 
         :rtype: table
 
-    .. method:: remove(label_pairs)
+    ..  method:: remove(label_pairs)
 
         Removes an observation with ``label_pairs``.
 
-    .. method:: reset(label_pairs)
+    ..  method:: reset(label_pairs)
 
         Set an observation under ``label_pairs`` to 0.
 
@@ -82,9 +78,8 @@ Counter
 
 .. _gauge:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Gauge
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+gauge
+~~~~~
 
 ..  function:: gauge(name [, help])
 
@@ -121,11 +116,10 @@ Gauge
 
         Same as Counter ``remove()``.
 
-.. _histogram:
+..  _histogram:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Histogram
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+histogram
+~~~~~~~~~
 
 ..  function:: histogram(name [, help, buckets])
 
@@ -141,17 +135,17 @@ Histogram
 
     :rtype: histogram_obj
 
-    .. NOTE::
+    ..  note::
 
         The histogram is just a set of collectors:
 
-        *  ``name .. "_sum"`` - A counter holding the sum of added observations.
-           Contains only an empty label set.
-        *  ``name .. "_count"`` - A counter holding the number of added observations.
-           Contains only an empty label set.
-        *  ``name .. "_bucket"`` - A counter holding all bucket sizes under the label
-           ``le`` (low or equal). So to access a specific bucket ``x`` (``x`` is a number),
-           you should specify the value ``x`` for the label ``le``.
+        *   ``name .. "_sum"`` - A counter holding the sum of added observations.
+            Contains only an empty label set.
+        *   ``name .. "_count"`` - A counter holding the number of added observations.
+            Contains only an empty label set.
+        *   ``name .. "_bucket"`` - A counter holding all bucket sizes under the label
+            ``le`` (low or equal). So to access a specific bucket ``x`` (``x`` is a number),
+            you should specify the value ``x`` for the label ``le``.
 
 ..  class:: histogram_obj
 
@@ -169,7 +163,7 @@ Histogram
                                   labels names and values in label_pairs
                                   are treated as strings.
 
-    .. method:: collect()
+    ..  method:: collect()
 
         Returns a concatenation of ``counter_obj:collect()`` across all internal
         counters of ``histogram_obj``. For ``observation`` description,
@@ -180,11 +174,10 @@ Histogram
         Same as Counter ``remove()``.
 
 
-.. _summary:
+..  _summary:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Summary
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+summary
+~~~~~~~
 
 ..  function:: summary(name [, help, objectives])
 
@@ -222,15 +215,15 @@ Summary
 
     :rtype: summary_obj
 
-    .. NOTE::
+    ..  note::
 
         The summary is just a set of collectors:
 
-        *  ``name .. "_sum"`` - A counter holding the sum of added observations.
-        *  ``name .. "_count"`` - A counter holding the number of added observations.
-        *  ``name`` - It's holding all quantiles under observation under the label
-           ``quantile`` (low or equal). So to access a specific quantile ``x`` (``x`` is a number),
-           you should specify the value ``x`` for the label ``quantile``.
+        *   ``name .. "_sum"`` - A counter holding the sum of added observations.
+        *   ``name .. "_count"`` - A counter holding the number of added observations.
+        *   ``name`` - It's holding all quantiles under observation under the label
+            ``quantile`` (low or equal). So to access a specific quantile ``x``
+            (``x`` is a number), you should specify the value ``x`` for the label ``quantile``.
 
 ..  class:: summary_obj
 
@@ -263,11 +256,10 @@ Summary
 
         Same as Counter ``remove()``.
 
-.. _labels:
+..  _labels:
 
--------------------------------------------------------------------------------
 Labels
--------------------------------------------------------------------------------
+------
 
 All collectors support providing ``label_pairs`` on data modification.
 Labels are basically a metainfo that you associate with a metric in the format
@@ -292,11 +284,10 @@ In the example above, we could derive these time series:
 You can also set global labels by calling
 ``metrics.set_global_labels({ label = value, ...})``.
 
-.. _metrics-functions:
+..  _metrics-functions:
 
--------------------------------------------------------------------------------
 Metrics functions
--------------------------------------------------------------------------------
+-----------------
 
 ..  function:: enable_default_metrics([include, exclude])
 
@@ -308,21 +299,21 @@ Metrics functions
 
     Default metrics names:
 
-    * "network"
-    * "operations"
-    * "system"
-    * "replicas"
-    * "info"
-    * "slab"
-    * "runtime"
-    * "memory"
-    * "spaces"
-    * "fibers"
-    * "cpu"
-    * "vinyl"
-    * "luajit"
-    * "cartridge_issues"
-    * "clock"
+    *   ``network``
+    *   ``operations``
+    *   ``system``
+    *   ``replicas``
+    *   ``info``
+    *   ``slab``
+    *   ``runtime``
+    *   ``memory``
+    *   ``spaces``
+    *   ``fibers``
+    *   ``cpu``
+    *   ``vinyl``
+    *   ``luajit``
+    *   ``cartridge_issues``
+    *   ``clock``
 
     See :ref:`metrics reference <metrics-reference>` for details.
 
@@ -359,6 +350,7 @@ Metrics functions
         Example:
 
         ..  code-block:: lua
+
             local collector = metrics.gauge('some-gauge')
 
             -- after some time we don't need it anymore
@@ -379,6 +371,7 @@ Metrics functions
         Example:
 
         ..  code-block:: lua
+            
             local collector = metrics.gauge('some-gauge')
 
             collector = metrics.registry:find('gauge', 'some-gauge')
@@ -423,16 +416,16 @@ Metrics functions
 
         metrics.unregister_callback(cpu_callback)
 
-..  function: invoke_callbacks()
+..  function:: invoke_callbacks()
 
     Invokes all registered callbacks. Needs to be called before each collect.
-    If youre using one of default exporters, invoke_callbacks function will be called by exporter
+    If youre using one of default exporters,
+    invoke_callbacks function will be called by exporter
 
-.. _metrics-role-functions:
+..  _metrics-role-functions:
 
--------------------------------------------------------------------------------
 Metrics role API
--------------------------------------------------------------------------------
+----------------
 
 Functions to call with ``metrics = require('cartridge.roles.metrics')`` in ``init.lua``
 
@@ -483,18 +476,17 @@ Functions to call with ``metrics = require('cartridge.roles.metrics')`` in ``ini
     are treated as strings.
 
     :param table label_pairs: Table containing label names as string keys,
-    label values as values (table).
+        label values as values (table).
 
     ..  code-block:: lua
 
         local metrics = require('cartridge.roles.metrics')
         metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
-.. _collecting-http-statistics:
+..  _collecting-http-statistics:
 
--------------------------------------------------------------------------------
 Collecting HTTP requests latency statistics
--------------------------------------------------------------------------------
+-------------------------------------------
 
 ``metrics`` also provides a middleware for monitoring HTTP
 (set by the `http <https://github.com/tarantool/http>`_ module)
@@ -570,11 +562,10 @@ latency statistics.
     For a more detailed example,
     see https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v2.lua
 
-.. _cpu-usage-metrics:
+..  _cpu-usage-metrics:
 
--------------------------------------------------------------------------------
 CPU usage metrics
--------------------------------------------------------------------------------
+-----------------
 
 CPU metrics work only on Linux. See :ref:`metrics reference <metrics-psutils>`
 for details. To enable it you should register callback:
@@ -613,9 +604,8 @@ for details. To enable it you should register callback:
 
 .. _example:
 
--------------------------------------------------------------------------------
 Examples
--------------------------------------------------------------------------------
+--------
 
 Below are examples of using metrics primitives.
 

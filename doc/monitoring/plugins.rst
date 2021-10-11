@@ -1,27 +1,25 @@
-.. _metrics-plugins:
+..  _metrics-plugins:
 
-===============================================================================
 Metrics plugins
-===============================================================================
+===============
 
 Plugins allow using a unified interface to collect metrics without
 worrying about the way metrics export is performed.
 If you want to use another DB to store metrics data, you can use an
 appropriate export plugin just by changing one line of code.
 
-.. _available-plugins:
+..  _available-plugins:
 
--------------------------------------------------------------------------------
 Available plugins
--------------------------------------------------------------------------------
+-----------------
 
-.. _prometheus:
+..  _prometheus:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prometheus
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
 
-**Usage**
+Usage
+^^^^^
 
 Import the Prometheus plugin:
 
@@ -45,70 +43,71 @@ for details on ``<body>`` and ``<headers>``.
 
 Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 
-* In Tarantool `http.server v1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
-  (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`_):
+*   In Tarantool `http.server v1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
+    (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`_):
 
-  ..  code-block:: lua
+    ..  code-block:: lua
 
-      local httpd = require('http.server').new(...)
-      ...
-      httpd:route( { path = '/metrics' }, prometheus.collect_http)
+        local httpd = require('http.server').new(...)
+        ...
+        httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
-* In Tarantool `http.server v2 <https://github.com/tarantool/http/>`_
-  (the latest version):
+*   In Tarantool `http.server v2 <https://github.com/tarantool/http/>`_
+    (the latest version):
 
-  ..  code-block:: lua
+    ..  code-block:: lua
 
-      local httpd = require('http.server').new(...)
-      local router = require('http.router').new(...)
-      httpd:set_router(router)
-      ...
-      router:route( { path = '/metrics' }, prometheus.collect_http)
+        local httpd = require('http.server').new(...)
+        local router = require('http.router').new(...)
+        httpd:set_router(router)
+        ...
+        router:route( { path = '/metrics' }, prometheus.collect_http)
 
-**Sample settings**
+Sample settings
+^^^^^^^^^^^^^^^
 
-* For Tarantool ``http.server`` v1:
+*   For Tarantool ``http.server`` v1:
 
-  ..  code-block:: lua
+    ..  code-block:: lua
 
-      metrics = require('metrics')
-      metrics.enable_default_metrics()
-      prometheus = require('metrics.plugins.prometheus')
-      httpd = require('http.server').new('0.0.0.0', 8080)
-      httpd:route( { path = '/metrics' }, prometheus.collect_http)
-      httpd:start()
+        metrics = require('metrics')
+        metrics.enable_default_metrics()
+        prometheus = require('metrics.plugins.prometheus')
+        httpd = require('http.server').new('0.0.0.0', 8080)
+        httpd:route( { path = '/metrics' }, prometheus.collect_http)
+        httpd:start()
 
-* For Tarantool Cartridge (with ``http.server`` v1):
+*   For Tarantool Cartridge (with ``http.server`` v1):
 
-  ..  code-block:: lua
+    ..  code-block:: lua
 
-      cartridge = require('cartridge')
-      httpd = cartridge.service_get('httpd')
-      metrics = require('metrics')
-      metrics.enable_default_metrics()
-      prometheus = require('metrics.plugins.prometheus')
-      httpd:route( { path = '/metrics' }, prometheus.collect_http)
+        cartridge = require('cartridge')
+        httpd = cartridge.service_get('httpd')
+        metrics = require('metrics')
+        metrics.enable_default_metrics()
+        prometheus = require('metrics.plugins.prometheus')
+        httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
-* For Tarantool ``http.server`` v2:
+*   For Tarantool ``http.server`` v2:
 
-  ..  code-block:: lua
+    ..  code-block:: lua
 
-      metrics = require('metrics')
-      metrics.enable_default_metrics()
-      prometheus = require('metrics.plugins.prometheus')
-      httpd = require('http.server').new('0.0.0.0', 8080)
-      router = require('http.router').new({charset = "utf8"})
-      httpd:set_router(router) router:route( { path = '/metrics' },
-      prometheus.collect_http)
-      httpd:start()
+        metrics = require('metrics')
+        metrics.enable_default_metrics()
+        prometheus = require('metrics.plugins.prometheus')
+        httpd = require('http.server').new('0.0.0.0', 8080)
+        router = require('http.router').new({charset = "utf8"})
+        httpd:set_router(router) router:route( { path = '/metrics' },
+        prometheus.collect_http)
+        httpd:start()
 
 .. _graphite:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Graphite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
 
-**Usage**
+Usage
+^^^^^
 
 Import the Graphite plugin:
 
@@ -119,7 +118,7 @@ Import the Graphite plugin:
 To start automatically exporting the current values of all
 ``metrics.{counter,gauge,histogram}``, just call:
 
-.. module:: metrics.plugins.graphite
+..  module:: metrics.plugins.graphite
 
 ..  function:: init(options)
 
@@ -136,13 +135,13 @@ To start automatically exporting the current values of all
 
     Exported metric name is sent in the format ``<prefix>.<metric_name>``.
 
-.. _json:
+..  _json:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 JSON
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
 
-**Usage**
+Usage
+^^^^^
 
 Import the JSON plugin:
 
@@ -230,15 +229,14 @@ To be used in Tarantool ``http.server`` as follows:
         end
     )
 
-.. _plugin-specific-api:
+..  _plugin-specific-api:
 
--------------------------------------------------------------------------------
 Plugin-specific API
--------------------------------------------------------------------------------
+-------------------
 
 We encourage you to use the following methods **only when developing a new plugin**.
 
-.. module:: metrics
+..  module:: metrics
 
 ..  function:: invoke_callbacks()
 
@@ -256,7 +254,7 @@ We encourage you to use the following methods **only when developing a new plugi
 
     ..  method:: collect()
 
-        ..  NOTE::
+        ..  note::
 
             You'll probably want to use ``metrics.collectors()`` instead.
 
@@ -286,9 +284,8 @@ We encourage you to use the following methods **only when developing a new plugi
 
 .. _writing-custom-plugins:
 
--------------------------------------------------------------------------------
 Writing custom plugins
--------------------------------------------------------------------------------
+----------------------
 
 Inside your main export function:
 
