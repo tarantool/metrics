@@ -8,12 +8,10 @@ worrying about the way metrics export is performed.
 If you want to use another DB to store metrics data, you can use an
 appropriate export plugin just by changing one line of code.
 
-..  _available-plugins:
+..  _metrics-plugins-available:
 
 Available plugins
 -----------------
-
-..  _prometheus:
 
 Prometheus
 ~~~~~~~~~~
@@ -101,8 +99,6 @@ Sample settings
         prometheus.collect_http)
         httpd:start()
 
-.. _graphite:
-
 Graphite
 ~~~~~~~~
 
@@ -134,8 +130,6 @@ To start automatically exporting the current values of all
     a remote Graphite server.
 
     Exported metric name is sent in the format ``<prefix>.<metric_name>``.
-
-..  _json:
 
 JSON
 ~~~~
@@ -229,7 +223,7 @@ To be used in Tarantool ``http.server`` as follows:
         end
     )
 
-..  _plugin-specific-api:
+..  _metrics-plugins-plugin-specific_api:
 
 Plugin-specific API
 -------------------
@@ -282,7 +276,7 @@ We encourage you to use the following methods **only when developing a new plugi
 
         :rtype: table
 
-.. _writing-custom-plugins:
+.. _metrics-plugins-custom:
 
 Writing custom plugins
 ----------------------

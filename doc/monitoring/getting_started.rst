@@ -1,9 +1,9 @@
-..  _monitoring-getting-started:
+..  _monitoring-getting_started:
 
 Monitoring: getting started
 ===========================
 
-.. _tarantool-metrics:
+.. _monitoring-getting_started-tarantool:
 
 Tarantool
 ---------
@@ -53,9 +53,9 @@ Initialize the Prometheus Exporter, or export metrics in any other format:
 
 Now you can use the HTTP API endpoint ``/metrics`` to collect your metrics
 in the Prometheus format. If you need your custom metrics, see the
-:ref:`API reference <metrics-api-reference>`.
+:ref:`API reference <metrics-api_reference>`.
 
-..  _metrics-http:
+..  _monitoring-getting_started-http_metrics:
 
 Collect HTTP metrics
 --------------------
@@ -103,7 +103,7 @@ If youre using default Grafana-dashboard (link) dont change collector name,
 otherwise you wont see your metrics on charts
 
 
-.. _instance-health-check:
+.. _monitoring-getting_started-instance_health_check:
 
 Instance health check
 ---------------------
@@ -117,7 +117,7 @@ load-balancer to check the current state of any Tarantool instance. If the insta
 is ready to accept the load, it will return a response with a 200 status code, if not,
 with a 500 status code.
 
-.. _cartridge-role:
+.. _monitoring-getting_started-cartridge_role:
 
 Cartridge role
 --------------
@@ -290,4 +290,5 @@ via configuration.
             - luajit
             - memory
 
-    You can see full list of default metrics in :ref:`API reference <metrics-functions>`.
+    You can see full list of default metrics
+    in :ref:`API reference metrics-api_reference-functions>`.

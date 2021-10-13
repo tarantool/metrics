@@ -16,7 +16,7 @@ General instance information:
 
 *   ``tnt_read_only``—is instance in read only mode (value is 1 if true and 0 if false).
 
-..  _memory-general:
+..  _metrics-reference-memory_general:
 
 Memory general
 --------------
@@ -41,7 +41,7 @@ These metrics provide a picture of memory usage by the Tarantool process.
     For the vinyl storage engine, this is the total size of all allocated objects
     (struct ``txv``, struct ``vy_tx``, struct ``vy_read_interval``) and tuples pinned for those objects.
 
-..  _memory-allocation:
+..  _metrics-reference-memory_allocation:
 
 Memory allocation
 -----------------
@@ -76,7 +76,7 @@ Memory utilization, %:
 
 *   ``tnt_slab_items_used_ratio``—tnt_slab_items_used / tnt_slab_items_size.
 
-..  _spaces:
+..  _metrics-reference-spaces:
 
 Spaces
 ------
@@ -108,7 +108,7 @@ These metrics provide specific information about each individual space in a Tara
     where ``name`` is the name of the space, and
     ``engine`` is the engine of the space.
 
-..  _network:
+..  _metrics-reference-network:
 
 Network
 -------
@@ -135,7 +135,7 @@ Requests:
 
 *   ``tnt_net_requests_current``—amount of pending network requests.
 
-..  _metrics-fibers:
+..  _metrics-reference-fibers:
 
 Fibers
 ------
@@ -151,7 +151,7 @@ fibers count and memory usage:
 
 *   ``tnt_fiber_memused``—the amount of memory that is used by fibers.
 
-..  _metrics-operations:
+..  _metrics-reference-operations:
 
 Operations
 ----------
@@ -179,7 +179,7 @@ Request type could be one of:
 *   ``prepare``—SQL prepare calls
 *   ``insert``—insert calls
 
-..  _metrics-replication:
+..  _metrics-reference-replication:
 
 Replication
 -----------
@@ -198,7 +198,7 @@ mechanism in Tarantool, see :ref:`this <replication-mechanism>`.
 *   ``tnt_replication_<id>_lag``—replication lag value in seconds, where
     ``id`` is the instance's number in the replicaset.
 
-..  _metrics-runtime:
+..  _metrics-reference-runtime:
 
 Runtime
 -------
@@ -207,7 +207,7 @@ Runtime
 
 *   ``tnt_runtime_used``—number of bytes used for the Lua runtime.
 
-..  _metrics-cartridge:
+..  _metrics-reference-cartridge:
 
 Cartridge
 ---------
@@ -229,7 +229,7 @@ This metric always has the label ``{delta="..."}``, which is one of:
 *   ``max``—the difference with the fastest clock (always positive),
 *   ``min``—the difference with the slowest clock (always negative).
 
-..  _metrics-luajit:
+..  _metrics-reference-luajit:
 
 LuaJIT metrics
 --------------
@@ -283,7 +283,7 @@ Allocations:
 
 *   ``lj_gc_allocated``—total amount of allocated memory.
 
-..  _metrics-psutils:
+..  _metrics-reference-psutils:
 
 CPU metrics
 -----------
@@ -308,7 +308,7 @@ There are also the following cross-platform metrics obtained using the call ``ge
 *   ``tnt_cpu_user_time`` - Tarantool CPU user time.
 *   ``tnt_cpu_system_time`` - Tarantool CPU system time.
 
-..  _metrics-vinyl:
+..  _metrics-reference-vinyl:
 
 Vinyl
 -----
@@ -326,7 +326,7 @@ The disk metrics are used to monitor the overall data size on disk.
 *   ``tnt_vinyl_disk_index_size``—the amount of data stored in the ``.index`` files
     located in the :ref:`vinyl_dir <cfg_basic-vinyl_dir>` directory, bytes.
 
-.. _metrics-vinyl-regulator:
+.. _metrics-reference-vinyl_regulator:
 
 Regulator
 ~~~~~~~~~
@@ -404,7 +404,7 @@ buffers.
     :ref:`bloom filters <vinyl-lsm_disadvantages_compression_bloom_filters>`,
     bytes.
 
-..  _metrics-vinyl-scheduler:
+..  _metrics-reference-vinyl_scheduler:
 
 Scheduler
 ~~~~~~~~~

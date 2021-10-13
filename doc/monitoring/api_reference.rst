@@ -1,9 +1,9 @@
-..  _metrics-api-reference:
+..  _metrics-api_reference:
 
 API reference
 =============
 
-.. _collectors:
+.. _metrics-api_reference-collectors:
 
 Collectors
 ----------
@@ -284,7 +284,7 @@ In the example above, we could derive these time series:
 You can also set global labels by calling
 ``metrics.set_global_labels({ label = value, ...})``.
 
-..  _metrics-functions:
+..  _metrics-api_reference-functions:
 
 Metrics functions
 -----------------
@@ -422,7 +422,7 @@ Metrics functions
     If youre using one of default exporters,
     invoke_callbacks function will be called by exporter
 
-..  _metrics-role-functions:
+..  _metrics-api_reference-role_functions:
 
 Metrics role API
 ----------------
@@ -483,7 +483,7 @@ Functions to call with ``metrics = require('cartridge.roles.metrics')`` in ``ini
         local metrics = require('cartridge.roles.metrics')
         metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
-..  _collecting-http-statistics:
+..  _metrics-api_reference-collecting_http_statistics:
 
 Collecting HTTP requests latency statistics
 -------------------------------------------
@@ -562,7 +562,7 @@ latency statistics.
     For a more detailed example,
     see https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v2.lua
 
-..  _cpu-usage-metrics:
+..  _metrics-api_reference-cpu_usage_metrics:
 
 CPU usage metrics
 -----------------
@@ -602,7 +602,7 @@ for details. To enable it you should register callback:
     sum by (thread_name) (idelta(tnt_cpu_thread[$__interval]))
       / scalar(idelta(tnt_cpu_total[$__interval]) / tnt_cpu_count)
 
-.. _example:
+.. _metrics-api_reference-example:
 
 Examples
 --------
