@@ -19,7 +19,7 @@ lint: .rocks
 
 .PHONY: test
 test: .rocks
-	.rocks/bin/luatest
+	.rocks/bin/luatest -v
 
 .PHONY: test_with_coverage_report
 test_with_coverage_report: .rocks
