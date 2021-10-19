@@ -3,9 +3,9 @@
 Metrics plugins
 ===============
 
-Plugins allow using a unified interface to collect metrics without
-worrying about the way metrics export is performed.
-If you want to use another DB to store metrics data, you can use an
+Plugins let you collect metrics through a unified interface
+without worrying about the way metrics export works.
+If you want to use another DB to store metrics data, you can enable an
 appropriate export plugin just by changing one line of code.
 
 ..  _metrics-plugins-available:
@@ -19,13 +19,13 @@ Prometheus
 Usage
 ^^^^^
 
-Import the Prometheus plugin:
+Import the plugin:
 
 ..  code-block:: lua
 
     local prometheus = require('metrics.plugins.prometheus')
 
-Further, use the ``prometheus.collect_http()`` function, which returns:
+Then use the ``prometheus.collect_http()`` function, which returns:
 
 ..  code-block:: lua
 
@@ -39,9 +39,10 @@ See the
 `Prometheus exposition format <https://github.com/prometheus/docs/blob/master/content/docs/instrumenting/exposition_formats.md>`_
 for details on ``<body>`` and ``<headers>``.
 
-Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
+With Tarantool `http.server <https://github.com/tarantool/http/>`__,
+use this plugin as follows:
 
-*   In Tarantool `http.server v1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
+*   With Tarantool `http.server v.1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
     (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`_):
 
     ..  code-block:: lua
@@ -50,7 +51,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
         ...
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
-*   In Tarantool `http.server v2 <https://github.com/tarantool/http/>`_
+*   With Tarantool `http.server v.2 <https://github.com/tarantool/http/>`_
     (the latest version):
 
     ..  code-block:: lua
@@ -64,7 +65,7 @@ Use in Tarantool `http.server <https://github.com/tarantool/http/>`_ as follows:
 Sample settings
 ^^^^^^^^^^^^^^^
 
-*   For Tarantool ``http.server`` v1:
+*   For Tarantool ``http.server`` v.1:
 
     ..  code-block:: lua
 
@@ -75,7 +76,7 @@ Sample settings
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
         httpd:start()
 
-*   For Tarantool Cartridge (with ``http.server`` v1):
+*   For Tarantool Cartridge (with ``http.server`` v.1):
 
     ..  code-block:: lua
 
@@ -86,7 +87,7 @@ Sample settings
         prometheus = require('metrics.plugins.prometheus')
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
-*   For Tarantool ``http.server`` v2:
+*   For Tarantool ``http.server`` v.2:
 
     ..  code-block:: lua
 
@@ -105,31 +106,31 @@ Graphite
 Usage
 ^^^^^
 
-Import the Graphite plugin:
+Import the plugin:
 
 ..  code-block:: lua
 
     local graphite = require('metrics.plugins.graphite')
 
 To start automatically exporting the current values of all
-``metrics.{counter,gauge,histogram}``, just call:
+``metrics.{counter,gauge,histogram}``, call the following function:
 
 ..  module:: metrics.plugins.graphite
 
 ..  function:: init(options)
 
-    :param table options: Possible options:
+    :param table options: possible options:
 
-                          *  ``prefix`` (string) - metrics prefix (default is ``'tarantool'``);
-                          *  ``host`` (string) - graphite server host (default is ``'127.0.0.1'``);
-                          *  ``port`` (number) - graphite server port (default is ``2003``);
-                          *  ``send_interval`` (number) - metrics collect interval in seconds
-                             (default is ``2``);
+                          *  ``prefix`` (string): metrics prefix (``'tarantool'`` by default)
+                          *  ``host`` (string): Graphite server host (``'127.0.0.1'`` by default)
+                          *  ``port`` (number): Graphite server port (``2003`` by default)
+                          *  ``send_interval`` (number): metrics collection interval in seconds
+                             (``2`` by default)
 
-    This creates a background fiber that periodically sends all metrics to
+    This function creates a background fiber that periodically sends all metrics to
     a remote Graphite server.
 
-    Exported metric name is sent in the format ``<prefix>.<metric_name>``.
+    Exported metric names are formatted as follows: ``<prefix>.<metric_name>``.
 
 JSON
 ~~~~
@@ -137,7 +138,7 @@ JSON
 Usage
 ^^^^^
 
-Import the JSON plugin:
+Import the plugin:
 
 ..  code-block:: lua
 
@@ -168,11 +169,11 @@ Import the JSON plugin:
 
     ..  IMPORTANT::
 
-        Values can be ``+-math.huge``, ``math.huge * 0``. Then:
+        The values can also be ``+-math.huge`` and ``math.huge * 0``. In such case:
 
-        * ``math.huge`` is serialized to ``"inf"``
-        * ``-math.huge`` is serialized to ``"-inf"``
-        * ``math.huge * 0`` is serialized to ``"nan"``
+        *   ``math.huge`` is serialized to ``"inf"``
+        *   ``-math.huge`` is serialized to ``"-inf"``
+        *   ``math.huge * 0`` is serialized to ``"nan"``.
 
     **Example**
 
@@ -205,7 +206,7 @@ Import the JSON plugin:
             }
         ]
 
-To be used in Tarantool ``http.server`` as follows:
+Use the JSON plugin with Tarantool ``http.server`` as follows:
 
 ..  code-block:: lua
 
@@ -228,21 +229,21 @@ To be used in Tarantool ``http.server`` as follows:
 Plugin-specific API
 -------------------
 
-We encourage you to use the following methods **only when developing a new plugin**.
+We encourage you to use the following methods **only when you're developing a new plugin**.
 
 ..  module:: metrics
 
 ..  function:: invoke_callbacks()
 
-    Invokes the function registered via
+    Invoke a function registered via
     ``metrics.register_callback(<callback>)``.
     Used in exporters.
 
 ..  function:: collectors()
 
-    Designed to be used in exporters in favor of ``metrics.collect()``.
+    List all collectors in the registry. Designed to be used in exporters.
 
-    :return: a list of created collectors
+    :return: A list of created collectors.
 
 ..  class:: collector_object
 
@@ -262,8 +263,7 @@ We encourage you to use the following methods **only when developing a new plugi
                 end
             end
 
-        :return: Concatenation of ``observation`` objects across all
-                 created collectors.
+        :return: A concatenation of ``observation`` objects across all created collectors.
 
             ..  code-block:: lua
 
@@ -278,21 +278,21 @@ We encourage you to use the following methods **only when developing a new plugi
 
 .. _metrics-plugins-custom:
 
-Writing custom plugins
-----------------------
+Creating custom plugins
+-----------------------
 
-Inside your main export function:
+Include the following in your main export function:
 
 ..  code-block:: lua
 
-    -- Invoke all callbacks registered via `metrics.register_callback(<callback-function>)`.
+    -- Invoke all callbacks registered via `metrics.register_callback(<callback-function>)`
     metrics.invoke_callbacks()
 
     -- Loop over collectors
     for _, c in pairs(metrics.collectors()) do
         ...
 
-        -- Loop over instant observations in the collector.
+        -- Loop over instant observations in the collector
         for _, obs in pairs(c:collect()) do
             -- Export observation `obs`
             ...
