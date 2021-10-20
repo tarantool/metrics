@@ -229,7 +229,7 @@ Use the JSON plugin with Tarantool ``http.server`` as follows:
 Plugin-specific API
 -------------------
 
-We encourage you to use the following methods **only when you're developing a new plugin**.
+Use the following methods **only when developing a new plugin**.
 
 ..  module:: metrics
 

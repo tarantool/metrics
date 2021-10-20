@@ -111,9 +111,9 @@ Instance health check
 ---------------------
 
 In production environments, Tarantool Cartridge usually has a large number of so-called
-routers, Tarantool instances that handle input load.
+routers---Tarantool instances that handle input load.
 Various load balancers help distribute that load evenly.
-However, any load balancer has to "know"
+However, any load balancer has to know
 which routers are ready to accept the load at the moment.
 The Tarantool metrics library has a special plugin that creates an HTTP handler,
 which the load balancer can use to check the current state of any Tarantool instance.
@@ -127,12 +127,12 @@ Cartridge role
 
 ``cartridge.roles.metrics`` is a
 `Tarantool Cartridge <https://github.com/tarantool/cartridge>`__ role.
-It allows using default metrics in a Cartridge application and manage them
+It allows using default metrics in a Cartridge application and managing them
 via Cartridge configuration.
 
 **Usage**
 
-#.  Add the ``metrics`` package to dependencies in the ``.rockspec`` file.
+#.  Add the ``metrics`` package to the dependencies in the ``.rockspec`` file.
     Make sure that you are using version **0.3.0** or higher.
 
     .. code-block:: lua
@@ -163,7 +163,7 @@ via Cartridge configuration.
     ..  note::
        
         ``set_export`` has lower priority than clusterwide configuration
-        and can be overridden by the metrics configuration.
+        and may be overridden by the metrics configuration.
 
     ..  code-block:: lua
 
@@ -210,22 +210,22 @@ via Cartridge configuration.
     Since version **0.6.0**, the metrics role is permanent and enabled on instances by default.
 
 #.  After the role has been initialized, the default metrics will be enabled
-    and the global label ``'alias'`` will be set.
-    **Note** that the ``'alias'`` label value is set by the ``alias`` or ``instance_name``
+    and the global label ``alias`` will be set.
+    **Note** that the ``alias`` label value is set by the ``alias`` or ``instance_name``
     instance :ref:`configuration option <cartridge-config>` (since **0.6.1**).
 
-    To use the functionality of any
-    metrics package, you can get it as a Cartridge service and use it like
-    a regular package after ``require``:
+    You can use the functionality of any
+    metrics package by getting it as a Cartridge service
+    and calling it with ``require`` like a regular package:
 
     ..  code-block:: lua
  
         local cartridge = require('cartridge')
         local metrics = cartridge.service_get('metrics')
 
-#.  Since Tarantool Cartridge ``'2.4.0'``, you can set a zone for each
+#.  Since Tarantool Cartridge ``2.4.0``, you can set a zone for each
     instance in the cluster. When a zone is set, all the metrics on the instance
-    receive the ``'zone'`` label.
+    receive the ``zone`` label.
 
 #.  To change the HTTP path for a metric in **runtime**,
     you can use the configuration below.
@@ -246,7 +246,7 @@ via Cartridge configuration.
     ..  image:: images/role-config.png
         :align: center
 
-#.  To set custom global labels, you can use the following configuration:
+#.  You can set custom global labels with the following configuration:
 
     ..  code-block:: yaml
 
@@ -264,7 +264,7 @@ via Cartridge configuration.
         local metrics = require('cartridge.roles.metrics')
         metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
-#.  To choose the default metrics to be exported, you can use the configuration below.
+#.  You can use the configuration below to choose the default metrics to be exported.
     If you add the include section, only the metrics from this section will be exported:
 
     ..  code-block:: yaml
@@ -279,7 +279,7 @@ via Cartridge configuration.
             - luajit
             - memory
 
-    When you add the exclude section,
+    If you add the exclude section,
     the metrics from this section will be removed from the default metrics list:
 
     ..  code-block:: yaml
@@ -294,5 +294,5 @@ via Cartridge configuration.
             - luajit
             - memory
 
-    For the full list of default metrics, refer to the
+    For the full list of default metrics, check the
     :ref:`API reference <metrics-api_reference-functions>`.

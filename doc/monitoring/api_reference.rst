@@ -52,7 +52,7 @@ counter
 
     ..  method:: collect()
 
-        :return: Array of ``observation`` objects for the given counter.
+        :return: Array of ``observation`` objects for a given counter.
 
         ..  code-block:: lua
 
@@ -100,12 +100,12 @@ gauge
 
     ..  method:: inc(num, label_pairs)
 
-        Works as the ``inc()`` function
-        of a :ref:`counter <metrics-api_reference-counter_inc>`..
+        Works like the ``inc()`` function
+        of a :ref:`counter <metrics-api_reference-counter_inc>`.
 
     ..  method:: dec(num, label_pairs)
 
-        Works as ``inc()``, but decrements the observation.
+        Works like ``inc()``, but decrements the observation.
 
     ..  method:: set(num, label_pairs)
 
@@ -113,13 +113,13 @@ gauge
 
     ..  method:: collect()
 
-        Returns an array of ``observation`` objects for the given gauge.
+        Returns an array of ``observation`` objects for a given gauge.
         For the description of ``observation``, see
         :ref:`counter_obj:collect() <metrics-api_reference-counter_collect>`.
 
     ..  method:: remove(label_pairs)
 
-        Works as the ``remove()`` function
+        Works like the ``remove()`` function
         of a :ref:`counter <metrics-api_reference-counter_remove>`.
 
 ..  _metrics-api_reference-histogram:
@@ -156,8 +156,8 @@ histogram
     ..  method:: observe(num, label_pairs)
 
         Record a new value in a histogram.
-        This increments all bucket sizes under labels ``le`` >= ``num``
-        and labels matching ``label_pairs``.
+        This increments all bucket sizes under the labels ``le`` >= ``num``
+        and the labels that match ``label_pairs``.
 
         :param number        num: value to put in the histogram.
         :param table label_pairs: table containing label names as keys,
@@ -175,7 +175,7 @@ histogram
 
     ..  method:: remove(label_pairs)
 
-        Works as the ``remove()`` function
+        Works like the ``remove()`` function
         of a :ref:`counter <metrics-api_reference-counter_remove>`.
 
 
@@ -186,16 +186,17 @@ summary
 
 ..  function:: summary(name [, help, objectives])
 
-    Register a new summary. Quantile computation is based on the algorithm
+    Register a new summary. Quantile computation is based on the
     `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
+    algorithm.
 
     :param string   name: сollector name. Must be unique.
     :param string   help: collector description.
-    :param table objectives: a list of "targeted" φ-quantiles in the form ``{quantile = error, ... }``.
-        For example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``.
-        A targeted φ-quantile is specified in the form of a φ-quantile and the tolerated
+    :param table objectives: a list of "targeted" φ-quantiles in the ``{quantile = error, ... }`` form.
+        Example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``.
+        The targeted φ-quantile is specified in the form of a φ-quantile and the tolerated
         error. For example, ``{[0.5] = 0.1}`` means that the median (= 50th
-        percentile) must be returned with a 10 percent error. Note that
+        percentile) is to be returned with a 10-percent error. Note that
         percentiles and quantiles are the same concept, except that percentiles are
         expressed as percentages. The φ-quantile must be in the interval ``[0, 1]``.
         A lower tolerated error for a φ-quantile results in higher memory and CPU
@@ -207,7 +208,7 @@ summary
         (from which observations are collected) is reset, and the next bucket becomes the
         new head. This way, each bucket stores observations for
         ``max_age_time * age_buckets_count`` seconds before it is reset.
-        ``max_age_time`` sets the duration of each bucket lifetime---that is, how
+        ``max_age_time`` sets the duration of each bucket's lifetime---that is, how
         many seconds the observations are kept before they are discarded.
         ``age_buckets_count`` sets the number of buckets in the sliding time window.
         This variable determines the number of buckets used to exclude observations
@@ -222,13 +223,13 @@ summary
 
     ..  note::
 
-        A summary is basically a set of collectors:
+        A summary represents a set of collectors:
 
         *   ``name .. "_sum"``---a counter holding the sum of added observations.
         *   ``name .. "_count"``---a counter holding the number of added observations.
-        *   ``name``---holds all the quantiles under observation that find themselves
+        *   ``name`` holds all the quantiles under observation that find themselves
             under the label ``quantile`` (less or equal).
-            To access a specific bucket---``x`` (where ``x`` is a number),
+            To access bucket ``x`` (where ``x`` is a number),
             specify the value ``x`` for the label ``quantile``.
 
 ..  class:: summary_obj
@@ -245,7 +246,7 @@ summary
                                   You can't add the ``"quantile"`` label to a summary.
                                   It is added automatically.
                                   If ``max_age_time`` and ``age_buckets_count`` are set,
-                                  the observed value will be added to each bucket.
+                                  the observed value is added to each bucket.
                                   Note that both label names and values in ``label_pairs``
                                   are treated as strings.
 
@@ -255,13 +256,13 @@ summary
         counters of ``summary_obj``. For the description of ``observation``,
         see :ref:`counter_obj:collect() <metrics-api_reference-counter_collect>`.
         If ``max_age_time`` and ``age_buckets_count`` are set, quantile observations
-        will be collected only from the head bucket in the sliding time window
-        and not from every bucket. If no observations were recorded,
-        the method will return NaN in the values.
+        are collected only from the head bucket in the sliding time window,
+        not from every bucket. If no observations were recorded,
+        the method will return ``NaN`` in the values.
 
     ..  method:: remove(label_pairs)
 
-        Works as the ``remove()`` function
+        Works like the ``remove()`` function
         of a :ref:`counter <metrics-api_reference-counter_remove>`.
 
 ..  _metrics-api_reference-labels:
@@ -270,10 +271,10 @@ Labels
 ------
 
 All collectors support providing ``label_pairs`` on data modification.
-Labels are basically pieces of metainfo that you associate with a metric in the format
-of key-value pairs. See tags in Graphite and labels in Prometheus.
+A label is a piece of metainfo that you associate with a metric in the key-value format.
+See tags in Graphite and labels in Prometheus.
 Labels are used to differentiate between the characteristics of a thing being
-measured. For example, in a metric associated with the total number of http
+measured. For example, in a metric associated with the total number of HTTP
 requests, you can represent methods and statuses as label pairs:
 
 ..  code-block:: lua
@@ -283,8 +284,8 @@ requests, you can represent methods and statuses as label pairs:
 You don't have to predefine labels in advance.
 
 With labels, you can extract new time series (visualize their graphs)
-by specifying conditions regarding label values.
-The example above would allow us to extract the following time series:
+by specifying conditions with regard to label values.
+The example above allows extracting the following time series:
 
 #.  The total number of requests over time with ``method = "POST"`` (and any status).
 #.  The total number of requests over time with ``status = 500`` (and any method).
@@ -299,13 +300,13 @@ Metrics functions
 
 ..  function:: enable_default_metrics([include, exclude])
 
-    Enable Tarantool metrics collection.
+    Enable Tarantool metric collection.
 
     :param table include: table containing the names of the default metrics that you need to enable.
 
     :param table exclude: table containing the names of the default metrics that you need to exclude.
 
-    Default metrics names:
+    Default metric names:
 
     *   ``network``
     *   ``operations``
@@ -332,12 +333,12 @@ Metrics functions
     :param table label_pairs: table containing label names as string keys,
                               label values as values.
 
-    Global labels are applied only to metrics collection. They have no effect
+    Global labels are applied only to metric collection. They have no effect
     on how observations are stored.
 
     Global labels can be changed on the fly.
 
-    ``label_pairs`` from an observation object has priority over global labels.
+    ``label_pairs`` from observation objects have priority over global labels.
     If you pass ``label_pairs`` to an observation method with the same key as
     some global label, the method argument value will be used.
 
@@ -353,7 +354,7 @@ Metrics functions
 
         Remove a collector from the registry.
 
-        :param collector_obj collector: collector that has to be removed
+        :param collector_obj collector: the collector to be removed.
 
     **Example:**
 
@@ -369,8 +370,8 @@ Metrics functions
 
         Find a collector in the registry.
 
-        :param string kind: collector kind (``counter``, ``gauge``, ``histogram``, or ``summary``)
-        :param string name: collector name
+        :param string kind: collector kind (``counter``, ``gauge``, ``histogram``, or ``summary``).
+        :param string name: collector name.
 
         :return: A collector object or ``nil``.
 
@@ -386,7 +387,7 @@ Metrics functions
 
 ..  function:: register_callback(callback)
 
-    Register a function named ``callback``, which will be called right before metrics
+    Register a function named ``callback``, which will be called right before metric
     collection on plugin export.
 
     :param function callback: a function that takes no parameters.
@@ -404,7 +405,7 @@ Metrics functions
 
 ..  function:: unregister_callback(callback)
 
-    Unregister a function named ``callback`` that is called right before metrics
+    Unregister a function named ``callback`` that is called right before metric
     collection on plugin export.
 
     :param function callback: a function that takes no parameters.
@@ -440,7 +441,7 @@ with ``metrics = require('cartridge.roles.metrics')`` specified in your ``init.l
 
 ..  function:: set_export(export)
 
-    :param table export: table containing the path and format of the exported metrics.
+    :param table export: a table containing paths and formats of the exported metrics.
 
     Configure the endpoints of the metrics role:
 
@@ -463,7 +464,7 @@ with ``metrics = require('cartridge.roles.metrics')`` specified in your ``init.l
         })
 
     You can add several entry points of the same format but with different paths,
-    like this:
+    for example:
 
     ..  code-block:: lua
 
@@ -517,7 +518,7 @@ latency statistics.
 
 ..  function:: build_default_collector(type_name, name [, help])
 
-    Register a collector for the middleware and return it.
+    Register and return a collector for the middleware.
 
     :param string type_name: collector type: ``histogram`` or ``summary``. The default is ``histogram``.
     :param string      name: collector name. The default is ``http_server_request_latency``.
@@ -538,19 +539,19 @@ latency statistics.
 ..  function:: get_default_collector()
 
     Return the default collector.
-    If the default collector hasn't been set yet, registers it (with default
-    ``http_middleware.build_default_collector(...)`` parameters) and sets it
+    If the default collector hasn't been set yet, register it (with default
+    ``http_middleware.build_default_collector(...)`` parameters) and set it
     as default.
 
     :return: A collector object.
 
 ..  function:: v1(handler, collector)
 
-    Latency measuring wrap-up for HTTP ver. 1.x.x handler. Returns a wrapped handler.
+    Latency measuring wrap-up for the HTTP ver. 1.x.x handler. Returns a wrapped handler.
 
-    :param function handler: Handler function.
-    :param collector: Middleware collector object.
-                      If not set, uses the default collector
+    :param function handler: handler function.
+    :param collector: middleware collector object.
+                      If not set, the default collector is used
                       (like in ``http_middleware.get_default_collector()``).
 
     **Usage:** ``httpd:route(route, http_middleware.v1(request_handler, collector))``
@@ -562,7 +563,7 @@ latency statistics.
     Return the latency measuring middleware for HTTP ver. 2.x.x.
 
     :param collector: Middleware collector object.
-                      If not set, uses the default collector
+                      If not set, the default collector is used
                       (like in ``http_middleware.get_default_collector()``).
 
     **Usage:**
@@ -581,7 +582,9 @@ CPU usage metrics
 -----------------
 
 CPU metrics work only on Linux. See the :ref:`metrics reference <metrics-reference-psutils>`
-for details. To enable CPU metrics, first register a callback function:
+for details.
+
+To enable CPU metrics, first register a callback function:
 
 ..  code-block:: lua
 
@@ -620,7 +623,7 @@ for details. To enable CPU metrics, first register a callback function:
 Examples
 --------
 
-Below are some examples of using metrics primitives.
+Below are some examples of using metric primitives.
 
 Notice that this usage is independent of export plugins such as
 Prometheus, Graphite, etc. For documentation on how to use the plugins, see
@@ -648,7 +651,7 @@ the :ref:`Metrics plugins <metrics-plugins>` section.
     local cpu_usage_gauge = metrics.gauge('cpu_usage', 'CPU usage')
 
     -- register a lazy gauge value update
-    -- this will be called whenever the export is invoked in any plugins
+    -- this will be called whenever export is invoked in any plugins
     metrics.register_callback(function()
         local current_cpu_usage = some_cpu_collect_function()
         cpu_usage_gauge:set(current_cpu_usage, {app = 'tarantool'})
@@ -680,7 +683,7 @@ the :ref:`Metrics plugins <metrics-plugins>` section.
     local metrics = require('metrics')
     local fiber = require('fiber')
 
-    -- create a summary with a window of 5 age buckets and 60s bucket lifetime
+    -- create a summary with a window of 5 age buckets and a bucket lifetime of 60 s
     local http_requests_latency = metrics.summary(
         'http_requests_latency', 'HTTP requests total',
         {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
