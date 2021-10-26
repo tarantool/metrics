@@ -82,18 +82,19 @@ function Shared:dec(num, label_pairs)
     self.label_pairs[key] = label_pairs
 end
 
+local function log_observe_latency_error(err)
+    log.error(debug.traceback('Saving metrics failed: ' .. tostring(err)))
+end
+
 local function observe_latency_tail(collector, label_pairs, start_time, ok, result, ...)
     local latency = clock.monotonic() - start_time
     if type(label_pairs) == 'function' then
         label_pairs = label_pairs(ok, result, ...)
     end
     xpcall(
-        function()
-            collector:observe(latency, label_pairs)
-        end,
-        function(err)
-            log.error(debug.traceback('Saving metrics failed: ' .. tostring(err)))
-        end
+        collector.observe,
+        log_observe_latency_error,
+        collector, latency, label_pairs
     )
     if not ok then
         error(result)

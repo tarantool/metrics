@@ -70,7 +70,7 @@ end
 -- @string route.method
 -- ... arguments for pcall to instrument
 -- @return value from observable function
-function export.observe(collector, route, ...)
+function export.observe(collector, route, handler, ...)
     return collector:observe_latency(function(ok, result)
         if type(result) ~= 'table' then
             error(('incorrect http handler for %s %s: expecting return response object'):
@@ -81,7 +81,7 @@ function export.observe(collector, route, ...)
             method = route.method,
             status = (not ok and 500) or result.status or 200,
         }
-    end, ...)
+    end, handler, ...)
 end
 
 --- Apply instrumentation middleware for http request handler
