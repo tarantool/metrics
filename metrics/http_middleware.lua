@@ -1,4 +1,5 @@
 local export = {}
+local log = require('log')
 
 export.DEFAULT_HISTOGRAM_BUCKETS = {
     0.001,  0.0025, 0.005,  0.0075,
@@ -103,6 +104,7 @@ end
 -- @return middleware
 -- @usage router:use(http_middleware.v2(), {name = 'http_instrumentation'})
 function export.v2(collector)
+    log.warn('HTTP v2 is deprecated and will be removed in next releases. Use HTTP v1 instead')
     collector = collector or export.get_default_collector()
     local tsgi = require('http.tsgi')
     return function(env)

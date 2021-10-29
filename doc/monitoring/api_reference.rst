@@ -380,7 +380,7 @@ Metrics functions
     **Example:**
 
     ..  code-block:: lua
-            
+
         local collector = metrics.gauge('some-gauge')
 
         collector = metrics.registry:find('gauge', 'some-gauge')
@@ -557,24 +557,6 @@ latency statistics.
     **Usage:** ``httpd:route(route, http_middleware.v1(request_handler, collector))``
 
     See `GitHub for a more detailed example <https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v1.lua>`__.
-
-..  function:: v2(collector)
-
-    Return the latency measuring middleware for HTTP ver. 2.x.x.
-
-    :param collector: Middleware collector object.
-                      If not set, the default collector is used
-                      (like in ``http_middleware.get_default_collector()``).
-
-    **Usage:**
-
-    ..  code-block:: lua
-
-        router = require('http.router').new()
-        router:route(route, request_handler)
-        router:use(http_middleware.v2(collector), {name = 'http_instrumentation'}) -- the second argument is optional, see HTTP docs
-
-    See `GitHub for a more detailed example <https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v2.lua>`__.
 
 ..  _metrics-api_reference-cpu_usage_metrics:
 
