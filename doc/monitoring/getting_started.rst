@@ -78,26 +78,6 @@ Using HTTP v.1:
     -- Start HTTP routing
     httpd:start()
 
-Using HTTP v.2:
-
-..  code-block:: lua
-
-    local httpd = require('http.server').new(ip, port)
-    local router = require('http.router').new()
-
-    router:route({ path = '/path-1', method = 'POST' }, handler_1)
-    router:route({ path = '/path-2', method = 'GET' }, handler_2)
-
-    -- Create a summary collector for latency
-    local collector = metrics.http_middleware.build_default_collector('summary')
-
-    -- Set middleware for the router to perform latency summary collection
-    router:use(metrics.http_middleware.v2(collector), { name = 'latency_instrumentation' })
-
-    -- Start HTTP routing using the configured router
-    httpd:set_router(router)
-    httpd:start()
-
 You can collect all HTTP metrics with a single collector.
 If you're using the default
 :ref:`Grafana dashboard <book/monitoring/grafana_dashboard>`,
@@ -161,7 +141,7 @@ via Cartridge configuration.
 #.  To get metrics via API endpoints, use ``set_export``.
 
     ..  note::
-       
+
         ``set_export`` has lower priority than clusterwide configuration
         and may be overridden by the metrics configuration.
 
@@ -219,7 +199,7 @@ via Cartridge configuration.
     and calling it with ``require`` like a regular package:
 
     ..  code-block:: lua
- 
+
         local cartridge = require('cartridge')
         local metrics = cartridge.service_get('metrics')
 
