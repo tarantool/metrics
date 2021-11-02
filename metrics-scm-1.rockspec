@@ -2,7 +2,7 @@ package = 'metrics'
 version = 'scm-1'
 
 source  = {
-    url    = 'git://github.com/tarantool/metrics.git',
+    url    = 'git+https://github.com/tarantool/metrics.git',
     branch = 'master'
 }
 
