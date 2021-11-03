@@ -58,3 +58,23 @@ g.test_number_value_serialization = function()
     t.assert_equals(float_obs.value, 0.333, 'check float')
     t.assert_equals(int_obs.value, 10, 'check int')
 end
+
+g.test_number64_ll_value_parses_to_json_number = function()
+    local gauge_ll = metrics.gauge('test_cdata_ll')
+    gauge_ll:set(-9007199254740992LL)
+
+    local json_metrics = json.decode(json_exporter.export())
+    local obs_ll = utils.find_obs('test_cdata_ll', {}, json_metrics)
+    t.assert_not_equals(type(obs_ll.value), 'string', 'number64 is not casted to string on export')
+    t.assert_equals(obs_ll.value, -9007199254740992LL, 'number64 LL parsed to corrent number value')
+end
+
+g.test_number64_ull_value_parses_to_json_number = function()
+    local gauge_ull = metrics.gauge('test_cdata_ull')
+    gauge_ull:set(9007199254740992ULL)
+
+    local json_metrics = json.decode(json_exporter.export())
+    local obs_ull = utils.find_obs('test_cdata_ull', {}, json_metrics)
+    t.assert_not_equals(type(obs_ull.value), 'string', 'number64 is not casted to string on export')
+    t.assert_equals(obs_ull.value, 9007199254740992ULL, 'number64 ULL parsed to corrent number value')
+end
