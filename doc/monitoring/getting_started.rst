@@ -62,8 +62,6 @@ Collect HTTP metrics
 
 To enable the collection of HTTP metrics, you need to create a collector first.
 
-Using HTTP v.1:
-
 ..  code-block:: lua
 
     local httpd = require('http.server').new(ip, port)

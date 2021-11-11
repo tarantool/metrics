@@ -42,30 +42,17 @@ for details on ``<body>`` and ``<headers>``.
 With Tarantool `http.server <https://github.com/tarantool/http/>`__,
 use this plugin as follows:
 
-*   With Tarantool `http.server v.1 <https://github.com/tarantool/http/tree/tarantool-1.6>`_
-    (currently used in `Tarantool Cartridge <https://github.com/tarantool/cartridge>`_):
+..  code-block:: lua
 
-    ..  code-block:: lua
+    local httpd = require('http.server').new(...)
+    ...
+    httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
-        local httpd = require('http.server').new(...)
-        ...
-        httpd:route( { path = '/metrics' }, prometheus.collect_http)
-
-*   With Tarantool `http.server v.2 <https://github.com/tarantool/http/>`_
-    (the latest version):
-
-    ..  code-block:: lua
-
-        local httpd = require('http.server').new(...)
-        local router = require('http.router').new(...)
-        httpd:set_router(router)
-        ...
-        router:route( { path = '/metrics' }, prometheus.collect_http)
 
 Sample settings
 ^^^^^^^^^^^^^^^
 
-*   For Tarantool ``http.server`` v.1:
+*   For Tarantool:
 
     ..  code-block:: lua
 
@@ -76,7 +63,7 @@ Sample settings
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
         httpd:start()
 
-*   For Tarantool Cartridge (with ``http.server`` v.1):
+*   For Tarantool Cartridge:
 
     ..  code-block:: lua
 
@@ -87,18 +74,6 @@ Sample settings
         prometheus = require('metrics.plugins.prometheus')
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
 
-*   For Tarantool ``http.server`` v.2:
-
-    ..  code-block:: lua
-
-        metrics = require('metrics')
-        metrics.enable_default_metrics()
-        prometheus = require('metrics.plugins.prometheus')
-        httpd = require('http.server').new('0.0.0.0', 8080)
-        router = require('http.router').new({charset = "utf8"})
-        httpd:set_router(router) router:route( { path = '/metrics' },
-        prometheus.collect_http)
-        httpd:start()
 
 Graphite
 ~~~~~~~~
