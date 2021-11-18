@@ -6,6 +6,8 @@ local function finite(value)
     if type(value) == "string" then
         value = tonumber(value)
         if value == nil then return nil end
+    elseif type(value) == "cdata" then -- support number64
+        return value
     elseif type(value) ~= "number" then
         return nil
     end

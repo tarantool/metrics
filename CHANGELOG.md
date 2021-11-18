@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Update `http` dependency to 1.1.1
 
+### Fixed
+- Cast number64 to json number in json export plugin [#321](https://github.com/tarantool/metrics/issues/321)
+
 ### Deprecated
 - HTTP middleware v2
 
