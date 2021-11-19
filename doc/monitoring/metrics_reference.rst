@@ -188,8 +188,8 @@ Received bytes:
         :widths: 25 75
         :header-rows: 0
 
-    *   -   ``tnt_net_received_total``
-        -   Bytes received by the instance since start time
+        *   -   ``tnt_net_received_total``
+            -   Bytes received by the instance since start time
 
 Connections:
 
