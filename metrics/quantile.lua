@@ -13,6 +13,8 @@ local sample_constructor = ffi.typeof('sample')
 
 local function quicksort(array, low, high)
     assert(low >= 0, 'Low bound must be non-negative')
+    assert(high < ffi.sizeof(array) / ffi.sizeof('double'),
+        'Upper bound must be lower than array size')
     if high - low < 1 then
         return array
     end
