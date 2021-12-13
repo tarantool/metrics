@@ -1,0 +1,17 @@
+Source: tarantool-metrics
+Priority: optional
+Section: database
+Maintainer: Roman Tsisyk <roman@tarantool.org>
+Build-Depends: tarantool (>= 1.6.8.0)
+Standards-Version: 3.9.8
+Homepage: https://github.com/tarantool/metrics
+Vcs-Git: git://github.com/tarantool/metrics.git
+Vcs-Browser: https://github.com/tarantool/metrics
+
+Package: tarantool-metrics
+Architecture: all
+Depends: tarantool (>= 1.6.8.0), ${shlibs:Depends}, ${misc:Depends},
+               tarantool-checks (>= 3.0.1)
+Pre-Depends: ${misc:Pre-Depends}
+Description: Lua module template for Tarantool
+ This package provides a Lua module template for Tarantool.

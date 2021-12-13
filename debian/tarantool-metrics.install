@@ -1,0 +1,10 @@
+metrics/init.lua usr/share/tarantool/metrics
+metrics/const.lua usr/share/tarantool/metrics
+metrics/http_middleware.lua usr/share/tarantool/metrics
+metrics/cartridge.lua usr/share/tarantool/metrics
+metrics/quantile.lua usr/share/tarantool/metrics
+metrics/registry.lua usr/share/tarantool/metrics
+metrics/tarantool.lua usr/share/tarantool/metrics
+metrics/utils.lua usr/share/tarantool/metrics
+metrics usr/share/tarantool
+

@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+dh_installdocs:
+	echo "install docs"
+dh_auto_test:
+	echo "test"
+test:
+	echo "only test"
+%:
+	dh $@
