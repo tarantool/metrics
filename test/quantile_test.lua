@@ -109,6 +109,17 @@ g.test_low_bound_negative = function()
     )
 end
 
+g.test_high_bound_higher_array_size = function()
+    local empty = ffi.new('double[?]', 2)
+    t.assert_error_msg_contains(
+        'Upper bound must be lower than array size',
+        quantile.quicksort,
+        empty,
+        1,
+        10
+    )
+end
+
 g.test_not_sorted = function()
     local array = ffi.new('double[?]', 2)
     array[0] = math.huge
