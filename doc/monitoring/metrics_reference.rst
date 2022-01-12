@@ -159,7 +159,9 @@ about each individual space in a Tarantool instance.
             -   Total tuple count for vinyl.
                 This metric always has 2 labels: ``{name="test", engine="vinyl"}``,
                 where ``name`` is the name of the space and
-                ``engine`` is the engine of the space.
+                ``engine`` is the engine of the space. For vinyl this metric is disabled 
+                by default and can be enabled only with global variable setup:
+                ``rawset(_G, 'include_vinyl_count', true)``.
 
 ..  _metrics-reference-network:
 
