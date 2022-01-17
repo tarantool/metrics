@@ -36,6 +36,8 @@ local function update()
             lj_metrics.jit_snap_restore, nil, LJ_PREFIX)
     collectors_list.gc_total =
         utils.set_gauge('gc_total', 'Memory currently allocated', lj_metrics.gc_total, nil, LJ_PREFIX)
+    collectors_list.gc_memory =
+        utils.set_gauge('gc_memory', 'Memory currently allocated', lj_metrics.gc_total, nil, LJ_PREFIX)
     collectors_list.gc_udatanum =
         utils.set_gauge('gc_udatanum', 'Amount of allocated udata objects', lj_metrics.gc_udatanum, nil, LJ_PREFIX)
     collectors_list.gc_steps_finalize =

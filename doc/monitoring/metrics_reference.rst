@@ -155,7 +155,7 @@ about each individual space in a Tarantool instance.
                 This metric always has 2 labels: ``{name="test", engine="memtx"}``,
                 where ``name`` is the name of the space and
                 ``engine`` is the engine of the space.
-        *   -   ``tnt_space_count``
+        *   -   ``tnt_vinyl_spaces``
             -   Total tuple count for vinyl.
                 This metric always has 2 labels: ``{name="test", engine="vinyl"}``,
                 where ``name`` is the name of the space and
@@ -179,9 +179,9 @@ Sent bytes:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_sent_total``
+        *   -   ``tnt_net_sent_bytes``
             -   Bytes sent from the instance over the network since the instance's start time
-        
+
 Received bytes:
 
 ..  container:: table
@@ -190,7 +190,7 @@ Received bytes:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_received_total``
+        *   -   ``tnt_net_received_bytes``
             -   Bytes received by the instance since start time
 
 Connections:
@@ -201,7 +201,7 @@ Connections:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_connections_total``
+        *   -   ``tnt_net_connections_amount``
             -   Number of incoming network connections since the instance's start time
         *   -   ``tnt_net_connections_current``
             -   Number of active network connections
@@ -214,7 +214,7 @@ Requests:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_requests_total``
+        *   -   ``tnt_net_requests_amount``
             -   Number of network requests the instance has handled since its start time
         *   -   ``tnt_net_requests_current``
             -   Number of pending network requests
@@ -234,7 +234,7 @@ you can use the metrics below to monitor fiber count and memory usage.
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_fiber_count``
+        *   -   ``tnt_fiber_amount``
             -   Number of fibers
         *   -   ``tnt_fiber_csw``
             -   Overall number of fiber context switches
@@ -258,7 +258,7 @@ This may help you find out what operations your clients perform most often.
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_stats_op_total``
+        *   -   ``tnt_stats_op_amount``
             -   Total number of calls since server start
 
 To distinguish between request types, this metric has the ``operation`` label.
@@ -445,7 +445,7 @@ Allocations:
             -   Number of allocated ``udata`` objects
         *   -   ``lj_gc_freed``
             -   Total amount of freed memory
-        *   -   ``lj_gc_total``
+        *   -   ``lj_gc_memory``
             -   Current allocated Lua memory
         *   -   ``lj_gc_allocated``
             -   Total amount of allocated memory
@@ -464,9 +464,9 @@ They are only available on Linux.
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_cpu_count``
+        *   -   ``tnt_cpu_number``
             -   Total number of processors configured by the operating system
-        *   -   ``tnt_cpu_total``
+        *   -   ``tnt_cpu_time``
             -   Host CPU time
         *   -   ``tnt_cpu_thread``
             -   Tarantool thread CPU time.
@@ -642,5 +642,5 @@ updates the related variables. This happens once per second.
 
         *   -   ``tnt_vinyl_scheduler_dump_time``
             -   Total time in seconds spent by all worker threads performing dumps.
-        *   -   ``tnt_vinyl_scheduler_dump_count``
+        *   -   ``tnt_vinyl_scheduler_dumps``
             -   Counter of dumps completed.

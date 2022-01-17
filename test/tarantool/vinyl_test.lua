@@ -27,5 +27,5 @@ g.test_vinyl_metrics_present = function()
         return x.metric_name:find('tnt_vinyl')
     end):length()
     require'log'.error(metrics.collect())
-    t.assert_equals(metrics_cnt, 19)
+    t.assert_equals(metrics_cnt, 20)
 end
