@@ -1,6 +1,7 @@
 local t = require('luatest')
 local g = t.group()
 
+local luatest_capture = require('luatest.capture')
 local utils = require('test.utils')
 
 local fun = require('fun')
@@ -160,6 +161,24 @@ g.test_v1_wrong_handler = function()
         'incorrect http handler for POST /some/path: expecting return response object',
         http_middleware.v1(handler, observer), request
     )
+end
+
+g.test_v1_handler_raise_an_error = function()
+    local request = {endpoint = table.copy(route)}
+    local observer = stub_observer(function() end)
+    local handler = function()
+        error('Handler is broken')
+    end
+
+    local capture = luatest_capture:new()
+
+    capture:wrap(true, function()
+        pcall(http_middleware.v1(handler, observer), request)
+    end)
+
+    local captured = capture:flush()
+
+    t.assert_str_contains(captured.stderr, 'Handler is broken')
 end
 
 g.test_v2_middleware = function()
