@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecated
+
+- Metrics:
+  - `tnt_net_sent_rps`
+  - `tnt_net_received_rps`
+  - `tnt_net_connections_rps`
+  - `tnt_net_requests_rps`
+  - `tnt_stats_op_rps`
+
 ## [0.12.0] - 2021-11-18
 ### Changed
 - Update `http` dependency to 1.1.1
