@@ -73,6 +73,9 @@ end
 -- @return value from observable function
 function export.observe(collector, route, handler, ...)
     return collector:observe_latency(function(ok, result)
+        if ok ~= true then
+            log.error('http handler returned %q', result)
+        end
         if type(result) ~= 'table' then
             error(('incorrect http handler for %s %s: expecting return response object'):
                 format(route.method, route.path), 0)
