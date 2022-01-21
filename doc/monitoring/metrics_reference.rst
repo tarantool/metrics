@@ -155,11 +155,11 @@ about each individual space in a Tarantool instance.
                 This metric always has 2 labels: ``{name="test", engine="memtx"}``,
                 where ``name`` is the name of the space and
                 ``engine`` is the engine of the space.
-        *   -   ``tnt_vinyl_spaces``
+        *   -   ``tnt_vinyl_tuples``
             -   Total tuple count for vinyl.
                 This metric always has 2 labels: ``{name="test", engine="vinyl"}``,
                 where ``name`` is the name of the space and
-                ``engine`` is the engine of the space. For vinyl this metric is disabled 
+                ``engine`` is the engine of the space. For vinyl this metric is disabled
                 by default and can be enabled only with global variable setup:
                 ``rawset(_G, 'include_vinyl_count', true)``.
 
@@ -179,7 +179,7 @@ Sent bytes:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_sent_bytes``
+        *   -   ``tnt_net_sent_total``
             -   Bytes sent from the instance over the network since the instance's start time
 
 Received bytes:
@@ -190,7 +190,7 @@ Received bytes:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_received_bytes``
+        *   -   ``tnt_net_received_total``
             -   Bytes received by the instance since start time
 
 Connections:
@@ -201,7 +201,7 @@ Connections:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_connections_amount``
+        *   -   ``tnt_net_connections_total``
             -   Number of incoming network connections since the instance's start time
         *   -   ``tnt_net_connections_current``
             -   Number of active network connections
@@ -214,7 +214,7 @@ Requests:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_net_requests_amount``
+        *   -   ``tnt_net_requests_total``
             -   Number of network requests the instance has handled since its start time
         *   -   ``tnt_net_requests_current``
             -   Number of pending network requests
@@ -258,7 +258,7 @@ This may help you find out what operations your clients perform most often.
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_stats_op_amount``
+        *   -   ``tnt_stats_op_total``
             -   Total number of calls since server start
 
 To distinguish between request types, this metric has the ``operation`` label.
@@ -642,5 +642,5 @@ updates the related variables. This happens once per second.
 
         *   -   ``tnt_vinyl_scheduler_dump_time``
             -   Total time in seconds spent by all worker threads performing dumps.
-        *   -   ``tnt_vinyl_scheduler_dumps``
+        *   -   ``tnt_vinyl_scheduler_dump_count``
             -   Counter of dumps completed.

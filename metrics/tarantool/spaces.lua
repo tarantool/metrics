@@ -47,8 +47,8 @@ local function update_spaces_metrics()
                 local include_vinyl_count = rawget(_G, 'include_vinyl_count') or false
                 if include_vinyl_count then
                     collectors_list.space_count = utils.set_gauge('space_count', 'Space count', sp:count(), labels)
-                    collectors_list.vinyl_spaces =
-                        utils.set_gauge('vinyl_spaces', 'Vinyl space count', sp:count(), labels)
+                    collectors_list.vinyl_tuples =
+                        utils.set_gauge('vinyl_tuples', 'Vinyl space tuples count', sp:count(), labels)
                 end
             end
         end

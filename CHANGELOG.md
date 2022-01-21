@@ -6,20 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Type changed from `gauge` to `counter`:
+  - `tnt_net_sent_total`
+  - `tnt_net_received_total`
+  - `tnt_net_connections_total`
+  - `tnt_net_requests_total`
+  - `tnt_stats_op_total`
+  - `tnt_vinyl_scheduler_dump_count`
+
 ### Added
 
 - New metrics:
-  - `tnt_vinyl_spaces` (same as `tnt_space_count`)
-  - `tnt_net_sent_bytes`  (same as `tnt_net_sent_total`)
-  - `tnt_net_received_bytes` (same as `tnt_net_received_total`)
-  - `tnt_net_connections_amount` (same as `tnt_net_connections_total`)
-  - `tnt_net_requests_amount` (same as `tnt_net_requests_total`)
+  - `tnt_vinyl_tuples` (same as `tnt_space_count`)
   - `tnt_fiber_amount` (same as `tnt_fiber_count`)
-  - `tnt_stats_op_amount` (same as `tnt_stats_op_total`)
   - `lj_gc_memory` (same as `lj_gc_total`)
   - `tnt_cpu_number` (same as `tnt_cpu_count`)
   - `tnt_cpu_time` (same as `tnt_cpu_total`)
-  - `tnt_vinyl_scheduler_dumps` (same as `tnt_vinyl_scheduler_dump_count`)
 
 ### Deprecated
 
@@ -30,16 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tnt_net_requests_rps`
   - `tnt_stats_op_rps`
   - `tnt_space_count`
-  - `tnt_net_sent_total`
-  - `tnt_net_received_total`
-  - `tnt_net_connections_total`
-  - `tnt_net_requests_total`
   - `tnt_fiber_count`
-  - `tnt_stats_op_total`
   - `lj_gc_total`
   - `tnt_cpu_count`
   - `tnt_cpu_total`
-  - `tnt_vinyl_scheduler_dump_count`
 
 ## [0.12.0] - 2021-11-18
 ### Changed
