@@ -202,19 +202,18 @@ end
 
 g.test_cartridge_hotreload_not_reset_collectors = function()
     local main_server = g.cluster:server('main')
+    upload_config()
 
     main_server:exec(function()
         local metrics = require('cartridge').service_get('metrics')
         metrics.gauge('hotreload_checker'):set(1)
     end)
 
-    upload_config()
     local resp = main_server:http_request('get', '/new-metrics')
     t.assert_equals(resp.status, 200)
 
-    local obs = utils.find_obs('hotreload_checker',  {alias = 'main', app_name = 'myapp'}, resp.json)
-    t.assert_covers(obs, {
-        label_pairs = {alias = 'main', app_name = 'myapp'},
+    local obs = utils.find_metric('hotreload_checker', resp.json)
+    t.assert_covers(obs[1], {
         metric_name = 'hotreload_checker',
         value = 1,
     })
@@ -225,9 +224,8 @@ g.test_cartridge_hotreload_not_reset_collectors = function()
     resp = main_server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
-    obs = utils.find_obs('hotreload_checker',  {alias = 'main', app_name = 'myapp'}, resp.json)
-    t.assert_covers(obs, {
-        label_pairs = {alias = 'main', app_name = 'myapp'},
+    obs = utils.find_metric('hotreload_checker', resp.json)
+    t.assert_covers(obs[1], {
         metric_name = 'hotreload_checker',
         value = 1,
     })
