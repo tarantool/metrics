@@ -7,7 +7,7 @@ local utils = require('test.utils')
 
 g.before_all(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-    -- helpers.skip_cartridge_version_less('2.3.0')
+    helpers.skip_cartridge_version_less('2.3.0')
     g.cluster = helpers.init_cluster({TARANTOOL_ROLES_RELOAD_ALLOWED = 'true'})
 end)
 
