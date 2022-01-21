@@ -205,7 +205,7 @@ g.test_cartridge_hotreload_not_reset_collectors = function()
 
     main_server:exec(function()
         local metrics = require('cartridge').service_get('metrics')
-        metrics.counter('hotreload_checker'):inc(1)
+        metrics.gauge('hotreload_checker'):set(1)
     end)
 
     upload_config()
