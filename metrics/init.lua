@@ -121,7 +121,7 @@ return {
     enable_default_metrics = function(include, exclude)
         log.warn('metrics tnt_net_sent_rps, tnt_net_received_rps, tnt_net_connections_rps, '..
             'tnt_net_requests_rps, tnt_stats_op_rps, tnt_space_count, tnt_fiber_count, ' ..
-            'lj_gc_total, tnt_cpu_count, tnt_cpu_total ' ..
+            'lj_gc_total, tnt_cpu_count, tnt_cpu_total, tnt_vinyl_scheduler_dump_count ' ..
             'are deprecated and will be removed in next releases.')
         require('metrics.tarantool').enable(include, exclude)
     end,
