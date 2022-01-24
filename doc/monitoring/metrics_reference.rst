@@ -642,5 +642,5 @@ updates the related variables. This happens once per second.
 
         *   -   ``tnt_vinyl_scheduler_dump_time``
             -   Total time in seconds spent by all worker threads performing dumps.
-        *   -   ``tnt_vinyl_scheduler_dump_count``
+        *   -   ``tnt_vinyl_scheduler_dump_total``
             -   Counter of dumps completed.

@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tnt_net_connections_total`
   - `tnt_net_requests_total`
   - `tnt_stats_op_total`
-  - `tnt_vinyl_scheduler_dump_count`
 
 ### Added
 
@@ -24,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `lj_gc_memory` (same as `lj_gc_total`)
   - `tnt_cpu_number` (same as `tnt_cpu_count`)
   - `tnt_cpu_time` (same as `tnt_cpu_total`)
+  - `tnt_vinyl_scheduler_dump_total` (same as `tnt_vinyl_scheduler_dump_count`)
 
 ### Deprecated
 
@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `lj_gc_total`
   - `tnt_cpu_count`
   - `tnt_cpu_total`
+  - `tnt_vinyl_scheduler_dump_count`
 
 ## [0.12.0] - 2021-11-18
 ### Changed
