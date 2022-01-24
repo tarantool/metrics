@@ -3,11 +3,12 @@ local t = require('luatest')
 local g = t.group()
 
 local helpers = require('test.helper')
+local utils = require('test.utils')
 
 g.before_all(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     helpers.skip_cartridge_version_less('2.3.0')
-    g.cluster = helpers.init_cluster()
+    g.cluster = helpers.init_cluster({TARANTOOL_ROLES_RELOAD_ALLOWED = 'true'})
 end)
 
 g.after_all(function()
@@ -57,9 +58,9 @@ end
 
 local function reload_roles()
     local main_server = g.cluster:server('main')
-    main_server.net_box:eval([[
-        require('cartridge.roles').reload()
-    ]])
+    t.assert(main_server.net_box:eval([[
+        return require('cartridge.roles').reload()
+    ]]))
 end
 
 g.test_cartridge_hotreload_set_export = function()
@@ -197,4 +198,35 @@ g.test_cartridge_hotreload_labels_from_config_and_set_labels = function()
         t.assert_equals(obs.label_pairs.app_name, 'myapp')
         t.assert_equals(obs.label_pairs.alias, 'main')
     end
+end
+
+g.test_cartridge_hotreload_not_reset_collectors = function()
+    local main_server = g.cluster:server('main')
+    upload_config()
+
+    main_server:exec(function()
+        local metrics = require('cartridge').service_get('metrics')
+        metrics.gauge('hotreload_checker'):set(1)
+    end)
+
+    local resp = main_server:http_request('get', '/new-metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+
+    local obs = utils.find_metric('hotreload_checker', resp.json)
+    t.assert_covers(obs[1], {
+        metric_name = 'hotreload_checker',
+        value = 1,
+    })
+
+    reload_roles()
+
+    main_server = g.cluster:server('main')
+    resp = main_server:http_request('get', '/new-metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+
+    obs = utils.find_metric('hotreload_checker', resp.json)
+    t.assert_covers(obs[1], {
+        metric_name = 'hotreload_checker',
+        value = 1,
+    })
 end

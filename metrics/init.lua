@@ -17,6 +17,11 @@ if not registry then
 end
 rawset(_G, '__metrics_registry', registry)
 
+local hotreload = package.loaded['cartridge.hotreload']
+if hotreload ~= nil then
+    hotreload.whitelist_globals({'__metrics_registry'})
+end
+
 local function collectors()
     return registry.collectors
 end

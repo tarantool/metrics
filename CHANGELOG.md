@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Don't reset collectors when Cartridge roles hot reload
+
 ### Changed
 
 - Type changed from `gauge` to `counter`:
