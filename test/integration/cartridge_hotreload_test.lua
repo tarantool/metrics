@@ -209,7 +209,7 @@ g.test_cartridge_hotreload_not_reset_collectors = function()
         metrics.gauge('hotreload_checker'):set(1)
     end)
 
-    local resp = main_server:http_request('get', '/new-metrics')
+    local resp = main_server:http_request('get', '/new-metrics', {raise = false})
     t.assert_equals(resp.status, 200)
 
     local obs = utils.find_metric('hotreload_checker', resp.json)
