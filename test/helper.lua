@@ -24,7 +24,7 @@ function helpers.entrypoint(name)
     return path
 end
 
-function helpers.init_cluster()
+function helpers.init_cluster(env)
     local cluster = helpers.Cluster:new({
         datadir = fio.tempdir(),
         server_command = helpers.entrypoint('srv_basic'),
@@ -38,6 +38,7 @@ function helpers.init_cluster()
                 },
             },
         },
+        env = env,
     })
     cluster:start()
     return cluster
