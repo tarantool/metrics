@@ -581,9 +581,9 @@ To enable CPU metrics, first register a callback function:
 
 ..  code-block:: none
 
-    # HELP tnt_cpu_total Host CPU time
-    # TYPE tnt_cpu_total gauge
-    tnt_cpu_total 15006759
+    # HELP tnt_cpu_time Host CPU time
+    # TYPE tnt_cpu_time gauge
+    tnt_cpu_time 15006759
     # HELP tnt_cpu_thread Tarantool thread cpu time
     # TYPE tnt_cpu_thread gauge
     tnt_cpu_thread{thread_name="coio",file_name="init.lua",thread_pid="699",kind="system"} 160

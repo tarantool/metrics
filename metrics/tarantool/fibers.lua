@@ -18,6 +18,7 @@ local function update_fibers_metrics()
     end
 
     collectors_list.fiber_count = utils.set_gauge('fiber_count', 'Amount of fibers', fibers)
+    collectors_list.fiber_amount = utils.set_gauge('fiber_amount', 'Amount of fibers', fibers)
     collectors_list.fiber_csw = utils.set_gauge('fiber_csw', 'Fibers csw', csws)
     collectors_list.fiber_memalloc = utils.set_gauge('fiber_memalloc', 'Fibers memalloc', falloc)
     collectors_list.fiber_memused = utils.set_gauge('fiber_memused', 'Fibers memused', fused)
