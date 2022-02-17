@@ -219,6 +219,33 @@ Requests:
         *   -   ``tnt_net_requests_current``
             -   Number of pending network requests
 
+Requests in progress:
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_net_requests_in_progress_total``
+            -   Total count of requests processed by tx thread
+        *   -   ``tnt_net_requests_in_progress_current``
+            -   Count of requests currently being processed in the tx thread
+
+Requests placed in queues of streams:
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_net_requests_in_stream_total``
+            -   Total count of requests, which was placed in queues of streams
+                for all time
+        *   -   ``tnt_net_requests_in_stream_current``
+            -   Count of requests currently waiting in queues of streams
+
 ..  _metrics-reference-fibers:
 
 Fibers
@@ -319,8 +346,11 @@ Learn more about :ref:`replication in Tarantool <replication-mechanism>`.
         *   -   ``tnt_replication_replica_<id>_lsn`` / ``tnt_replication_master_<id>_lsn``
             -   LSN of the master/replica, where
                 ``id`` is the instance's number in the replica set.
-        *   -   ``tnt_replication_<id>_lag``
-            -   Replication lag value in seconds, where
+        *   -   ``tnt_replication_upstream_<id>_lag``
+            -   Replication upstream lag value in seconds, where
+                ``id`` is the instance's number in the replica set.
+        *   -   ``tnt_replication_downstream_<id>_lag``
+            -   Replication downstream lag value in seconds, where
                 ``id`` is the instance's number in the replica set.
 
 ..  _metrics-reference-runtime:
@@ -556,6 +586,9 @@ efficient.
                 The value is slightly smaller
                 than the amount of memory allocated for vinyl trees,
                 reflected in the :ref:`vinyl_memory <cfg_storage-vinyl_memory>` parameter.
+        *   -   ``tnt_vinyl_regulator_blocked_writers``
+            -   The number of fibers that are blocked waiting
+                for Vinyl level0 memory quota.
 
 Transactional activity
 ~~~~~~~~~~~~~~~~~~~~~~

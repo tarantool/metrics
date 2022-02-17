@@ -41,6 +41,25 @@ local function update_network_metrics()
         collectors_list.net_requests_current =
             utils.set_gauge('net_requests_current', 'Pending requests', box_stat_net.REQUESTS.current)
     end
+
+    if box_stat_net.REQUESTS_IN_PROGRESS ~= nil then
+        collectors_list.net_requests_in_progress_total =
+            utils.set_counter('net_requests_in_progress_total', 'Requests in progress total amount',
+            box_stat_net.REQUESTS_IN_PROGRESS.total)
+        collectors_list.net_requests_in_progress_current =
+            utils.set_gauge('net_requests_in_progress_current',
+            'Count of requests currently being processed in the tx thread', box_stat_net.REQUESTS_IN_PROGRESS.current)
+    end
+
+    if box_stat_net.REQUESTS_IN_STREAM_QUEUE ~= nil then
+        collectors_list.net_requests_in_stream_total =
+            utils.set_counter('net_requests_in_stream_queue_total',
+            'Total count of requests, which was placed in queues of streams',
+            box_stat_net.REQUESTS_IN_STREAM_QUEUE.total)
+        collectors_list.net_requests_in_stream_current =
+            utils.set_gauge('net_requests_in_stream_queue_current',
+            'count of requests currently waiting in queues of streams', box_stat_net.REQUESTS_IN_STREAM_QUEUE.current)
+    end
 end
 
 
