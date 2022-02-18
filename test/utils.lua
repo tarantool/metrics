@@ -62,7 +62,6 @@ function utils.find_metric(metric_name, metrics_data)
     return #m > 0 and m or nil
 end
 
-
 local function to_number_multiple(...)
     return unpack(fun.map(tonumber, {...}):totable())
 end
