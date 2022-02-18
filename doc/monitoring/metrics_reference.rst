@@ -346,12 +346,11 @@ Learn more about :ref:`replication in Tarantool <replication-mechanism>`.
         *   -   ``tnt_replication_replica_<id>_lsn`` / ``tnt_replication_master_<id>_lsn``
             -   LSN of the master/replica, where
                 ``id`` is the instance's number in the replica set.
-        *   -   ``tnt_replication_upstream_<id>_lag``
-            -   Replication upstream lag value in seconds, where
-                ``id`` is the instance's number in the replica set.
-        *   -   ``tnt_replication_downstream_<id>_lag``
-            -   Replication downstream lag value in seconds, where
-                ``id`` is the instance's number in the replica set.
+        *   -   ``tnt_replication_lag``
+            -   Replication lag value in seconds.
+                This metric always has labels ``{id="id", stream="stream"}``,
+                where ``id`` is the instance's number in the replica set,
+                ``stream`` is ``downstream`` or ``upstream``.
 
 ..  _metrics-reference-runtime:
 
