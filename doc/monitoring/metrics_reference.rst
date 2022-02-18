@@ -343,9 +343,11 @@ Learn more about :ref:`replication in Tarantool <replication-mechanism>`.
             -   LSN number in vclock.
                 This metric always has the label ``{id="id"}``,
                 where ``id`` is the instance's number in the replica set.
-        *   -   ``tnt_replication_replica_<id>_lsn`` / ``tnt_replication_master_<id>_lsn``
-            -   LSN of the master/replica, where
-                ``id`` is the instance's number in the replica set.
+        *   -   ``tnt_replication_lsn``
+            -   LSN of the tarantool instance.
+                This metric always has labels ``{id="id", type="type"}``, where
+                ``id`` is the instance's number in the replica set,
+                ``type`` is ``master`` or ``replica``.
         *   -   ``tnt_replication_lag``
             -   Replication lag value in seconds.
                 This metric always has labels ``{id="id", stream="stream"}``,

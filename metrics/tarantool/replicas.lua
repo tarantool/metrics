@@ -16,6 +16,9 @@ local function update_replicas_metrics()
                 local lsn = replication_info.lsn
                 local metric_name = 'replication_replica_' .. k .. '_lsn'
                 collectors_list[metric_name] = utils.set_gauge(metric_name, 'lsn for replica ' .. k, lsn - v)
+
+                collectors_list.replication_lsn =
+                    utils.set_gauge('replication_lsn', 'lsn for instance', lsn - v, {type = 'replica', id = k})
             end
         end
     else
@@ -28,6 +31,12 @@ local function update_replicas_metrics()
                         metric_name,
                         'lsn for master ' .. k,
                         current_box_info.lsn - lsn
+                    )
+                    collectors_list.replication_lsn = utils.set_gauge(
+                        'replication_lsn',
+                        'lsn for instance',
+                        current_box_info.lsn - lsn,
+                        {type = 'master', id = k}
                     )
                 end
             end
