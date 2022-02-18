@@ -26,5 +26,9 @@ g.test_vinyl_metrics_present = function()
     local metrics_cnt = fun.iter(metrics.collect()):filter(function(x)
         return x.metric_name:find('tnt_vinyl')
     end):length()
-    t.assert_equals(metrics_cnt, 21)
+    if utils.is_version_less(_TARANTOOL, '2.10.0') then
+        t.assert_equals(metrics_cnt, 20)
+    else
+        t.assert_equals(metrics_cnt, 21)
+    end
 end
