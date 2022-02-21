@@ -28,10 +28,16 @@ local function update_info_metrics()
                 utils.set_gauge(metric_name_old, 'Replication lag for instance ' .. k, v.upstream.lag)
             collectors_list.replication_lag =
                 utils.set_gauge('replication_lag', 'Replication lag', v.upstream.lag, {stream = 'upstream', id = k})
+            collectors_list.replication_status =
+                utils.set_gauge('replication_status', 'Replication status', v.upstream.status == 'follow' and 1 or 0,
+                {stream = 'upstream', id = k})
         end
         if v.downstream ~= nil then
             collectors_list.replication_lag =
                 utils.set_gauge('replication_lag', 'Replication lag', v.downstream.lag, {stream = 'downstream', id = k})
+            collectors_list.replication_status =
+                utils.set_gauge('replication_status', 'Replication status', v.downstream.status == 'follow' and 1 or 0,
+                {stream = 'downstream', id = k})
         end
     end
 
