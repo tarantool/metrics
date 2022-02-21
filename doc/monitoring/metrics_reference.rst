@@ -353,6 +353,11 @@ Learn more about :ref:`replication in Tarantool <replication-mechanism>`.
                 This metric always has labels ``{id="id", stream="stream"}``,
                 where ``id`` is the instance's number in the replica set,
                 ``stream`` is ``downstream`` or ``upstream``.
+        *   -   ``tnt_replication_status``
+            -   This metrics equals 1 when replication status is "follow" and 0 otherwise.
+                This metric always has labels ``{id="id", stream="stream"}``,
+                where ``id`` is the instance's number in the replica set,
+                ``stream`` is ``downstream`` or ``upstream``.
 
 ..  _metrics-reference-runtime:
 
