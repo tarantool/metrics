@@ -18,14 +18,27 @@ jobs:
           - "2.5"
           - "2.6"
           - "2.7"
+          - "2.8"
         cartridge: [ "", "1.2.0", "2.1.2", "2.4.0", "2.5.1", "2.6.0", "2.7.3" ]
+        include:
+          - tarantool: "2.x-latest"
+            cartridge: "2.7.3"
+          - tarantool: "2.x-latest"
+            cartridge: ""
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
       - uses: tarantool/setup-tarantool@v1
+        if: matrix.tarantool != '2.x-latest'
         with:
           tarantool-version: ${{ matrix.tarantool }}
+
+      - name: Install latest pre-release Tarantool 2.x
+        if: matrix.tarantool == '2.x-latest'
+        run: |
+          curl -L https://tarantool.io/pre-release/2/installer.sh | bash
+          sudo apt-get -y install tarantool
 
       - name: lint
         run: make lint

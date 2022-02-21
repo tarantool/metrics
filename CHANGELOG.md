@@ -28,6 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tnt_cpu_number` (same as `tnt_cpu_count`)
   - `tnt_cpu_time` (same as `tnt_cpu_total`)
   - `tnt_vinyl_scheduler_dump_total` (same as `tnt_vinyl_scheduler_dump_count`)
+  - `tnt_replication_lag`
+  - `tnt_vinyl_regulator_blocked_writers`
+  - `tnt_net_requests_in_progress_total`
+  - `tnt_net_requests_in_progress_current`
+  - `tnt_net_requests_in_stream_total`
+  - `tnt_net_requests_in_stream_current`
+  - `tnt_replication_lsn`
 
 ### Deprecated
 
@@ -43,6 +50,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tnt_cpu_count`
   - `tnt_cpu_total`
   - `tnt_vinyl_scheduler_dump_count`
+  - `tnt_replication_<id>_lag`
+  - `tnt_replication_master_<id>_lsn`
+  - `tnt_replication_replica_<id>_lsn`
 
 ## [0.12.0] - 2021-11-18
 ### Changed

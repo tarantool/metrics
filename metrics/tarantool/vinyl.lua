@@ -24,6 +24,11 @@ local function update()
     collectors_list.vinyl_regulator_dump_watermark =
         utils.set_gauge('vinyl_regulator_dump_watermark', 'Point when dumping must occur',
         vinyl_stat.regulator.dump_watermark)
+    if vinyl_stat.regulator.blocked_writers ~= nil then
+        collectors_list.vinyl_regulator_blocked_writers =
+            utils.set_gauge('vinyl_regulator_blocked_writers', 'The number of fibers that are blocked waiting ' ..
+            'for Vinyl level0 memory quota', vinyl_stat.regulator.blocked_writers)
+    end
 
     collectors_list.vinyl_tx_conflict =
         utils.set_gauge('vinyl_tx_conflict', 'Count of transaction conflicts', vinyl_stat.tx.conflict)
