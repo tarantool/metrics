@@ -30,7 +30,6 @@ local function update()
             'for Vinyl level0 memory quota', vinyl_stat.regulator.blocked_writers)
     end
 
-
     collectors_list.vinyl_tx_conflict =
         utils.set_gauge('vinyl_tx_conflict', 'Count of transaction conflicts', vinyl_stat.tx.conflict)
     collectors_list.vinyl_tx_commit =
