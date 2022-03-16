@@ -17,11 +17,11 @@ local function update_info_metrics()
     collectors_list.info_lsn = utils.set_gauge('info_lsn', 'Tarantool lsn', info.lsn)
     collectors_list.info_uptime = utils.set_gauge('info_uptime', 'Tarantool uptime', info.uptime)
 
-    for k, v in ipairs(info.vclock) do
+    for k, v in pairs(info.vclock) do
         collectors_list.info_vclock = utils.set_gauge('info_vclock', 'VClock', v, {id = k})
     end
 
-    for k, v in ipairs(info.replication) do
+    for k, v in pairs(info.replication) do
         if v.upstream ~= nil then
             local metric_name_old = 'replication_' .. k .. '_lag'
             collectors_list[metric_name_old] =
