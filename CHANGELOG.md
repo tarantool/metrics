@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Don't reset collectors when Cartridge roles hot reload
+- `pairs` instead of `ipairs` in iterations over replication info
 
 ### Changed
 
