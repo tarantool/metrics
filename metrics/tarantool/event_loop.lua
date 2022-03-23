@@ -42,9 +42,9 @@ end
 
 local function update_info_metrics()
     local ev_once_time, ev_prolog, ev_epilog = evloop_time()
-    collectors_list.ev_loop_time = utils.set_gauge('ev_loop_time', 'EV loop time (ms)', ev_once_time)
-    collectors_list.ev_prolog_time = utils.set_gauge('ev_loop_prolog_time', 'EV prolog time (ms)', ev_prolog)
-    collectors_list.ev_epilog_time = utils.set_gauge('ev_loop_epilog_time', 'EV epilog time (ms)', ev_epilog)
+    collectors_list.ev_loop_time = utils.set_gauge('ev_loop_time', 'Event loop time (ms)', ev_once_time)
+    collectors_list.ev_prolog_time = utils.set_gauge('ev_loop_prolog_time', 'Event loop prolog time (ms)', ev_prolog)
+    collectors_list.ev_epilog_time = utils.set_gauge('ev_loop_epilog_time', 'Event loop epilog time (ms)', ev_epilog)
 end
 
 return {
