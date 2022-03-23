@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tnt_net_requests_in_stream_current`
   - `tnt_replication_lsn`
   - `tnt_replication_status`
+  - `tnt_ev_loop_time` 
+  - `tnt_ev_loop_prolog_time`
+  - `tnt_ev_loop_epilog_time`
 
 ### Deprecated
 
