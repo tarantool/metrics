@@ -11,6 +11,8 @@ local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
 local Summary = require('metrics.collectors.summary')
 
+local VERSION = 'scm-1'
+
 local registry = rawget(_G, '__metrics_registry')
 if not registry then
     registry = Registry.new()
@@ -137,4 +139,5 @@ return {
     end,
     http_middleware = require('metrics.http_middleware'),
     collect = collect,
+    VERSION = VERSION,
 }

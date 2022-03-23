@@ -41,6 +41,7 @@ jobs:
             -e "s/branch = '.\+'/tag = '${GIT_TAG}'/g" \
             -e "s/version = '.\+'/version = '${GIT_TAG}-1'/g" \
             ${{ env.ROCK_NAME }}-scm-1.rockspec > ${{ env.ROCK_NAME }}-${GIT_TAG}-1.rockspec
+          sed -i "s/local VERSION = 'scm-1'/local VERSION = '"${GIT_TAG}"-1'/g" metrics/init.lua
 
       - uses: tarantool/rocks.tarantool.org/github-action@master
         with:
