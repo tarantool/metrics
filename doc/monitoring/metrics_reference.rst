@@ -683,3 +683,23 @@ updates the related variables. This happens once per second.
             -   Total time in seconds spent by all worker threads performing dumps.
         *   -   ``tnt_vinyl_scheduler_dump_total``
             -   Counter of dumps completed.
+
+..  _metrics-reference-memory_event_loop:
+
+Event loop metrics
+------------------
+
+Event loop tx thread information:
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_ev_loop_time``
+            -   Event loop time (ms)
+        *   -   ``tnt_ev_loop_prolog_time``
+            -   Event loop prolog time (ms)
+        *   -   ``tnt_ev_loop_epilog_time``
+            -   Event loop epilog time (ms)
