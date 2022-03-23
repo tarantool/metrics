@@ -323,6 +323,7 @@ Metrics functions
     *   ``luajit``
     *   ``cartridge_issues``
     *   ``clock``
+    *   ``event_loop``
 
     See :ref:`metrics reference <metrics-reference>` for details.
 

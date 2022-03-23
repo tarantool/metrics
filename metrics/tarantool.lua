@@ -16,6 +16,7 @@ local default_metrics = {
     luajit              = require('metrics.tarantool.luajit'),
     cartridge_issues    = require('metrics.cartridge.issues'),
     clock               = require('metrics.tarantool.clock'),
+    event_loop          = require('metrics.tarantool.event_loop'),
 }
 
 local function delete_collectors(list)
