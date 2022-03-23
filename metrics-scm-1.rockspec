@@ -47,6 +47,7 @@ build = {
         ['metrics.tarantool.spaces']        = 'metrics/tarantool/spaces.lua',
         ['metrics.tarantool.system']        = 'metrics/tarantool/system.lua',
         ['metrics.tarantool.cpu']           = 'metrics/tarantool/cpu.lua',
+        ['metrics.tarantool.event_loop']    = 'metrics/tarantool/event_loop.lua',
         ['metrics.cartridge']               = 'metrics/cartridge.lua',
         ['metrics.cartridge.issues']        = 'metrics/cartridge/issues.lua',
         ['metrics.tarantool.clock']         = 'metrics/tarantool/clock.lua',
