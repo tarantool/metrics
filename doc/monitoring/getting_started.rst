@@ -78,7 +78,7 @@ To enable the collection of HTTP metrics, you need to create a collector first.
 
 You can collect all HTTP metrics with a single collector.
 If you're using the default
-:doc:`Grafana dashboard <book/monitoring/grafana_dashboard>`,
+:ref:`Grafana dashboard <monitoring-grafana_dashboard-page>`,
 don't change the default collector name.
 Otherwise, your metrics won't appear on the charts.
 
