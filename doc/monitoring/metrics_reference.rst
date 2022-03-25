@@ -583,7 +583,7 @@ efficient.
                 based on the observed dump/compaction performance.
                 If the metric value is down to approximately ``10^5``,
                 this indicates issues with the disk
-                or the :ref:`scheduler <metrics-vinyl-scheduler>`.
+                or the :ref:`scheduler <metrics-reference-vinyl_scheduler>`.
         *   -   ``tnt_vinyl_regulator_dump_watermark``
             -   Maximum amount of memory in bytes used
                 for in-memory storing of a vinyl LSM tree.
@@ -661,7 +661,7 @@ The following metrics show state memory areas used by vinyl for caches and write
 Scheduler
 ~~~~~~~~~
 
-The vinyl scheduler invokes the :ref:`regulator <metrics-vinyl-regulator>` and
+The vinyl scheduler invokes the :ref:`regulator <metrics-reference-vinyl_regulator>` and
 updates the related variables. This happens once per second.
 
 ..  container:: table
