@@ -23,6 +23,12 @@ local function update()
         collectors_list.cartridge_issues =
             utils.set_gauge('cartridge_issues', 'Tarantool Cartridge issues', len, {level = level})
     end
+
+    local global_issues_cnt = rawget(_G, '__cartridge_issues_cnt')
+    if global_issues_cnt ~= nil then
+        collectors_list.global_issues =
+            utils.set_gauge('cartridge_cluster_issues', 'Tarantool Cartridge cluster issues', global_issues_cnt)
+    end
 end
 
 return {

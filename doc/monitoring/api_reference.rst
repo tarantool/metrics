@@ -322,6 +322,7 @@ Metrics functions
     *   ``vinyl``
     *   ``luajit``
     *   ``cartridge_issues``
+    *   ``cartridge_cluster_issues``
     *   ``clock``
     *   ``event_loop``
 
