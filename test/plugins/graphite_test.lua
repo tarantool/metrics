@@ -70,6 +70,19 @@ g.test_graphite_format_observation_removes_LL_suffix = function()
     t.assert_equals(graphite_val, '1')
 end
 
+g.test_graphite_format_observation_float = function()
+    local gauge = metrics.gauge('test_gauge', 'Test gauge')
+    gauge:set(1.5)
+    local obs = gauge:collect()[1]
+    local ll_number = tostring(obs.value)
+    t.assert_equals(ll_number, '1.5')
+
+    local graphite_obs = graphite.format_observation('', obs)
+
+    local graphite_val = graphite_obs:split(' ')[2]
+    t.assert_equals(graphite_val, '1.5')
+end
+
 g.test_graphite_format_observation_time_in_seconds = function()
     local obs = {
         metric_name = 'test_metric',
