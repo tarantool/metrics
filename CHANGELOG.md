@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Float numbers in Graphite exporter
 
+### Added
+
+- `tnt_cartridge_cluster_issues` metric
+
 ## [0.13.0] - 2022-03-23
 ### Fixed
 

@@ -396,6 +396,9 @@ Cartridge
                 *   ``warning`` is associated with other cluster problems,
                     such as replication issues on the instance.
 
+        *   -   ``tnt_cartridge_cluster_issues``
+            -   Sum of :ref:`instance issues <cartridge.issues>` number over cluster.
+
         *   -   ``tnt_clock_delta``
             -   Clock drift across the cluster.
                 This metric always has the label ``{delta="..."}``,
