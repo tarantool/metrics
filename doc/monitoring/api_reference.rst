@@ -184,7 +184,7 @@ histogram
 summary
 ~~~~~~~
 
-..  function:: summary(name [, help, objectives])
+..  function:: summary(name [, help, objectives, params])
 
     Register a new summary. Quantile computation is based on the
     `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
