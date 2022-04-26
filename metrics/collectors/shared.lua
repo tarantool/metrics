@@ -63,7 +63,7 @@ function Shared:set(num, label_pairs)
     num = num or 0
     local key = self.make_key(label_pairs)
     self.observations[key] = num
-    self.label_pairs[key] = label_pairs
+    self.label_pairs[key] = label_pairs or {}
 end
 
 function Shared:inc(num, label_pairs)
@@ -71,7 +71,7 @@ function Shared:inc(num, label_pairs)
     local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value + num
-    self.label_pairs[key] = label_pairs
+    self.label_pairs[key] = label_pairs or {}
 end
 
 function Shared:dec(num, label_pairs)
@@ -79,7 +79,7 @@ function Shared:dec(num, label_pairs)
     local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
-    self.label_pairs[key] = label_pairs
+    self.label_pairs[key] = label_pairs or {}
 end
 
 local function log_observe_latency_error(err)
