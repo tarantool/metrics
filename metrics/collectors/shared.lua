@@ -41,6 +41,9 @@ function Shared:set_registry(registry)
 end
 
 function Shared.make_key(label_pairs)
+    if type(label_pairs) ~= 'table' then
+        return ""
+    end
     local parts = {}
     for k, v in pairs(label_pairs) do
         table.insert(parts, k .. '\t' .. v)
@@ -58,7 +61,6 @@ end
 
 function Shared:set(num, label_pairs)
     num = num or 0
-    label_pairs = label_pairs or {}
     local key = self.make_key(label_pairs)
     self.observations[key] = num
     self.label_pairs[key] = label_pairs
@@ -66,7 +68,6 @@ end
 
 function Shared:inc(num, label_pairs)
     num = num or 1
-    label_pairs = label_pairs or {}
     local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value + num
@@ -75,7 +76,6 @@ end
 
 function Shared:dec(num, label_pairs)
     num = num or 1
-    label_pairs = label_pairs or {}
     local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
