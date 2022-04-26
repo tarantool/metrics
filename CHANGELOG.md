@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Float numbers in Graphite exporter
 - Signed timestamp in Graphite exporter
+- Increase `Shared.make_key` perfomance in observations with empty label
 
 ### Added
 
