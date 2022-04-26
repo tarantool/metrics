@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Float numbers in Graphite exporter
+- Signed timestamp in Graphite exporter
 
 ### Added
 

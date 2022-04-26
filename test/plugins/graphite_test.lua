@@ -98,6 +98,21 @@ g.test_graphite_format_observation_time_in_seconds = function()
     t.assert_equals(graphite_time, sec)
 end
 
+g.test_graphite_format_observation_signed_time = function()
+    local obs = {
+        metric_name = 'test_metric',
+        label_pairs = {},
+        value = 1,
+        timestamp = 1000000000000LL,
+    }
+
+    local graphite_obs = graphite.format_observation('', obs)
+
+    local graphite_time = tonumber(graphite_obs:split(' ')[3])
+    local sec = obs.timestamp / 10^6
+    t.assert_equals(graphite_time, sec)
+end
+
 g.test_graphite_sends_data_to_socket = function()
     local cnt = metrics.counter('test_cnt', 'test-cnt')
     cnt:inc(1)

@@ -30,7 +30,7 @@ function graphite.format_observation(prefix, obs)
     metric_path = metric_path:gsub(' ', '_') -- remove spaces (e.g. in values)
     local string_val = tostring(tonumber(obs.value)) -- removes ULL/LL suffixes
 
-    local ts = tostring(obs.timestamp):sub(1, -10) -- Graphite takes time in seconds
+    local ts = tostring(obs.timestamp / 10^6):gsub("U*LL", "") -- Graphite takes time in seconds
     local graph = ('%s %s %s\n'):format(metric_path, string_val, ts)
 
     return graph
