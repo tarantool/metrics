@@ -23,10 +23,7 @@ local handler = function(req)
 end
 
 -- Configure summary latency collector
-local collector = http_middleware.build_default_collector(
-    'summary', 'path_latency',
-    'My collector for /path requests latency'
-)
+local collector = http_middleware.build_default_collector('summary')
 
 -- Set route handler with summary latency collection
 httpd:route(route, http_middleware.v1(handler, collector))
