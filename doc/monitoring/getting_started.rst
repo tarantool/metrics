@@ -89,7 +89,7 @@ Instance health check
 ---------------------
 
 In production environments, Tarantool Cartridge usually has a large number of so-called
-routers---Tarantool instances that handle input load.
+routers -- Tarantool instances that handle input load.
 Various load balancers help distribute that load evenly.
 However, any load balancer has to know
 which routers are ready to accept the load at the moment.

@@ -404,8 +404,8 @@ Cartridge
                 This metric always has the label ``{delta="..."}``,
                 which has the following possible values:
 
-                *   ``max``---difference with the fastest clock (always positive)
-                *   ``min``---difference with the slowest clock (always negative).
+                *   ``max`` -- difference with the fastest clock (always positive)
+                *   ``min`` -- difference with the slowest clock (always negative).
 
 ..  _metrics-reference-luajit:
 
@@ -618,14 +618,14 @@ Transactional activity
             -   Сounter of rollbacks (unsuccessful transaction ends).
                 This is not merely a count of explicit
                 :doc:`/reference/reference_lua/box_txn_management/rollback`
-                requests---it includes requests that ended with errors.
+                requests -- it includes requests that ended with errors.
         *   -   ``tnt_vinyl_tx_conflict``
             -   Counter of conflicts that caused transactions to roll back.
                 The ratio ``tnt_vinyl_tx_conflict / tnt_vinyl_tx_commit``
                 above 5% indicates that vinyl is not healthy.
                 At that moment, you'll probably see a lot of other problems with vinyl.
         *   -   ``tnt_vinyl_tx_read_views``
-            -   Current number of read views---that is, transactions
+            -   Current number of read views -- that is, transactions
                 that entered the read-only state to avoid conflict temporarily.
                 Usually the value is ``0``.
                 If it stays non-zero for a long time, it is indicative of a memory leak.

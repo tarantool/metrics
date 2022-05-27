@@ -145,10 +145,10 @@ histogram
 
         A histogram is basically a set of collectors:
 
-        *   ``name .. "_sum"``---a counter holding the sum of added observations.
-        *   ``name .. "_count"``---a counter holding the number of added observations.
-        *   ``name .. "_bucket"``---a counter holding all bucket sizes under the label
-            ``le`` (less or equal). To access a specific bucket---``x`` (where ``x`` is a number),
+        *   ``name .. "_sum"`` -- a counter holding the sum of added observations.
+        *   ``name .. "_count"`` -- a counter holding the number of added observations.
+        *   ``name .. "_bucket"`` -- a counter holding all bucket sizes under the label
+            ``le`` (less or equal). To access a specific bucket -- ``x`` (where ``x`` is a number),
             specify the value ``x`` for the label ``le``.
 
 ..  class:: histogram_obj
@@ -208,7 +208,7 @@ summary
         (from which observations are collected) is reset, and the next bucket becomes the
         new head. This way, each bucket stores observations for
         ``max_age_time * age_buckets_count`` seconds before it is reset.
-        ``max_age_time`` sets the duration of each bucket's lifetime---that is, how
+        ``max_age_time`` sets the duration of each bucket's lifetime -- that is, how
         many seconds the observations are kept before they are discarded.
         ``age_buckets_count`` sets the number of buckets in the sliding time window.
         This variable determines the number of buckets used to exclude observations
@@ -225,8 +225,8 @@ summary
 
         A summary represents a set of collectors:
 
-        *   ``name .. "_sum"``---a counter holding the sum of added observations.
-        *   ``name .. "_count"``---a counter holding the number of added observations.
+        *   ``name .. "_sum"`` -- a counter holding the sum of added observations.
+        *   ``name .. "_count"`` -- a counter holding the number of added observations.
         *   ``name`` holds all the quantiles under observation that find themselves
             under the label ``quantile`` (less or equal).
             To access bucket ``x`` (where ``x`` is a number),
