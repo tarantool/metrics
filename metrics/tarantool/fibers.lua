@@ -4,7 +4,7 @@ local utils = require('metrics.utils')
 local collectors_list = {}
 
 local function update_fibers_metrics()
-    local fibers_info = fiber.info()
+    local fibers_info = fiber.info({backtrace = false})
     local fibers = 0
     local csws = 0
     local falloc = 0
