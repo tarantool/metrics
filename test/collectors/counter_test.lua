@@ -85,3 +85,8 @@ g.test_counter_remove_metric_by_label = function()
         {'cnt', 1, {label = 2}},
     })
 end
+
+g.test_insert_non_number = function()
+    local c = metrics.counter('cnt')
+    t.assert_error_msg_contains('Counter increment should be a number', c.inc, c, true)
+end

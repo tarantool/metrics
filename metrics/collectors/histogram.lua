@@ -43,6 +43,9 @@ end
 
 function Histogram:observe(num, label_pairs)
     label_pairs = label_pairs or {}
+    if num ~= nil and type(tonumber(num)) ~= 'number' then
+        error("Histogram observation should be a number")
+    end
 
     self.count_collector:inc(1, label_pairs)
     self.sum_collector:inc(num, label_pairs)

@@ -54,6 +54,9 @@ function Summary:observe(num, label_pairs)
     if label_pairs.quantile then
         error('Label "quantile" are not allowed in summary')
     end
+    if num ~= nil and type(tonumber(num)) ~= 'number' then
+        error("Summary observation should be a number")
+    end
     self.count_collector:inc(1, label_pairs)
     self.sum_collector:inc(num, label_pairs)
     if self.objectives then
