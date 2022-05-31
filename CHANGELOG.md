@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Set non-number values in `gauge:set`
 
+### Removed
+
+- HTTP middleware v2
+- `enable_cartridge_metrics` function
+
 ## [0.13.0] - 2022-03-23
 ### Fixed
 

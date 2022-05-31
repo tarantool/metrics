@@ -133,10 +133,6 @@ return {
             'are deprecated and will be removed in next releases.')
         require('metrics.tarantool').enable(include, exclude)
     end,
-    enable_cartridge_metrics = function()
-        log.warn('metrics.enable_cartridge_metrics() is deprecated. Use metrics.enable_default_metrics() instead.')
-        return require('metrics.cartridge').enable()
-    end,
     http_middleware = require('metrics.http_middleware'),
     collect = collect,
     VERSION = VERSION,
