@@ -60,6 +60,9 @@ function Shared:remove(label_pairs)
 end
 
 function Shared:set(num, label_pairs)
+    if num ~= nil and type(tonumber(num)) ~= 'number' then
+        log.error("Collector set value should be a number. In the next release it will raise an error")
+    end
     num = num or 0
     local key = self.make_key(label_pairs)
     self.observations[key] = num
@@ -67,6 +70,9 @@ function Shared:set(num, label_pairs)
 end
 
 function Shared:inc(num, label_pairs)
+    if num ~= nil and type(tonumber(num)) ~= 'number' then
+        error("Collector increment should be a number")
+    end
     num = num or 1
     local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0
@@ -75,6 +81,9 @@ function Shared:inc(num, label_pairs)
 end
 
 function Shared:dec(num, label_pairs)
+    if num ~= nil and type(tonumber(num)) ~= 'number' then
+        error("Collector decrement should be a number")
+    end
     num = num or 1
     local key = self.make_key(label_pairs)
     local old_value = self.observations[key] or 0

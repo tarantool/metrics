@@ -91,3 +91,9 @@ g.test_histogram = function()
     t.assert_equals(obs_bucket_4.value, 1, 'bucket 4 has 1 value: 3')
     t.assert_equals(obs_bucket_inf.value, 1, 'bucket +inf has 1 value: 3')
 end
+
+g.test_insert_non_number = function()
+    local h = metrics.histogram('hist', 'some histogram', {2, 4})
+
+    t.assert_error_msg_contains('Histogram observation should be a number', h.observe, h, true)
+end

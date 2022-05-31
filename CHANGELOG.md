@@ -10,10 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Float numbers in Graphite exporter
 - Signed timestamp in Graphite exporter
 - Increase `Shared.make_key` perfomance in observations with empty label
+- Forbid observation of non-number value in collectors (except `gauge:set`)
 
 ### Added
 
 - `tnt_cartridge_cluster_issues` metric
+
+### Deprecated
+
+- Set non-number values in `gauge:set`
 
 ## [0.13.0] - 2022-03-23
 ### Fixed

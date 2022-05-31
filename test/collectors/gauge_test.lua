@@ -59,3 +59,24 @@ g.test_gauge_remove_metric_by_label = function()
         {'gauge', 1, {label = 2}},
     })
 end
+
+g.test_inc_non_number = function()
+    local c = metrics.gauge('gauge')
+
+    t.assert_error_msg_contains('Collector increment should be a number', c.inc, c, true)
+end
+
+g.test_dec_non_number = function()
+    local c = metrics.gauge('gauge')
+
+    t.assert_error_msg_contains('Collector decrement should be a number', c.dec, c, true)
+end
+
+g.test_inc_non_number = function()
+    local c = metrics.gauge('gauge')
+
+    t.xfail('That test fails until collector will raise an error')
+
+    t.assert_error_msg_contains('Collector set value should be a number', c.set, c, true)
+end
+

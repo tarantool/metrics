@@ -231,3 +231,9 @@ g.test_remove_metric_by_label = function()
         {'latency', 3, {quantile = 0.99, tag = 'a'}},
     })
 end
+
+g.test_insert_non_number = function()
+    local s = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+
+    t.assert_error_msg_contains('Summary observation should be a number', s.observe, s, true)
+end
