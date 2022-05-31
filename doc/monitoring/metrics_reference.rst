@@ -374,6 +374,8 @@ Runtime
             -   Lua garbage collector size in bytes
         *   -   ``tnt_runtime_used``
             -   Number of bytes used for the Lua runtime
+        *   -   ``tnt_runtime_tuple``
+            -   Number of bytes used for the tuples (except tuples owned by memtx and vinyl)
 
 ..  _metrics-reference-cartridge:
 
