@@ -49,6 +49,7 @@ build = {
         ['metrics.tarantool.cpu']           = 'metrics/tarantool/cpu.lua',
         ['metrics.tarantool.event_loop']    = 'metrics/tarantool/event_loop.lua',
         ['metrics.cartridge.issues']        = 'metrics/cartridge/issues.lua',
+        ['metrics.cartridge.failover']      = 'metrics/cartridge/failover.lua',
         ['metrics.tarantool.clock']         = 'metrics/tarantool/clock.lua',
         ['metrics.psutils.cpu']             = 'metrics/psutils/cpu.lua',
         ['metrics.psutils.psutils_linux']   = 'metrics/psutils/psutils_linux.lua',
