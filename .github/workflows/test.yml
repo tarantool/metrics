@@ -19,10 +19,10 @@ jobs:
           - "2.6"
           - "2.7"
           - "2.8"
-        cartridge: [ "", "1.2.0", "2.1.2", "2.4.0", "2.5.1", "2.6.0", "2.7.3" ]
+        cartridge: [ "", "1.2.0", "2.1.2", "2.4.0", "2.5.1", "2.6.0", "2.7.4" ]
         include:
           - tarantool: "2.x-latest"
-            cartridge: "2.7.3"
+            cartridge: "2.7.4"
           - tarantool: "2.x-latest"
             cartridge: ""
     runs-on: ubuntu-latest
