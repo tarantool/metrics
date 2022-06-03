@@ -101,23 +101,4 @@ function export.v1(handler, collector)
     end
 end
 
-local log_deprecate_message = true
-
---- Build middleware for http
---
--- @func[opt] collector custom histogram-like collector
--- @return middleware
--- @usage router:use(http_middleware.v2(), {name = 'http_instrumentation'})
-function export.v2(collector)
-    if log_deprecate_message then
-        log_deprecate_message = false
-        log.warn('HTTP v2 is deprecated and will be removed in next releases. Use HTTP v1 instead')
-    end
-    collector = collector or export.get_default_collector()
-    local tsgi = require('http.tsgi')
-    return function(env)
-        return export.observe(collector, env[tsgi.KEY_ROUTE].endpoint, tsgi.next, env)
-    end
-end
-
 return export
