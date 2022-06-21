@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Float numbers in Graphite exporter
 - Signed timestamp in Graphite exporter
-- Increase `Shared.make_key` perfomance in observations with empty label
+- Increase `Shared.make_key` performance in observations with empty label
 - Forbid observation of non-number value in collectors (except `gauge:set`)
+- Clean dead threads from `psutils.cpu` metric
 
 ### Added
 
