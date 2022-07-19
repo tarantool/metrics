@@ -12,21 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `tnt_net_thread_X_sent_total`
-- `tnt_net_thread_X_sent_rps`
-- `tnt_net_thread_X_received_total`
-- `tnt_net_thread_X_received_rps`
-- `tnt_net_thread_X_connections_rps`
-- `tnt_net_thread_X_connections_total`
-- `tnt_net_thread_X_connections_current`
-- `tnt_net_thread_X_requests_rps`
-- `tnt_net_thread_X_requests_total`
-- `tnt_net_thread_X_requests_current`
-- `tnt_net_thread_X_requests_in_progress_total`
-- `tnt_net_thread_X_requests_in_progress_current`
-- `tnt_net_thread_X_requests_in_stream_queue_total`
-- `tnt_net_thread_X_requests_in_stream_queue_current`
-Metrics for reporting per thread net statistics.
+- `tnt_net_thread_<index>_`
+Metrics for reporting net statistics per thread.
 
 ## [0.14.0] - 2022-06-28
 ### Fixed

@@ -246,6 +246,17 @@ Requests placed in queues of streams:
         *   -   ``tnt_net_requests_in_stream_current``
             -   Count of requests currently waiting in queues of streams
 
+Since tarantool version 2.10 network metrics available per thread separately:
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_net_thread_<index>_``
+            -   where <index> is thread number
+
 ..  _metrics-reference-fibers:
 
 Fibers
