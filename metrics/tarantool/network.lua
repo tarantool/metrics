@@ -61,82 +61,84 @@ local function update_network_metrics()
             'count of requests currently waiting in queues of streams', box_stat_net.REQUESTS_IN_STREAM_QUEUE.current)
     end
 
-    local box_stat_net_per_thread = box.stat.net.thread()
+    if box.stat.net.thread ~= nil then
+        local box_stat_net_per_thread = box.stat.net.thread()
 
-    for _index, _box_stat_net in pairs(box_stat_net_per_thread) do
-        local metric_prefix = 'net_thread_' .. _index .. '_'
+        for _index, _box_stat_net in pairs(box_stat_net_per_thread) do
+            local metric_prefix = 'net_thread_' .. _index .. '_'
 
-        local metric_name = metric_prefix .. 'sent_total'
-        collectors_list[metric_name] =
-            utils.set_counter(metric_name, 'Totally sent in bytes', _box_stat_net.SENT.total)
-
-        metric_name = metric_prefix .. 'sent_rps'
-        collectors_list[metric_name] =
-            utils.set_gauge(metric_name, 'Sending RPS', _box_stat_net.SENT.rps)
-
-        metric_name = metric_prefix .. 'received_total'
-        collectors_list[metric_name] =
-            utils.set_counter(metric_name, 'Totally received in bytes', _box_stat_net.RECEIVED.total)
-
-        metric_name = metric_prefix .. 'received_rps'
-        collectors_list[metric_name] =
-            utils.set_gauge(metric_name, 'Receive RPS', _box_stat_net.RECEIVED.rps)
-
-        if _box_stat_net.CONNECTIONS ~= nil and type(_box_stat_net.CONNECTIONS) ~= 'number' then
-            metric_name = metric_prefix .. 'connections_rps'
+            local metric_name = metric_prefix .. 'sent_total'
             collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'Connection RPS', _box_stat_net.CONNECTIONS.rps)
+                utils.set_counter(metric_name, 'Totally sent in bytes', _box_stat_net.SENT.total)
 
-            metric_name = metric_prefix .. 'connections_total'
+            metric_name = metric_prefix .. 'sent_rps'
             collectors_list[metric_name] =
-                utils.set_counter(metric_name, 'Connections total amount', _box_stat_net.CONNECTIONS.total)
+                utils.set_gauge(metric_name, 'Sending RPS', _box_stat_net.SENT.rps)
 
-            metric_name = metric_prefix .. 'connections_current'
+            metric_name = metric_prefix .. 'received_total'
             collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'Current connections amount', _box_stat_net.CONNECTIONS.current)
+                utils.set_counter(metric_name, 'Totally received in bytes', _box_stat_net.RECEIVED.total)
 
-        elseif _box_stat_net.CONNECTIONS ~= nil then
-            metric_name = metric_prefix .. 'connections_current'
+            metric_name = metric_prefix .. 'received_rps'
             collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'Current connections amount', _box_stat_net.CONNECTIONS)
-        end
+                utils.set_gauge(metric_name, 'Receive RPS', _box_stat_net.RECEIVED.rps)
 
-        if _box_stat_net.REQUESTS ~= nil then
-            metric_name = metric_prefix .. 'requests_rps'
-            collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'Requests RPS', _box_stat_net.REQUESTS.rps)
+            if _box_stat_net.CONNECTIONS ~= nil and type(_box_stat_net.CONNECTIONS) ~= 'number' then
+                metric_name = metric_prefix .. 'connections_rps'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'Connection RPS', _box_stat_net.CONNECTIONS.rps)
 
-            metric_name = metric_prefix .. 'requests_total'
-            collectors_list[metric_name] =
-                utils.set_counter(metric_name, 'Requests total amount', _box_stat_net.REQUESTS.total)
+                metric_name = metric_prefix .. 'connections_total'
+                collectors_list[metric_name] =
+                    utils.set_counter(metric_name, 'Connections total amount', _box_stat_net.CONNECTIONS.total)
 
-            metric_name = metric_prefix .. 'requests_current'
-            collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'Pending requests', _box_stat_net.REQUESTS.current)
-        end
+                metric_name = metric_prefix .. 'connections_current'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'Current connections amount', _box_stat_net.CONNECTIONS.current)
 
-        if _box_stat_net.REQUESTS_IN_PROGRESS ~= nil then
-            metric_name = metric_prefix .. 'requests_in_progress_total'
-            collectors_list[metric_name] =
-                utils.set_counter(metric_name, 'Requests in progress total amount',
-                _box_stat_net.REQUESTS_IN_PROGRESS.total)
+            elseif _box_stat_net.CONNECTIONS ~= nil then
+                metric_name = metric_prefix .. 'connections_current'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'Current connections amount', _box_stat_net.CONNECTIONS)
+            end
 
-            metric_name = metric_prefix .. 'requests_in_progress_current'
-            collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'Count of requests currently being processed in the tx thread',
-                _box_stat_net.REQUESTS_IN_PROGRESS.current)
-        end
+            if _box_stat_net.REQUESTS ~= nil then
+                metric_name = metric_prefix .. 'requests_rps'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'Requests RPS', _box_stat_net.REQUESTS.rps)
 
-        if _box_stat_net.REQUESTS_IN_STREAM_QUEUE ~= nil then
-            metric_name = metric_prefix .. 'requests_in_stream_queue_total'
-            collectors_list[metric_name] =
-                utils.set_counter(metric_name, 'Total count of requests, which was placed in queues of streams',
-                _box_stat_net.REQUESTS_IN_STREAM_QUEUE.total)
+                metric_name = metric_prefix .. 'requests_total'
+                collectors_list[metric_name] =
+                    utils.set_counter(metric_name, 'Requests total amount', _box_stat_net.REQUESTS.total)
 
-            metric_name = metric_prefix .. 'requests_in_stream_queue_current'
-            collectors_list[metric_name] =
-                utils.set_gauge(metric_name, 'count of requests currently waiting in queues of streams',
-                _box_stat_net.REQUESTS_IN_STREAM_QUEUE.current)
+                metric_name = metric_prefix .. 'requests_current'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'Pending requests', _box_stat_net.REQUESTS.current)
+            end
+
+            if _box_stat_net.REQUESTS_IN_PROGRESS ~= nil then
+                metric_name = metric_prefix .. 'requests_in_progress_total'
+                collectors_list[metric_name] =
+                    utils.set_counter(metric_name, 'Requests in progress total amount',
+                    _box_stat_net.REQUESTS_IN_PROGRESS.total)
+
+                metric_name = metric_prefix .. 'requests_in_progress_current'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'Count of requests currently being processed in the tx thread',
+                    _box_stat_net.REQUESTS_IN_PROGRESS.current)
+            end
+
+            if _box_stat_net.REQUESTS_IN_STREAM_QUEUE ~= nil then
+                metric_name = metric_prefix .. 'requests_in_stream_queue_total'
+                collectors_list[metric_name] =
+                    utils.set_counter(metric_name, 'Total count of requests, which was placed in queues of streams',
+                    _box_stat_net.REQUESTS_IN_STREAM_QUEUE.total)
+
+                metric_name = metric_prefix .. 'requests_in_stream_queue_current'
+                collectors_list[metric_name] =
+                    utils.set_gauge(metric_name, 'count of requests currently waiting in queues of streams',
+                    _box_stat_net.REQUESTS_IN_STREAM_QUEUE.current)
+            end
         end
     end
 end
