@@ -98,4 +98,12 @@ function utils.len(tbl)
     return l
 end
 
+function utils.clear_spaces()
+    for _, v in pairs(box.space) do
+        if v.id > box.schema.SYSTEM_ID_MAX then
+            v:drop()
+        end
+    end
+end
+
 return utils
