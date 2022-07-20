@@ -210,9 +210,6 @@ msgstr ""
 msgid "``tnt_net_requests_current``—amount of pending network requests."
 msgstr ""
 
-msgid "``tnt_net_thread_<index>_``—net work metrics, where ``index`` is "
-"the thread number."
-
 msgid "Fibers"
 msgstr ""
 
