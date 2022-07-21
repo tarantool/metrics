@@ -15,7 +15,7 @@ local function update()
     local trigger_cnt = vars.failover_trigger_cnt
     if trigger_cnt ~= nil then
         collectors_list.trigger_cnt =
-            utils.set_gauge(
+            utils.set_counter(
                 'cartridge_failover_trigger',
                 'Count of Cartridge Failover triggers',
                 trigger_cnt
