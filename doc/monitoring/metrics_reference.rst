@@ -772,3 +772,44 @@ Shows the current state of a replica set node in regards to leader election.
 
         *   -   ``tnt_election_term``
             -   Current election term.
+
+Memtx
+-----
+
+Memtx metrics provide ?
+Also this patch introduces box.stat.memtx.mvcc - the way to
+get memtx mvcc memory statistics.
+
+TXN
+~~~~
+
+?
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``?``
+            -   ...
+        *   -   ``?``
+            -   .
+
+.. _metrics-reference-vinyl_regulator:
+
+2
+~~~~~~~~~
+
+?
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_memtx_...``
+            -   ?.
+        *   -   ``?``
+            -   ?
