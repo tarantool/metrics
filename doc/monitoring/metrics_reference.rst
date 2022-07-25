@@ -713,3 +713,56 @@ Event loop tx thread information:
             -   Event loop prolog time (ms)
         *   -   ``tnt_ev_loop_epilog_time``
             -   Event loop epilog time (ms)
+
+Synchro
+-------
+
+?
+
+..  _metrics-reference-synchro:
+
+..  container:: table
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+        *   -   ``tnt_synchro_queue_owner``
+            -   ?
+        *   -   ``tnt_synchro_queue_term``
+            -   ?
+        *   -   ``tnt_synchro_queue_len``
+            -   ?
+        *   -   ``tnt_synchro_queue_busy``
+            -   ?
+        *   -   ``tnt_synchro_quorum``
+            -   ?
+
+Election
+--------
+
+Show the current state of a replica set node in regards to leader election.
+
+..  _metrics-reference-election:
+
+..  container:: table
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+        *   -   ``tnt_election_state``
+            -   election state (mode) of the node.
+                When election is enabled, the node is writable only in the leader state.
+                Possible values:
+
+                *   ``leader`` -- the node that collected a quorum of votes becomes the leader
+                *   ``follower`` -- all the non-leader nodes are called followers
+                *   ``candidate`` -- the nodes that start a new election round are called candidates.
+
+        *   -   ``tnt_election_vote``
+            -   ID of a node the current node votes for.
+                If the value is 0, it means the node hasn’t voted in the current term yet.
+
+        *   -   ``tnt_election_leader``
+            -   Leader node ID in the current term.
+                If the value is 0, it means the node doesn’t know which node is the leader in the current term.
+
+        *   -   ``tnt_election_term``
+            -   Current election term.

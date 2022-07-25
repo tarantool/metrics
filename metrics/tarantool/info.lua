@@ -39,6 +39,46 @@ local function update_info_metrics()
     end
 
     collectors_list.read_only = utils.set_gauge('read_only', 'Is instance read only', read_only_status[info.ro])
+
+    if info.synchro ~= nil then
+        collectors_list.synchro_queue_owner =
+            utils.set_gauge('synchro_queue_owner', '',
+                info.synchro.queue.owner)
+
+        collectors_list.synchro_queue_term =
+            utils.set_gauge('synchro_queue_term', '',
+                info.synchro.queue.term)
+
+        collectors_list.synchro_queue_len =
+            utils.set_gauge('synchro_queue_len', '',
+                info.synchro.queue)
+
+        collectors_list.synchro_queue_busy =
+            utils.set_gauge('synchro_queue_busy', '',
+                info.synchro.busy)
+
+        collectors_list.synchro_quorum =
+            utils.set_gauge('synchro_quorum', '',
+                info.synchro.quorum)
+    end
+
+    if info.election ~= nil then
+        collectors_list.election_state =
+            utils.set_gauge('election_state', 'Election state (mode) of the node',
+                info.election.state)
+
+        collectors_list.election_vote =
+            utils.set_gauge('election_vote', 'ID of a node the current node votes for',
+                info.election.vote)
+
+        collectors_list.election_leader =
+            utils.set_gauge('election_leader', 'Leader node ID in the current term',
+                info.election.leader)
+
+        collectors_list.election_term =
+            utils.set_gauge('election_term', 'Current election term',
+                info.election.term)
+    end
 end
 
 return {
