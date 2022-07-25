@@ -9,13 +9,11 @@ local psutils = require('metrics.psutils.psutils_linux')
 local collectors_list = {}
 
 local instance_file = arg[0]
-collectors_list.cpu_count = utils.set_gauge('cpu_count', 'The number of processors', psutils.get_cpu_count())
 collectors_list.cpu_number = utils.set_gauge('cpu_number', 'The number of processors', psutils.get_cpu_count())
 
 local threads = {}
 
 local function update_cpu_metrics()
-    utils.set_gauge('cpu_total', 'Host CPU time', psutils.get_cpu_time())
     utils.set_gauge('cpu_time', 'Host CPU time', psutils.get_cpu_time())
 
     local new_threads = {}

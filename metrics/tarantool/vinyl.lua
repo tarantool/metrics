@@ -62,8 +62,6 @@ local function update()
     collectors_list.vinyl_scheduler_dump_time =
         utils.set_gauge('vinyl_scheduler_dump_time', 'Total time spent by all worker threads performing dump',
         vinyl_stat.scheduler.dump_time)
-    collectors_list.vinyl_scheduler_dump_count =
-        utils.set_gauge('vinyl_scheduler_dump_count', 'The count of completed dumps', vinyl_stat.scheduler.dump_count)
     collectors_list.vinyl_scheduler_dump_total =
         utils.set_counter('vinyl_scheduler_dump_total', 'The count of completed dumps', vinyl_stat.scheduler.dump_count)
 end

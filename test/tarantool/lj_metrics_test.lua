@@ -38,7 +38,6 @@ g.test_lj_metrics = function()
         "lj_gc_tabnum",
         "lj_gc_cdatanum",
         "lj_jit_snap_restore",
-        "lj_gc_total",
         "lj_gc_memory",
         "lj_gc_udatanum",
         "lj_gc_steps_finalize",
