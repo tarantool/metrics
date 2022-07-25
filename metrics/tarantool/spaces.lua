@@ -21,7 +21,7 @@ local function update_spaces_metrics()
         end
 
         local sp = box.space[space_name]
-        if not sp or #sp.index == 0 then
+        if sp == nil or sp.index[0] == nil then
             goto continue
         end
 
