@@ -114,11 +114,23 @@ g.test_read_only = function()
     t.assert_equals(read_only[1].value, 1)
 end
 
-g.test_failover = function()
+g.before_test('test_failover', function()
     helpers.skip_cartridge_version_less('2.7.5')
-    local main_server = g.cluster:server('main')
+    local replica_server = g.cluster:server('replica')
+    replica_server:stop()
+end)
 
-    local resp = main_server:http_request('get', '/metrics')
-    local failover_trigger_cnt = utils.find_metric('tnt_cartridge_failover_trigger', resp.json)
-    t.assert_equals(failover_trigger_cnt[1].value, 0)
+g.test_failover = function()
+    local main_server = g.cluster:server('main')
+    helpers.retrying({timeout = 20}, function()
+        local resp = main_server:http_request('get', '/metrics')
+        local failover_trigger_cnt = utils.find_metric('tnt_cartridge_failover_trigger', resp.json)
+        t.assert_equals(failover_trigger_cnt[1].value, 1)
+    end)
 end
+
+g.after_test('test_failover', function()
+    local replica_server = g.cluster:server('replica')
+    replica_server:start()
+    g.cluster:wait_until_healthy()
+end)

@@ -41,6 +41,22 @@ function helpers.init_cluster(env)
         env = env,
     })
     cluster:start()
+    cluster:wait_until_healthy()
+    cluster.main_server:graphql({
+        query = [[
+            mutation($mode: String) {
+                cluster {
+                    failover_params(
+                        mode: $mode
+                    ) {
+                        mode
+                    }
+                }
+            }
+        ]],
+        variables = { mode = 'eventual' },
+        raise = false,
+    })
     return cluster
 end
 
