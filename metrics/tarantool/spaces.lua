@@ -16,13 +16,17 @@ local function update_spaces_metrics()
         local space_name = s[3]
         local flags = s[6]
 
-        if s.id <= box.schema.SYSTEM_ID_MAX or flags.temporary or space_name:match('^_') then
+        if s[1] <= box.schema.SYSTEM_ID_MAX or flags.temporary or space_name:match('^_') then
+            goto continue
+        end
+
+        local sp = box.space[space_name]
+        if not sp or #sp.index == 0 then
             goto continue
         end
 
         new_spaces[space_name] = {indexes = {}}
 
-        local sp = box.space[space_name]
         local labels = { name = sp.name }
 
         for space_id, i in pairs(sp.index) do

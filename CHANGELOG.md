@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Clean info about spaces and indexes after their drop
+- Fixed error when indexing spaces
 
 ### Added
 
