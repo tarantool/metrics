@@ -246,6 +246,8 @@ Requests placed in queues of streams:
         *   -   ``tnt_net_requests_in_stream_current``
             -   Count of requests currently waiting in queues of streams
 
+Since Tarantool 2.10 in each network metric has the label ``thread``, showing per-thread network statistics.
+
 ..  _metrics-reference-fibers:
 
 Fibers

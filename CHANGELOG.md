@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Clean info about spaces and indexes after their drop
 
+### Added
+
+- label `thread` for per thread reporting net statistics metrics.
+
 ## [0.14.0] - 2022-06-28
 ### Fixed
 
