@@ -783,13 +783,17 @@ Memtx mvcc memory statistics.
 TXN
 ~~~
 
-?
+Since transaction can allocate objects on its own, we need to track it
+to collect memory statistics of memtx txn.
 
 ..  container:: table
 
     ..  list-table::
         :widths: 25 75
         :header-rows: 0
+
+Sizes of objects from transaction manager.
+ -- Please update them, if you changed the relevant structures.
 
         *   -   ``tnt_memtx_tx_tnx_statements_max``
             -   ?
