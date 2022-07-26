@@ -717,7 +717,7 @@ Event loop tx thread information:
 Synchro
 -------
 
-?
+Show the current state of a synchronous replication.
 
 ..  _metrics-reference-synchro:
 
@@ -725,16 +725,21 @@ Synchro
     ..  list-table::
         :widths: 25 75
         :header-rows: 0
+
         *   -   ``tnt_synchro_queue_owner``
-            -   ?
+            -   Instance ID of the current synchronous replication master.
+
         *   -   ``tnt_synchro_queue_term``
-            -   ?
+            -   Current queue term.
+
         *   -   ``tnt_synchro_queue_len``
-            -   ?
+            -   How many transactions are collecting confirmations now.
+
         *   -   ``tnt_synchro_queue_busy``
-            -   ?
+            -   Whether the queue is processing any system entry (CONFIRM/ROLLBACK/PROMOTE/DEMOTE).
+
         *   -   ``tnt_synchro_quorum``
-            -   ?
+            -   Current value of ``box.cfg.replication_synchro_quorum``
 
 Election
 --------
