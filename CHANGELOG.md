@@ -29,6 +29,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Deprecated metrics
 
+### Deprecated
+
+- Metrics:
+  - `lj_gc_allocated`
+  - `lj_gc_freed`
+  - `lj_gc_steps_atomic`
+  - `lj_gc_steps_finalize`
+  - `lj_gc_steps_pause`
+  - `lj_gc_steps_propagate`
+  - `lj_gc_steps_sweep`
+  - `lj_gc_steps_sweepstring`
+  - `lj_jit_snap_restore`
+  - `lj_jit_trace_abort`
+  - `lj_strhash_hit`
+  - `lj_strhash_miss`
+
 ## [0.14.0] - 2022-06-28
 ### Fixed
 
