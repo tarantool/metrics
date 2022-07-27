@@ -777,14 +777,18 @@ Memtx
 -----
 
 Memtx mvcc memory statistics.
+Transaction manager consists of two parts:
+- the transactions themselves (TXN section)
+- MVCC
 
 ..  _metrics-reference-memtx_txn:
 
 TXN
 ~~~
 
-Since transaction can allocate objects on its own, we need to track it
-to collect memory statistics of memtx txn.
+``statements`` are the transaction statements.
+For example, the user started a transaction and made an action in it `space:replace{0, 1}`.
+Under the hood, this operation will turn into ``statement`` for the current transaction.
 
 ..  container:: table
 
@@ -792,22 +796,55 @@ to collect memory statistics of memtx txn.
         :widths: 25 75
         :header-rows: 0
 
-Sizes of objects from transaction manager.
- -- Please update them, if you changed the relevant structures.
-
-        *   -   ``tnt_memtx_tx_tnx_statements_max``
-            -   ?
-        *   -   ``tnt_memtx_tx_tnx_statements_avg``
-            -   ?
         *   -   ``tnt_memtx_tx_tnx_statements_total``
-            -   ?
+            -   The number of bytes that are allocated for the statements of all transactions.
+        *   -   ``tnt_memtx_tx_tnx_statements_avg``
+            -   Average bytes used by transactions for statements (`txn.statements.total` / number of open transactions).
+        *   -   ``tnt_memtx_tx_tnx_statements_max``
+            -   Maximum number of bytes used by one transaction for statements.
+
+``user``
+In Tarantool C API there are function `box_txn_alloc()`.
+By using this function user can allocate memory for the current transaction.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_memtx_tx_tnx_user_total``
+            -   Memory allocated by the `box_txn_alloc()` function on all transactions.
+        *   -   ``tnt_memtx_tx_tnx_user_avg``
+            -   Transaction average (total / number of transactions)
+        *   -   ``tnt_memtx_tx_tnx_user_max``
+            -   The maximum number of bytes allocated by `box_txn_alloc()` function per transaction.
+
+``system`` - internals: logs, savepoints
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_memtx_tx_tnx_system_total``
+            -   Memory allocated by internals on all transactions.
+        *   -   ``tnt_memtx_tx_tnx_system_avg``
+            -   Average allocated memory by internals (total / number of transactions)
+        *   -   ``tnt_memtx_tx_tnx_system_max``
+            -   The maximum number of bytes allocated by internals per transaction.
 
 .. _metrics-reference-memtx_mvcc:
 
 MVCC
-~~~~~~~~~
+~~~~
 
-?
+``mvcc`` is responsible for the isolation of transactions.
+It detects conflicts and makes sure that tuples that are no longer in the space, but read by some transaction
+(or can be read) have not been deleted.
+
+``trackers`` - trackers that keep track of transaction reads.
 
 ..  container:: table
 
@@ -815,27 +852,91 @@ MVCC
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_memtx_tx_mvcc_trackers_max``
-            -   ?
-        *   -   ``tnt_memtx_tx_mvcc_trackers_avg``
-            -   ?
         *   -   ``tnt_memtx_tx_mvcc_trackers_total``
-            -   ?
-        *   -   ``tnt_memtx_tx_mvcc_conflicts_max``
-            -   ?
-        *   -   ``tnt_memtx_tx_mvcc_conflicts_avg``
-            -   ?
+            -   Trackers are allocated in total (in bytes)
+        *   -   ``tnt_memtx_tx_mvcc_trackers_avg``
+            -   Average for all transactions (total / number of transactions)
+        *   -   ``tnt_memtx_tx_mvcc_trackers_max``
+            -   Maximum trackers allocated per transaction (in bytes)
+
+``conflict`` - allocated in case of transaction conflicts.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
         *   -   ``tnt_memtx_tx_mvcc_conflicts_total``
-            -   ?
-        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories_count``
-            -   ?
-        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories_total``
-            -   ?
+            -   Memory is allocated for conflicts in total (in bytes)
+        *   -   ``tnt_memtx_tx_mvcc_conflicts_avg``
+            -   Average for all transactions (total / number of transactions)
+        *   -   ``tnt_memtx_tx_mvcc_conflicts_max``
+            -   Maximum conflicts allocated per transaction (in bytes)
+
+Tuples
+~~~~~~
+
+Saved tuples are divided into 3 categories: ``used``, ``read_view``, ``tracking``.
+
+Each category has two metrics:
+- ``retained`` tuples - they are no longer in the index, but MVCC does not allow them to be removed.
+- ``stories`` - MVCC is based on the story mechanism, almost every tuple has a story.
+This is a separate metric because even the tuples that are in the index can have a story.
+So ``stories`` and ``retained`` need to be measured separately.
+
+
+``used`` - tuples that are used by active read-write transactions.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
         *   -   ``tnt_memtx_tx_mvcc_tuples_used_stories_count``
-            -   ?
+            -   Number of retained tuples / number of stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_used_stories_total``
-            -   ?
+            -   Amount of used memory in bytes.
+
+        *   -   ``tnt_memtx_tx_mvcc_tuples_used_retained_count``
+            -   Number of retained tuples / number of stories.
+        *   -   ``tnt_memtx_tx_mvcc_tuples_used_retained_total``
+            -   Amount of used memory in bytes.
+
+``read_view`` - tuples that are not used by active read-write transactions,
+but are used by read-only transactions (i.e. in read view).
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
         *   -   ``tnt_memtx_tx_mvcc_tuples_read_view_stories_count``
-            -   ?
+            -   Number of retained tuples / number of stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_read_view_stories_total``
-            -   ?
+            -   Amount of used memory in bytes.
+
+        *   -   ``memtx_tx_mvcc_tuples_read_view_retained_count``
+            -   Number of retained tuples / number of stories.
+        *   -   ``memtx_tx_mvcc_tuples_read_view_retained_total``
+            -   Amount of used memory in bytes.
+
+``tracking`` - tuples that are not directly used by any transactions, but are used by MVCC to track reads.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories_count``
+            -   Number of retained tuples / number of stories.
+        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories_total``
+            -   Amount of used memory in bytes.
+
+        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_retained_count``
+            -   Number of retained tuples / number of stories.
+        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_retained_total``
+            -   Amount of used memory in bytes.
