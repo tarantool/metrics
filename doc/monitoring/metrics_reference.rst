@@ -816,7 +816,7 @@ By using this function user can allocate memory for the current transaction.
         *   -   ``tnt_memtx_tx_tnx_user_total``
             -   Memory allocated by the `box_txn_alloc()` function on all transactions.
         *   -   ``tnt_memtx_tx_tnx_user_avg``
-            -   Transaction average (total / number of transactions)
+            -   Transaction average (total / number of transactions).
         *   -   ``tnt_memtx_tx_tnx_user_max``
             -   The maximum number of bytes allocated by `box_txn_alloc()` function per transaction.
 
@@ -831,7 +831,7 @@ By using this function user can allocate memory for the current transaction.
         *   -   ``tnt_memtx_tx_tnx_system_total``
             -   Memory allocated by internals on all transactions.
         *   -   ``tnt_memtx_tx_tnx_system_avg``
-            -   Average allocated memory by internals (total / number of transactions)
+            -   Average allocated memory by internals (total / number of transactions).
         *   -   ``tnt_memtx_tx_tnx_system_max``
             -   The maximum number of bytes allocated by internals per transaction.
 
@@ -853,11 +853,11 @@ It detects conflicts and makes sure that tuples that are no longer in the space,
         :header-rows: 0
 
         *   -   ``tnt_memtx_tx_mvcc_trackers_total``
-            -   Trackers are allocated in total (in bytes)
+            -   Trackers are allocated in total (in bytes).
         *   -   ``tnt_memtx_tx_mvcc_trackers_avg``
-            -   Average for all transactions (total / number of transactions)
+            -   Average for all transactions (total / number of transactions).
         *   -   ``tnt_memtx_tx_mvcc_trackers_max``
-            -   Maximum trackers allocated per transaction (in bytes)
+            -   Maximum trackers allocated per transaction (in bytes).
 
 ``conflict`` - allocated in case of transaction conflicts.
 
@@ -868,12 +868,13 @@ It detects conflicts and makes sure that tuples that are no longer in the space,
         :header-rows: 0
 
         *   -   ``tnt_memtx_tx_mvcc_conflicts_total``
-            -   Memory is allocated for conflicts in total (in bytes)
+            -   Bytes allocated for conflicts in total.
         *   -   ``tnt_memtx_tx_mvcc_conflicts_avg``
-            -   Average for all transactions (total / number of transactions)
+            -   Average for all transactions (total / number of transactions).
         *   -   ``tnt_memtx_tx_mvcc_conflicts_max``
-            -   Maximum conflicts allocated per transaction (in bytes)
+            -   Maximum bytes allocated for conflicts per transaction.
 
+~~~~~~
 Tuples
 ~~~~~~
 
@@ -895,14 +896,14 @@ So ``stories`` and ``retained`` need to be measured separately.
         :header-rows: 0
 
         *   -   ``tnt_memtx_tx_mvcc_tuples_used_stories_count``
-            -   Number of retained tuples / number of stories.
+            -   Number of ``used`` tuples / number of stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_used_stories_total``
-            -   Amount of used memory in bytes.
+            -   Amount of bytes used by stories ``used`` tuples.
 
         *   -   ``tnt_memtx_tx_mvcc_tuples_used_retained_count``
-            -   Number of retained tuples / number of stories.
+            -   Number of retained ``used`` tuples / number of stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_used_retained_total``
-            -   Amount of used memory in bytes.
+            -   Amount of bytes used by retained ``used`` tuples.
 
 ``read_view`` - tuples that are not used by active read-write transactions,
 but are used by read-only transactions (i.e. in read view).
@@ -914,14 +915,14 @@ but are used by read-only transactions (i.e. in read view).
         :header-rows: 0
 
         *   -   ``tnt_memtx_tx_mvcc_tuples_read_view_stories_count``
-            -   Number of retained tuples / number of stories.
+            -   Number of ``read_view`` tuples / number of stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_read_view_stories_total``
-            -   Amount of used memory in bytes.
+            -   Amount of bytes used by stories ``read_view`` tuples.
 
         *   -   ``memtx_tx_mvcc_tuples_read_view_retained_count``
-            -   Number of retained tuples / number of stories.
+            -   Number of retained ``read_view`` tuples / number of stories.
         *   -   ``memtx_tx_mvcc_tuples_read_view_retained_total``
-            -   Amount of used memory in bytes.
+            -   Amount of bytes used by retained ``read_view`` tuples.
 
 ``tracking`` - tuples that are not directly used by any transactions, but are used by MVCC to track reads.
 
@@ -932,11 +933,11 @@ but are used by read-only transactions (i.e. in read view).
         :header-rows: 0
 
         *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories_count``
-            -   Number of retained tuples / number of stories.
+            -   Number of ``tracking`` tuples / number of tracking stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories_total``
-            -   Amount of used memory in bytes.
+            -   Amount of bytes used by stories ``tracking`` tuples.
 
         *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_retained_count``
-            -   Number of retained tuples / number of stories.
+            -   Number of retained ``tracking`` tuples / number of stories.
         *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_retained_total``
-            -   Amount of used memory in bytes.
+            -   Amount of bytes used by retained ``tracking`` tuples.
