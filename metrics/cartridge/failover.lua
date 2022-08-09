@@ -16,7 +16,7 @@ local function update()
     if trigger_cnt ~= nil then
         collectors_list.trigger_cnt =
             utils.set_counter(
-                'cartridge_failover_trigger',
+                'cartridge_failover_trigger_total',
                 'Count of Cartridge Failover triggers',
                 trigger_cnt
             )

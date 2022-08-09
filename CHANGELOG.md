@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Label `thread` for per thread reporting net statistics metrics.
-- `tnt_cartridge_failover_trigger` metric
+- `tnt_cartridge_failover_trigger_total` metric
 - New synchro and election metrics:
   - `tnt_synchro_queue_owner`
   - `tnt_synchro_queue_term`
