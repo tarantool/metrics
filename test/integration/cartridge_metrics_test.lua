@@ -137,7 +137,7 @@ g.test_failover = function()
 
     helpers.retrying({timeout = 30}, function()
         local resp = g.cluster:server('replica'):http_request('get', '/metrics')
-        local failover_trigger_cnt = utils.find_metric('tnt_cartridge_failover_trigger', resp.json)
+        local failover_trigger_cnt = utils.find_metric('tnt_cartridge_failover_trigger_total', resp.json)
         t.assert_equals(failover_trigger_cnt[1].value, 1)
     end)
 

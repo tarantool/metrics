@@ -411,7 +411,7 @@ Cartridge
                 *   ``max`` -- difference with the fastest clock (always positive),
                 *   ``min`` -- difference with the slowest clock (always negative).
 
-        *   -   ``tnt_cartridge_failover_trigger``
+        *   -   ``tnt_cartridge_failover_trigger_total``
             -   Count of failover triggers in cluster.
 
 ..  _metrics-reference-luajit:
