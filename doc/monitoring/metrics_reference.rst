@@ -754,9 +754,9 @@ Shows the current state of a replica set node in regards to leader election.
                 When election is enabled, the node is writable only in the leader state.
                 Possible values:
 
-                *   ``leader`` -- the node that collected a quorum of votes becomes the leader
-                *   ``follower`` -- all the non-leader nodes are called followers
-                *   ``candidate`` -- the nodes that start a new election round are called candidates.
+                *   0 (``follower``) -- all the non-leader nodes are called followers
+                *   1 (``candidate``) -- the nodes that start a new election round are called candidates.
+                *   2 (``leader``) -- the node that collected a quorum of votes becomes the leader
 
         *   -   ``tnt_election_vote``
             -   ID of a node the current node votes for.
