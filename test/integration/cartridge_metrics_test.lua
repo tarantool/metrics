@@ -116,6 +116,23 @@ end
 
 g.before_test('test_failover', function()
     helpers.skip_cartridge_version_less('2.7.5')
+    g.cluster:wait_until_healthy()
+    g.cluster.main_server:graphql({
+        query = [[
+            mutation($mode: String) {
+                cluster {
+                    failover_params(
+                        mode: $mode
+                    ) {
+                        mode
+                    }
+                }
+            }
+        ]],
+        variables = { mode = 'eventual' },
+        raise = false,
+    })
+    g.cluster:wait_until_healthy()
     local main_server = g.cluster:server('main')
     main_server:stop()
 end)
