@@ -717,7 +717,7 @@ Event loop tx thread information:
 Synchro
 -------
 
-Show the current state of a synchronous replication.
+Shows the current state of a synchronous replication.
 
 ..  _metrics-reference-synchro:
 
@@ -744,7 +744,7 @@ Show the current state of a synchronous replication.
 Election
 --------
 
-Show the current state of a replica set node in regards to leader election.
+Shows the current state of a replica set node in regards to leader election.
 
 ..  _metrics-reference-election:
 
