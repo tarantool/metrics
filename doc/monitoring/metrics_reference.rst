@@ -738,9 +738,6 @@ Shows the current state of a synchronous replication.
         *   -   ``tnt_synchro_queue_busy``
             -   Whether the queue is processing any system entry (CONFIRM/ROLLBACK/PROMOTE/DEMOTE).
 
-        *   -   ``tnt_synchro_quorum``
-            -   Current value of ``box.cfg.replication_synchro_quorum``
-
 Election
 --------
 

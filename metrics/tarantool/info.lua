@@ -7,6 +7,12 @@ local read_only_status = {
     [false] = 0,
 }
 
+local election_states = {
+    follower = 0,
+    candidate = 1,
+    leader = 2,
+}
+
 local function update_info_metrics()
     if not utils.box_is_configured() then
         return
@@ -42,30 +48,26 @@ local function update_info_metrics()
 
     if info.synchro ~= nil then
         collectors_list.synchro_queue_owner =
-            utils.set_gauge('synchro_queue_owner', '',
+            utils.set_gauge('synchro_queue_owner', 'Synchro queue owner',
                 info.synchro.queue.owner)
 
         collectors_list.synchro_queue_term =
-            utils.set_gauge('synchro_queue_term', '',
+            utils.set_gauge('synchro_queue_term', 'Synchro queue term',
                 info.synchro.queue.term)
 
         collectors_list.synchro_queue_len =
-            utils.set_gauge('synchro_queue_len', '',
+            utils.set_gauge('synchro_queue_len', 'Amount of transactions are collecting confirmations now',
                 info.synchro.queue)
 
         collectors_list.synchro_queue_busy =
-            utils.set_gauge('synchro_queue_busy', '',
-                info.synchro.busy)
-
-        collectors_list.synchro_quorum =
-            utils.set_gauge('synchro_quorum', '',
-                info.synchro.quorum)
+            utils.set_gauge('synchro_queue_busy', 'Is synchro queue busy',
+                info.synchro.busy == true and 1 or 0)
     end
 
     if info.election ~= nil then
         collectors_list.election_state =
-            utils.set_gauge('election_state', 'Election state (mode) of the node',
-                info.election.state)
+            utils.set_gauge('election_state', 'Election state of the node',
+                election_states[info.election.state])
 
         collectors_list.election_vote =
             utils.set_gauge('election_vote', 'ID of a node the current node votes for',
