@@ -713,3 +713,58 @@ Event loop tx thread information:
             -   Event loop prolog time (ms)
         *   -   ``tnt_ev_loop_epilog_time``
             -   Event loop epilog time (ms)
+
+Synchro
+-------
+
+Shows the current state of a synchronous replication.
+
+..  _metrics-reference-synchro:
+
+..  container:: table
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_synchro_queue_owner``
+            -   Instance ID of the current synchronous replication master.
+
+        *   -   ``tnt_synchro_queue_term``
+            -   Current queue term.
+
+        *   -   ``tnt_synchro_queue_len``
+            -   How many transactions are collecting confirmations now.
+
+        *   -   ``tnt_synchro_queue_busy``
+            -   Whether the queue is processing any system entry (CONFIRM/ROLLBACK/PROMOTE/DEMOTE).
+
+Election
+--------
+
+Shows the current state of a replica set node in regards to leader election.
+
+..  _metrics-reference-election:
+
+..  container:: table
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+        *   -   ``tnt_election_state``
+            -   election state (mode) of the node.
+                When election is enabled, the node is writable only in the leader state.
+                Possible values:
+
+                *   0 (``follower``) -- all the non-leader nodes are called followers
+                *   1 (``candidate``) -- the nodes that start a new election round are called candidates.
+                *   2 (``leader``) -- the node that collected a quorum of votes becomes the leader
+
+        *   -   ``tnt_election_vote``
+            -   ID of a node the current node votes for.
+                If the value is 0, it means the node hasn’t voted in the current term yet.
+
+        *   -   ``tnt_election_leader``
+            -   Leader node ID in the current term.
+                If the value is 0, it means the node doesn’t know which node is the leader in the current term.
+
+        *   -   ``tnt_election_term``
+            -   Current election term.

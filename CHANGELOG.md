@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Label `thread` for per thread reporting net statistics metrics.
+- `tnt_cartridge_failover_trigger` metric
+- New synchro and election metrics:
+  - `tnt_synchro_queue_owner`
+  - `tnt_synchro_queue_term`
+  - `tnt_synchro_queue_len`
+  - `tnt_synchro_queue_busy`
+  - `tnt_election_state`
+  - `tnt_election_vote`
+  - `tnt_election_leader`
+  - `tnt_election_term`
 
 ### Removed
 
@@ -31,7 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `tnt_cartridge_cluster_issues` metric
-- `tnt_cartridge_failover_trigger` metric
 
 ### Deprecated
 
