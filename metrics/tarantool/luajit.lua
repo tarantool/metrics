@@ -95,11 +95,6 @@ local function update()
     collectors_list.gc_steps_pause_total =
         utils.set_counter('gc_steps_pause_total', 'Total count of incremental GC steps (pause state)',
             lj_metrics.gc_steps_pause, nil, LJ_PREFIX)
-
-    require('log').warn('metrics lj_gc_allocated, lj_gc_freed, lj_gc_steps_atomic, '..
-        'lj_gc_steps_finalize, lj_gc_steps_pause, lj_gc_steps_propagate, lj_gc_steps_sweep, ' ..
-        'lj_gc_steps_sweepstring, lj_jit_snap_restore, lj_jit_trace_abort, lj_strhash_hit, ' ..
-        'lj_strhash_miss are deprecated and will be removed in next releases.')
 end
 
 return {

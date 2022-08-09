@@ -125,6 +125,10 @@ return {
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
     enable_default_metrics = function(include, exclude)
+        require('log').warn('metrics lj_gc_allocated, lj_gc_freed, lj_gc_steps_atomic, '..
+            'lj_gc_steps_finalize, lj_gc_steps_pause, lj_gc_steps_propagate, lj_gc_steps_sweep, ' ..
+            'lj_gc_steps_sweepstring, lj_jit_snap_restore, lj_jit_trace_abort, lj_strhash_hit, ' ..
+            'lj_strhash_miss are deprecated and will be removed in next releases.')
         require('metrics.tarantool').enable(include, exclude)
     end,
     http_middleware = require('metrics.http_middleware'),
