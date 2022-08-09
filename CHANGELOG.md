@@ -13,7 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- label `thread` for per thread reporting net statistics metrics.
+- Label `thread` for per thread reporting net statistics metrics.
+
+### Removed
+
+- Deprecated metrics
 
 ## [0.14.0] - 2022-06-28
 ### Fixed

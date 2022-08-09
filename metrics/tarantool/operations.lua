@@ -12,8 +12,6 @@ local function update_operations_metrics()
     for k, v in pairs(current_stat) do
         collectors_list.stats_op_total =
             utils.set_counter('stats_op_total', 'Total amount of operations', v.total, {operation = k:lower()})
-        collectors_list.stats_op_rps =
-            utils.set_gauge('stats_op_rps', 'Total RPS', v.rps, {operation = k:lower()})
     end
 end
 

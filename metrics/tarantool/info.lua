@@ -23,9 +23,6 @@ local function update_info_metrics()
 
     for k, v in pairs(info.replication) do
         if v.upstream ~= nil then
-            local metric_name_old = 'replication_' .. k .. '_lag'
-            collectors_list[metric_name_old] =
-                utils.set_gauge(metric_name_old, 'Replication lag for instance ' .. k, v.upstream.lag)
             collectors_list.replication_lag =
                 utils.set_gauge('replication_lag', 'Replication lag', v.upstream.lag, {stream = 'upstream', id = k})
             collectors_list.replication_status =

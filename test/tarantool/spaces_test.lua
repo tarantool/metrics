@@ -48,6 +48,8 @@ g.test_spaces = function()
         {engine = 'memtx', name = 'memtx_space_2'},
         {engine = 'memtx', name = 'memtx_space_3'},
     })
+
+    metrics_list = get_space_metrics('tnt_vinyl_tuples')
     t.assert_items_include(metrics_list, {
         {engine = 'vinyl', name = 'vinyl_space_1'},
         {engine = 'vinyl', name = 'vinyl_space_2'},
@@ -71,7 +73,7 @@ g.test_indexes = function()
 end
 
 g.test_disable_vinyl = function()
-    local metrics_list = get_space_metrics('tnt_space')
+    local metrics_list = get_space_metrics('tnt_vinyl_tuples')
 
     t.assert_items_include(metrics_list, {
         {engine = 'vinyl', name = 'vinyl_space_1'},
@@ -79,7 +81,9 @@ g.test_disable_vinyl = function()
         {engine = 'vinyl', name = 'vinyl_space_3'},
     })
 
-    t.assert_items_include(metrics_list, {
+    local metrics_vinyl_index = get_space_metrics('tnt_space_index_bsize')
+
+    t.assert_items_include(metrics_vinyl_index, {
         {index_name = 'index_1', name = 'vinyl_space_1'},
         {index_name = 'index_2', name = 'vinyl_space_2'},
         {index_name = 'index_3', name = 'vinyl_space_3'},
@@ -172,7 +176,9 @@ g.test_drop_spaces = function()
         {engine = 'memtx', name = 'memtx_space_3'},
     })
 
-    t.assert_items_include(metrics_list, {
+    local metrics_list_vinyl = get_space_metrics('tnt_vinyl_tuples')
+
+    t.assert_items_include(metrics_list_vinyl, {
         {engine = 'vinyl', name = 'vinyl_space_1'},
         {engine = 'vinyl', name = 'vinyl_space_2'},
         {engine = 'vinyl', name = 'vinyl_space_3'},
@@ -180,6 +186,11 @@ g.test_drop_spaces = function()
 
     local count = 0
     for _, item in pairs(metrics_list) do
+        if item.engine ~= nil then
+            count = count + 1
+        end
+    end
+    for _, item in pairs(metrics_list_vinyl) do
         if item.engine ~= nil then
             count = count + 1
         end
@@ -198,6 +209,12 @@ g.test_drop_spaces = function()
             count = count + 1
         end
     end
+    metrics_list_vinyl = get_space_metrics('tnt_vinyl_tuples')
+    for _, item in pairs(metrics_list_vinyl) do
+        if item.engine ~= nil then
+            count = count + 1
+        end
+    end
     t.assert_equals(count, 7)
 
     t.assert_items_include(metrics_list, {
@@ -205,7 +222,7 @@ g.test_drop_spaces = function()
         {engine = 'memtx', name = 'memtx_space_3'},
     })
 
-    t.assert_items_include(metrics_list, {
+    t.assert_items_include(metrics_list_vinyl, {
         {engine = 'vinyl', name = 'vinyl_space_2'},
     })
 end

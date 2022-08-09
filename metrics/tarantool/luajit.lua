@@ -34,8 +34,6 @@ local function update()
     collectors_list.jit_snap_restore =
         utils.set_counter('jit_snap_restore', 'Overall number of snap restores',
             lj_metrics.jit_snap_restore, nil, LJ_PREFIX)
-    collectors_list.gc_total =
-        utils.set_gauge('gc_total', 'Memory currently allocated', lj_metrics.gc_total, nil, LJ_PREFIX)
     collectors_list.gc_memory =
         utils.set_gauge('gc_memory', 'Memory currently allocated', lj_metrics.gc_total, nil, LJ_PREFIX)
     collectors_list.gc_udatanum =

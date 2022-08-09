@@ -70,7 +70,6 @@ local function update_spaces_metrics()
             if include_vinyl_count then
                 labels.engine = 'vinyl'
                 local count = sp:count()
-                collectors_list.space_count = utils.set_gauge('space_count', 'Space count', count, labels)
                 collectors_list.vinyl_tuples =
                     utils.set_gauge('vinyl_tuples', 'Vinyl space tuples count', count, labels)
                 new_spaces[space_name].vinyl_labels = labels
@@ -92,7 +91,6 @@ local function update_spaces_metrics()
             collectors_list.space_total_bsize:remove(space.memtx_labels)
         end
         if space.vinyl_labels ~= nil then
-            collectors_list.space_count:remove(space.vinyl_labels)
             collectors_list.vinyl_tuples:remove(space.vinyl_labels)
         end
     end
