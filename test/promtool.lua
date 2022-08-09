@@ -3,6 +3,8 @@ local fio = require('fio')
 local prometheus = require('metrics.plugins.prometheus')
 local metrics = require('metrics')
 
+metrics.enable_default_metrics(nil, {'luajit'}) -- remove luajit after removing of deprecated metrics
+
 local counter = metrics.counter('counter_total', 'help text')
 local gauge = metrics.gauge('gauge', 'help text')
 local histogram = metrics.histogram('histogran', 'help text', nil)

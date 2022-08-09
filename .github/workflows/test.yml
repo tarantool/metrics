@@ -68,13 +68,15 @@ jobs:
 
       - uses: tarantool/setup-tarantool@v1
         with:
-          tarantool-version: '2.4'
+          tarantool-version: '2.10'
 
       - uses: actions/setup-go@v2
         with:
           go-version: '1.15'
 
       - name: promtool test
+        env:
+          CARTRIDGE_VERSION: '2.7.5'
         run: |
           GO111MODULE=on go get github.com/prometheus/prometheus/cmd/promtool@a6be548dbc17780d562a39c0e4bd0bd4c00ad6e2
           make test_promtool
