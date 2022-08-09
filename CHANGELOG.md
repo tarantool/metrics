@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2022-08-09
 ### Fixed
 
 - Clean info about spaces and indexes after their drop
