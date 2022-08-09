@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `tnt_cartridge_cluster_issues` metric
+- `tnt_cartridge_failover_trigger` metric
 
 ### Deprecated
 

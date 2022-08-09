@@ -15,6 +15,7 @@ local default_metrics = {
     vinyl               = require('metrics.tarantool.vinyl'),
     luajit              = require('metrics.tarantool.luajit'),
     cartridge_issues    = require('metrics.cartridge.issues'),
+    cartridge_failover  = require('metrics.cartridge.failover'),
     clock               = require('metrics.tarantool.clock'),
     event_loop          = require('metrics.tarantool.event_loop'),
 }

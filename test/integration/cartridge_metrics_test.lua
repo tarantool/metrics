@@ -113,3 +113,34 @@ g.test_read_only = function()
     read_only = utils.find_metric('tnt_read_only', resp.json)
     t.assert_equals(read_only[1].value, 1)
 end
+
+g.test_failover = function()
+    helpers.skip_cartridge_version_less('2.7.5')
+    g.cluster:wait_until_healthy()
+    g.cluster.main_server:graphql({
+        query = [[
+            mutation($mode: String) {
+                cluster {
+                    failover_params(
+                        mode: $mode
+                    ) {
+                        mode
+                    }
+                }
+            }
+        ]],
+        variables = { mode = 'eventual' },
+        raise = false,
+    })
+    g.cluster:wait_until_healthy()
+    g.cluster.main_server:stop()
+
+    helpers.retrying({timeout = 30}, function()
+        local resp = g.cluster:server('replica'):http_request('get', '/metrics')
+        local failover_trigger_cnt = utils.find_metric('tnt_cartridge_failover_trigger', resp.json)
+        t.assert_equals(failover_trigger_cnt[1].value, 1)
+    end)
+
+    g.cluster.main_server:start()
+    g.cluster:wait_until_healthy()
+end

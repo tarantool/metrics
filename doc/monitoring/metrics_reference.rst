@@ -408,8 +408,11 @@ Cartridge
                 This metric always has the label ``{delta="..."}``,
                 which has the following possible values:
 
-                *   ``max`` -- difference with the fastest clock (always positive)
+                *   ``max`` -- difference with the fastest clock (always positive),
                 *   ``min`` -- difference with the slowest clock (always negative).
+
+        *   -   ``tnt_cartridge_failover_trigger``
+            -   Count of failover triggers in cluster.
 
 ..  _metrics-reference-luajit:
 
