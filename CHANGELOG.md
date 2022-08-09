@@ -24,10 +24,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tnt_election_vote`
   - `tnt_election_leader`
   - `tnt_election_term`
+- Renamed LuaJit metrics:
+  - `lj_gc_allocated_total`
+  - `lj_gc_freed_total`
+  - `lj_gc_steps_atomic_total`
+  - `lj_gc_steps_finalize_total`
+  - `lj_gc_steps_pause_total`
+  - `lj_gc_steps_propagate_total`
+  - `lj_gc_steps_sweep_total`
+  - `lj_gc_steps_sweepstring_total`
+  - `lj_jit_snap_restore_total`
+  - `lj_jit_trace_abort_total`
+  - `lj_strhash_hit_total`
+  - `lj_strhash_miss_total`
+
+### Deprecated
+
+- Metrics:
+  - `lj_gc_allocated`
+  - `lj_gc_freed`
+  - `lj_gc_steps_atomic`
+  - `lj_gc_steps_finalize`
+  - `lj_gc_steps_pause`
+  - `lj_gc_steps_propagate`
+  - `lj_gc_steps_sweep`
+  - `lj_gc_steps_sweepstring`
+  - `lj_jit_snap_restore`
+  - `lj_jit_trace_abort`
+  - `lj_strhash_hit`
+  - `lj_strhash_miss`
 
 ### Removed
 
-- Deprecated metrics
+- Deprecated metrics from previous releases
 
 ## [0.14.0] - 2022-06-28
 ### Fixed
