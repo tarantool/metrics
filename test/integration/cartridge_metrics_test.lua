@@ -114,7 +114,7 @@ g.test_read_only = function()
     t.assert_equals(read_only[1].value, 1)
 end
 
-g.before_test('test_failover', function()
+g.test_failover = function()
     helpers.skip_cartridge_version_less('2.7.5')
     g.cluster:wait_until_healthy()
     g.cluster.main_server:graphql({
@@ -133,20 +133,14 @@ g.before_test('test_failover', function()
         raise = false,
     })
     g.cluster:wait_until_healthy()
-    local main_server = g.cluster:server('main')
-    main_server:stop()
-end)
+    g.cluster.main_server:stop()
 
-g.test_failover = function()
     helpers.retrying({timeout = 30}, function()
         local resp = g.cluster:server('replica'):http_request('get', '/metrics')
         local failover_trigger_cnt = utils.find_metric('tnt_cartridge_failover_trigger', resp.json)
         t.assert_equals(failover_trigger_cnt[1].value, 1)
     end)
-end
 
-g.after_test('test_failover', function()
-    local main_server = g.cluster:server('main')
-    main_server:start()
+    g.cluster.main_server:start()
     g.cluster:wait_until_healthy()
-end)
+end
