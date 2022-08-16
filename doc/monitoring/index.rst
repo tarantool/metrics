@@ -18,3 +18,4 @@ This chapter includes the following sections:
     api_reference
     plugins
     grafana_dashboard
+    alerting
