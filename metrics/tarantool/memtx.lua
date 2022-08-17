@@ -2,11 +2,6 @@ local utils = require('metrics.utils')
 
 local collectors_list = {}
 
-local mvcc_tuples_states = {
-    count = 0,
-    total = 1,
-}
-
 local function update()
     if not utils.box_is_configured() then
         return
