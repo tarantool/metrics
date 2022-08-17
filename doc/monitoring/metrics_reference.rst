@@ -804,7 +804,7 @@ TXN
                     Average bytes used by transactions for statements
                     (`txn.statements.total` bytes / number of open transactions).
                 *   ``max``
-                    The maximum number of bytes used by one transaction for statements.
+                    The maximum number of bytes used by one the current transaction for statements.
 
         *   - ``tnt_memtx_tx_tnx_user``
             -   In Tarantool C API there is a function `box_txn_alloc()`.
@@ -852,7 +852,7 @@ It detects conflicts and makes sure that tuples that are no longer in the space,
                 which has the following possible values:
 
                 *   ``total``
-                    Trackers are allocated in total (in bytes).
+                    Trackers of all current transactions are allocated in total (in bytes).
                 *   ``average``
                     Average for all current transactions (total memory bytes / number of transactions).
                 *   ``max``
