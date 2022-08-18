@@ -19,23 +19,46 @@ g.test_info = function()
     info.update()
     local default_metrics = metrics.collect()
 
-    local metrics_list = {
-        'tnt_info_lsn',
-        'tnt_info_uptime',
-        'tnt_synchro_queue_owner',
-        'tnt_synchro_queue_term',
-        'tnt_synchro_queue_len',
-        'tnt_synchro_queue_busy',
-        'tnt_election_state',
-        'tnt_election_vote',
-        'tnt_election_leader',
-        'tnt_election_term',
-    }
+    local tnt_info_lsn = utils.find_metric('tnt_info_lsn', default_metrics)
+    t.assert(tnt_info_lsn)
+    t.assert_type(tnt_info_lsn[1].value, 'number')
 
-    for _, item in ipairs(metrics_list) do
-        require('log').info('checking metric: ' .. item)
-        local metric = utils.find_metric(item, default_metrics)
-        t.assert(metric)
-        t.assert_type(metric[1].value, 'number')
-    end
+    local tnt_info_uptime = utils.find_metric('tnt_info_uptime', default_metrics)
+    t.assert(tnt_info_uptime)
+    t.assert_type(tnt_info_uptime[1].value, 'number')
+
+    t.skip_if(utils.is_version_less(_TARANTOOL, '2.8.0'),
+        'Tarantool version is must be v2.8.0 or greater')
+
+    local tnt_synchro_queue_owner = utils.find_metric('tnt_synchro_queue_owner', default_metrics)
+    t.assert(tnt_synchro_queue_owner)
+    t.assert_type(tnt_synchro_queue_owner[1].value, 'number')
+
+    local tnt_synchro_queue_term = utils.find_metric('tnt_synchro_queue_term', default_metrics)
+    t.assert(tnt_synchro_queue_term)
+    t.assert_type(tnt_synchro_queue_term[1].value, 'number')
+
+    local tnt_synchro_queue_len = utils.find_metric('tnt_synchro_queue_len', default_metrics)
+    t.assert(tnt_synchro_queue_len)
+    t.assert_type(tnt_synchro_queue_len[1].value, 'number')
+
+    local tnt_synchro_queue_busy = utils.find_metric('tnt_synchro_queue_busy', default_metrics)
+    t.assert(tnt_synchro_queue_busy)
+    t.assert_type(tnt_synchro_queue_busy[1].value, 'number')
+
+    local tnt_election_state = utils.find_metric('tnt_election_state', default_metrics)
+    t.assert(tnt_election_state)
+    t.assert_type(tnt_election_state[1].value, 'number')
+
+    local tnt_election_vote = utils.find_metric('tnt_election_vote', default_metrics)
+    t.assert(tnt_election_vote)
+    t.assert_type(tnt_election_vote[1].value, 'number')
+
+    local tnt_election_leader = utils.find_metric('tnt_election_leader', default_metrics)
+    t.assert(tnt_election_leader)
+    t.assert_type(tnt_election_leader[1].value, 'number')
+
+    local tnt_election_term = utils.find_metric('tnt_election_term', default_metrics)
+    t.assert(tnt_election_term)
+    t.assert_type(tnt_election_term[1].value, 'number')
 end
