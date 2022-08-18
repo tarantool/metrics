@@ -27,8 +27,8 @@ g.test_info = function()
     t.assert(tnt_info_uptime)
     t.assert_type(tnt_info_uptime[1].value, 'number')
 
-    t.skip_if(utils.is_version_less(_TARANTOOL, '2.6.0'),
-        'Tarantool version is must be v2.6.0 or greater')
+    t.skip_if(utils.is_version_less(_TARANTOOL, '2.7.0'),
+        'Tarantool version is must be v2.7.0 or greater')
 
     local tnt_synchro_queue_owner = utils.find_metric('tnt_synchro_queue_owner', default_metrics)
     t.assert(tnt_synchro_queue_owner)
