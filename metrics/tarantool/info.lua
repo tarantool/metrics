@@ -57,7 +57,7 @@ local function update_info_metrics()
 
         collectors_list.synchro_queue_len =
             utils.set_gauge('synchro_queue_len', 'Amount of transactions are collecting confirmations now',
-                info.synchro.queue)
+                info.synchro.queue.len)
 
         collectors_list.synchro_queue_busy =
             utils.set_gauge('synchro_queue_busy', 'Is synchro queue busy',
