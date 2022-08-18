@@ -15,11 +15,14 @@ g.after_each(function()
 end)
 
 g.test_memtx = function()
-    if utils.is_version_greater(_TARANTOOL, '2.9.0') then
+    local log = require('log')
+
+    if utils.is_version_less(_TARANTOOL, '2.10.0') then
+        log.info("test_memtx skipped")
+    else
         metrics.enable_default_metrics()
         memtx.update()
         local default_metrics = metrics.collect()
-        local log = require('log')
 
         local metrics_list1 = {
             'tnt_memtx_tnx_statements',
