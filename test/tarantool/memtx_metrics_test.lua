@@ -15,7 +15,7 @@ g.after_each(function()
 end)
 
 g.test_memtx = function()
-    if utils.is_version_greater(_TARANTOOL, '2.8.0') then
+    if utils.is_version_greater(_TARANTOOL, '2.9.0') then
         metrics.enable_default_metrics()
         memtx.update()
         local default_metrics = metrics.collect()
