@@ -792,7 +792,7 @@ TXN
         :widths: 25 75
         :header-rows: 0
 
-        *   - ``tnt_memtx_tx_tnx_statements`` are the transaction statements.
+        *   - ``tnt_memtx_tnx_statements`` are the transaction statements.
             -   For example, the user started a transaction and made an action in it `space:replace{0, 1}`.
                 Under the hood, this operation will turn into ``statement`` for the current transaction.
                 This metric always has the label ``{kind="..."}``,
@@ -806,7 +806,7 @@ TXN
                 *   ``max``
                     The maximum number of bytes used by one the current transaction for statements.
 
-        *   - ``tnt_memtx_tx_tnx_user``
+        *   - ``tnt_memtx_tnx_user``
             -   In Tarantool C API there is a function `box_txn_alloc()`.
                 By using this function user can allocate memory for the current transaction.
                 This metric always has the label ``{kind="..."}``,
@@ -819,7 +819,7 @@ TXN
                 *   ``max``
                     The maximum number of bytes allocated by `box_txn_alloc()` function per transaction.
 
-        *   - ``tnt_memtx_tx_tnx_system``
+        *   - ``tnt_memtx_tnx_system``
             -   There are internals: logs, savepoints.
                 This metric always has the label ``{kind="..."}``,
                 which has the following possible values:
@@ -846,7 +846,7 @@ It detects conflicts and makes sure that tuples that are no longer in the space,
         :widths: 25 75
         :header-rows: 0
 
-        *   - ``tnt_memtx_tx_mvcc_trackers``
+        *   - ``tnt_memtx_mvcc_trackers``
             -   Trackers that keep track of transaction reads.
                 This metric always has the label ``{kind="..."}``,
                 which has the following possible values:
@@ -858,7 +858,7 @@ It detects conflicts and makes sure that tuples that are no longer in the space,
                 *   ``max``
                     Maximum trackers allocated per transaction (in bytes).
 
-        *   - ``tnt_memtx_tx_mvcc_conflicts``
+        *   - ``tnt_memtx_mvcc_conflicts``
             -   Allocated in case of transaction conflicts.
                 This metric always has the label ``{kind="..."}``,
                 which has the following possible values:
@@ -889,7 +889,7 @@ So ``stories`` and ``retained`` need to be measured separately.
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``tnt_memtx_tx_mvcc_tuples_used_stories``
+        *   -   ``tnt_memtx_mvcc_tuples_used_stories``
             -   Tuples that are used by active read-write transactions.
                 This metric always has the label ``{kind="..."}``,
                 which has the following possible values:
@@ -899,7 +899,7 @@ So ``stories`` and ``retained`` need to be measured separately.
                 *   ``total``
                     Amount of bytes used by stories ``used`` tuples.
 
-        *   -   ``tnt_memtx_tx_mvcc_tuples_used_retained``
+        *   -   ``tnt_memtx_mvcc_tuples_used_retained``
             -   Tuples that are used by active read-write transactions.
                 But they are no longer in the index, but MVCC does not allow them to be removed.
                 This metric always has the label ``{kind="..."}``,
@@ -910,7 +910,7 @@ So ``stories`` and ``retained`` need to be measured separately.
                 *   ``total``
                     Amount of bytes used by retained ``used`` tuples.
 
-        *   -   ``tnt_memtx_tx_mvcc_tuples_read_view_stories``
+        *   -   ``tnt_memtx_mvcc_tuples_read_view_stories``
             -   Tuples that are not used by active read-write transactions,
                 but are used by read-only transactions (i.e. in read view).
                 This metric always has the label ``{kind="..."}``,
@@ -921,7 +921,7 @@ So ``stories`` and ``retained`` need to be measured separately.
                 *   ``total``
                     Amount of bytes used by stories ``read_view`` tuples.
 
-        *   -   ``tnt_memtx_tx_mvcc_tuples_read_view_retained``
+        *   -   ``tnt_memtx_mvcc_tuples_read_view_retained``
             -   Tuples that are not used by active read-write transactions,
                 but are used by read-only transactions (i.e. in read view).
                 This tuples are no longer in the index, but MVCC does not allow them to be removed.
@@ -933,7 +933,7 @@ So ``stories`` and ``retained`` need to be measured separately.
                 *   ``total``
                     Amount of bytes used by retained ``read_view`` tuples.
 
-        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_stories``
+        *   -   ``tnt_memtx_mvcc_tuples_tracking_stories``
             -   Tuples that are not directly used by any transactions, but are used by MVCC to track reads.
                 This metric always has the label ``{kind="..."}``,
                 which has the following possible values:
@@ -943,7 +943,7 @@ So ``stories`` and ``retained`` need to be measured separately.
                 *   ``total``
                     Amount of bytes used by stories ``tracking`` tuples.
 
-        *   -   ``tnt_memtx_tx_mvcc_tuples_tracking_retained``
+        *   -   ``tnt_memtx_mvcc_tuples_tracking_retained``
             -   Tuples that are not directly used by any transactions, but are used by MVCC to track reads.
                 This tuples are no longer in the index, but MVCC does not allow them to be removed.
                 This metric always has the label ``{kind="..."}``,
