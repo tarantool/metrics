@@ -26,9 +26,15 @@ g.test_info = function()
     local tnt_info_uptime = utils.find_metric('tnt_info_uptime', default_metrics)
     t.assert(tnt_info_uptime)
     t.assert_type(tnt_info_uptime[1].value, 'number')
+end
 
+g.test_synchro_queue = function()
     t.skip_if(utils.is_version_less(_TARANTOOL, '2.7.0'),
         'Tarantool version is must be v2.7.0 or greater')
+
+    metrics.enable_default_metrics()
+    info.update()
+    local default_metrics = metrics.collect()
 
     local tnt_synchro_queue_owner = utils.find_metric('tnt_synchro_queue_owner', default_metrics)
     t.assert(tnt_synchro_queue_owner)
@@ -45,6 +51,15 @@ g.test_info = function()
     local tnt_synchro_queue_busy = utils.find_metric('tnt_synchro_queue_busy', default_metrics)
     t.assert(tnt_synchro_queue_busy)
     t.assert_type(tnt_synchro_queue_busy[1].value, 'number')
+end
+
+g.test_election = function()
+    t.skip_if(utils.is_version_less(_TARANTOOL, '2.7.0'),
+        'Tarantool version is must be v2.7.0 or greater')
+
+    metrics.enable_default_metrics()
+    info.update()
+    local default_metrics = metrics.collect()
 
     local tnt_election_state = utils.find_metric('tnt_election_state', default_metrics)
     t.assert(tnt_election_state)
