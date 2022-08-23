@@ -714,14 +714,16 @@ Event loop tx thread information:
         *   -   ``tnt_ev_loop_epilog_time``
             -   Event loop epilog time (ms)
 
+
+..  _metrics-reference-synchro:
+
 Synchro
 -------
 
 Shows the current state of a synchronous replication.
 
-..  _metrics-reference-synchro:
-
 ..  container:: table
+
     ..  list-table::
         :widths: 25 75
         :header-rows: 0
@@ -738,17 +740,19 @@ Shows the current state of a synchronous replication.
         *   -   ``tnt_synchro_queue_busy``
             -   Whether the queue is processing any system entry (CONFIRM/ROLLBACK/PROMOTE/DEMOTE).
 
+..  _metrics-reference-election:
+
 Election
 --------
 
 Shows the current state of a replica set node in regards to leader election.
 
-..  _metrics-reference-election:
-
 ..  container:: table
+
     ..  list-table::
         :widths: 25 75
         :header-rows: 0
+
         *   -   ``tnt_election_state``
             -   election state (mode) of the node.
                 When election is enabled, the node is writable only in the leader state.
