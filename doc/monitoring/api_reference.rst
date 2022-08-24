@@ -320,6 +320,7 @@ Metrics functions
     *   ``fibers``
     *   ``cpu``
     *   ``vinyl``
+    *   ``memtx``
     *   ``luajit``
     *   ``cartridge_issues``
     *   ``cartridge_failover``

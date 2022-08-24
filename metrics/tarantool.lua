@@ -13,6 +13,7 @@ local default_metrics = {
     fibers              = require('metrics.tarantool.fibers'),
     cpu                 = require('metrics.tarantool.cpu'),
     vinyl               = require('metrics.tarantool.vinyl'),
+    memtx               = require('metrics.tarantool.memtx'),
     luajit              = require('metrics.tarantool.luajit'),
     cartridge_issues    = require('metrics.cartridge.issues'),
     cartridge_failover  = require('metrics.cartridge.failover'),

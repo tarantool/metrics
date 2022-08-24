@@ -772,3 +772,184 @@ Shows the current state of a replica set node in regards to leader election.
 
         *   -   ``tnt_election_term``
             -   Current election term.
+
+Memtx
+-----
+
+Memtx mvcc memory statistics.
+Transaction manager consists of two parts:
+- the transactions themselves (TXN section)
+- MVCC
+
+..  _metrics-reference-memtx_txn:
+
+TXN
+~~~
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   - ``tnt_memtx_tnx_statements`` are the transaction statements.
+            -   For example, the user started a transaction and made an action in it `space:replace{0, 1}`.
+                Under the hood, this operation will turn into ``statement`` for the current transaction.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``total``
+                    The number of bytes that are allocated for the statements of all current transactions.
+                *   ``average``
+                    Average bytes used by transactions for statements
+                    (`txn.statements.total` bytes / number of open transactions).
+                *   ``max``
+                    The maximum number of bytes used by one the current transaction for statements.
+
+        *   - ``tnt_memtx_tnx_user``
+            -   In Tarantool C API there is a function `box_txn_alloc()`.
+                By using this function user can allocate memory for the current transaction.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``total``
+                    Memory allocated by the `box_txn_alloc()` function on all current transactions.
+                *   ``average``
+                    Transaction average (total allocated bytes / number of all current transactions).
+                *   ``max``
+                    The maximum number of bytes allocated by `box_txn_alloc()` function per transaction.
+
+        *   - ``tnt_memtx_tnx_system``
+            -   There are internals: logs, savepoints.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``total``
+                    Memory allocated by internals on all current transactions.
+                *   ``average``
+                    Average allocated memory by internals (total memory / number of all current transactions).
+                *   ``max``
+                    The maximum number of bytes allocated by internals per transaction.
+
+.. _metrics-reference-memtx_mvcc:
+
+MVCC
+~~~~
+
+``mvcc`` is responsible for the isolation of transactions.
+It detects conflicts and makes sure that tuples that are no longer in the space, but read by some transaction
+(or can be read) have not been deleted.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   - ``tnt_memtx_mvcc_trackers``
+            -   Trackers that keep track of transaction reads.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``total``
+                    Trackers of all current transactions are allocated in total (in bytes).
+                *   ``average``
+                    Average for all current transactions (total memory bytes / number of transactions).
+                *   ``max``
+                    Maximum trackers allocated per transaction (in bytes).
+
+        *   - ``tnt_memtx_mvcc_conflicts``
+            -   Allocated in case of transaction conflicts.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``total``
+                    Bytes allocated for conflicts in total.
+                *   ``average``
+                    Average for all current transactions (total memory bytes / number of transactions).
+                *   ``max``
+                    Maximum bytes allocated for conflicts per transaction.
+
+
+~~~~~~
+Tuples
+~~~~~~
+
+Saved tuples are divided into 3 categories: ``used``, ``read_view``, ``tracking``.
+
+Each category has two metrics:
+- ``retained`` tuples - they are no longer in the index, but MVCC does not allow them to be removed.
+- ``stories`` - MVCC is based on the story mechanism, almost every tuple has a story.
+This is a separate metric because even the tuples that are in the index can have a story.
+So ``stories`` and ``retained`` need to be measured separately.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_memtx_mvcc_tuples_used_stories``
+            -   Tuples that are used by active read-write transactions.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``count``
+                    Number of ``used`` tuples / number of stories.
+                *   ``total``
+                    Amount of bytes used by stories ``used`` tuples.
+
+        *   -   ``tnt_memtx_mvcc_tuples_used_retained``
+            -   Tuples that are used by active read-write transactions.
+                But they are no longer in the index, but MVCC does not allow them to be removed.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``count``
+                    Number of retained ``used`` tuples / number of stories.
+                *   ``total``
+                    Amount of bytes used by retained ``used`` tuples.
+
+        *   -   ``tnt_memtx_mvcc_tuples_read_view_stories``
+            -   Tuples that are not used by active read-write transactions,
+                but are used by read-only transactions (i.e. in read view).
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``count``
+                    Number of ``read_view`` tuples / number of stories.
+                *   ``total``
+                    Amount of bytes used by stories ``read_view`` tuples.
+
+        *   -   ``tnt_memtx_mvcc_tuples_read_view_retained``
+            -   Tuples that are not used by active read-write transactions,
+                but are used by read-only transactions (i.e. in read view).
+                This tuples are no longer in the index, but MVCC does not allow them to be removed.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``count``
+                    Number of retained ``read_view`` tuples / number of stories.
+                *   ``total``
+                    Amount of bytes used by retained ``read_view`` tuples.
+
+        *   -   ``tnt_memtx_mvcc_tuples_tracking_stories``
+            -   Tuples that are not directly used by any transactions, but are used by MVCC to track reads.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``count``
+                    Number of ``tracking`` tuples / number of tracking stories.
+                *   ``total``
+                    Amount of bytes used by stories ``tracking`` tuples.
+
+        *   -   ``tnt_memtx_mvcc_tuples_tracking_retained``
+            -   Tuples that are not directly used by any transactions, but are used by MVCC to track reads.
+                This tuples are no longer in the index, but MVCC does not allow them to be removed.
+                This metric always has the label ``{kind="..."}``,
+                which has the following possible values:
+
+                *   ``count``
+                    Number of retained ``tracking`` tuples / number of stories.
+                *   ``total``
+                    Amount of bytes used by retained ``tracking`` tuples.
