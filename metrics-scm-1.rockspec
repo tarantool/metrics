@@ -39,6 +39,7 @@ build = {
         ['metrics.tarantool.fibers']        = 'metrics/tarantool/fibers.lua',
         ['metrics.tarantool.info']          = 'metrics/tarantool/info.lua',
         ['metrics.tarantool.memory']        = 'metrics/tarantool/memory.lua',
+        ['metrics.tarantool.memtx']         = 'metrics/tarantool/memtx.lua',
         ['metrics.tarantool.network']       = 'metrics/tarantool/network.lua',
         ['metrics.tarantool.operations']    = 'metrics/tarantool/operations.lua',
         ['metrics.tarantool.replicas']      = 'metrics/tarantool/replicas.lua',
