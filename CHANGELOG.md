@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - `memtx` MVCC memory monitoring
 
+### Fixed
+
+- `tnt_synchro_queue_len` metric type
+
 ## [0.15.0] - 2022-08-09
 ### Fixed
 
