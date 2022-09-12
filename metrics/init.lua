@@ -16,6 +16,8 @@ local registry = rawget(_G, '__metrics_registry')
 if not registry then
     registry = Registry.new()
 end
+registry.callbacks = {}
+
 rawset(_G, '__metrics_registry', registry)
 
 local hotreload = package.loaded['cartridge.hotreload']

@@ -138,3 +138,21 @@ g.test_default_metrics_clear = function()
     metrics.invoke_callbacks()
     t.assert(#metrics.collect() > 0)
 end
+
+g.test_hotreload_remove_callbacks = function()
+    metrics.enable_default_metrics()
+
+    local Registry = rawget(_G, '__metrics_registry')
+    local len_before_hotreload = utils.len(Registry.callbacks)
+    t.assert_gt(len_before_hotreload, 0)
+
+    package.loaded['metrics'] = nil
+
+    metrics = require('metrics')
+    metrics.enable_default_metrics()
+
+    Registry = rawget(_G, '__metrics_registry')
+    local len_after_hotreload = utils.len(Registry.callbacks)
+
+    t.assert_equals(len_before_hotreload, len_after_hotreload)
+end
