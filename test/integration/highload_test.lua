@@ -32,7 +32,7 @@ g.test_eventloop = function()
 
     local collector = metrics.summary('tnt_fiber_event_loop', 'event loop time',
         { [0.5] = 0.01, [0.9] = 0.01, [0.99] = 0.01, })
-    fiber.create(function() monitor(collector) end)
+    local fiber_object = fiber.create(function() monitor(collector) end)
 
     for _ = 1, 10 do
         fiber.sleep(0.1)
@@ -43,5 +43,7 @@ g.test_eventloop = function()
 
         t.assert_not_inf(obs_summary.value)
     end
+
+    fiber.kill(fiber_object:id())
 
 end
