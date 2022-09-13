@@ -230,3 +230,23 @@ g.test_cartridge_hotreload_not_reset_collectors = function()
         value = 1,
     })
 end
+
+g.test_cartridge_hotreload_reset_callbacks = function()
+    local main_server = g.cluster:server('main')
+    upload_config()
+
+    local len_before_hotreload = main_server:exec(function()
+        local test_utils = require('test.utils')
+        local Registry = rawget(_G, '__metrics_registry')
+        return test_utils.len(Registry.callbacks)
+    end)
+
+    reload_roles()
+
+    local len_after_hotreload = main_server:exec(function()
+        local test_utils = require('test.utils')
+        local Registry = rawget(_G, '__metrics_registry')
+        return test_utils.len(Registry.callbacks)
+    end)
+    t.assert_equals(len_before_hotreload, len_after_hotreload)
+end
