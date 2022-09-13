@@ -37,7 +37,10 @@ g.test_eventloop = function()
     for _ = 1, 20 do
         fiber.sleep(0.1)
         local observations = metrics.collect()
-        local obs_summary = utils.find_obs('tnt_fiber_event_loop', { alias = 'my_instance', quantile = 0.99 }, observations)
+
+        local obs_summary = utils.find_obs('tnt_fiber_event_loop',
+            { alias = 'my_instance', quantile = 0.99 }, observations)
+
         t.assert_not_inf(obs_summary.value)
     end
 
