@@ -34,7 +34,7 @@ g.test_eventloop = function()
         { [0.5] = 0.01, [0.9] = 0.01, [0.99] = 0.01, })
     fiber.create(function() monitor(collector) end)
 
-    for _ = 1, 20 do
+    for _ = 1, 10 do
         fiber.sleep(0.1)
         local observations = metrics.collect()
 
