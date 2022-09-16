@@ -165,7 +165,7 @@ function stream:query(q)
 
     local p = s.l[0]
     local r = 0
-    for i = 1, s.l_len do
+    for i = 1, s.l_len-1 do  -- samples buffer indexing starts from 0 to length-1
         local c = s.l[i]
         if r + c.Width + c.Delta > t then
             return p.Value

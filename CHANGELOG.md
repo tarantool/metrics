@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `tnt_synchro_queue_len` metric type
 - Reset callbacks on hotreload
+- Fix queries in quantile
 
 ## [0.15.0] - 2022-08-09
 ### Fixed
