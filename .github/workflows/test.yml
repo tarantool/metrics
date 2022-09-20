@@ -48,17 +48,17 @@ jobs:
       - name: test
         run: make test_with_coverage_report
 
-  # packpack:
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   steps:
-  #     - uses: actions/checkout@v2
+  packpack:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: packpack
-  #       run: |
-  #         git clone https://github.com/packpack/packpack.git packpack
-  #         OS=el DIST=7 packpack/packpack
-  #         ls -l build/
+      - name: packpack
+        run: |
+          git clone https://github.com/packpack/packpack.git packpack
+          OS=el DIST=8 packpack/packpack
+          ls -l build/
 
   promtool:
     runs-on: ubuntu-latest

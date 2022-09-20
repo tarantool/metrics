@@ -18,7 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - { os: 'el', dist: '7' }
           - { os: 'el', dist: '8' }
           - { os: 'fedora', dist: '30' }
           - { os: 'fedora', dist: '31' }
