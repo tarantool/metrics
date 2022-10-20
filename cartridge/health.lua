@@ -1,5 +1,5 @@
-local membership = require('membership')
-local argparse = require('cartridge.argparse')
+local membership = require("membership")
+local argparse = require("cartridge.argparse")
 
 -- Original private member_is_healthy function:
 -- https://github.com/tarantool/cartridge/blob/master/cartridge/rpc.lua
@@ -7,7 +7,8 @@ local function is_healthy(_)
     local member = membership.myself()
     local parse = argparse.parse()
     local instance = parse.instance_name or parse.alias or 'instance'
-    if (member ~= nil)
+    if box.info.status and box.info.status == 'running'
+        and member ~= nil
         and (member.status == 'alive' or member.status == 'suspect')
         and (
             member.payload.state_prev == nil or -- for backward compatibility with old versions
@@ -19,9 +20,9 @@ local function is_healthy(_)
             member.payload.state == 'RolesConfigured'
         )
     then
-        return {body = instance .. ' is OK', status = 200}
+        return {body = instance .. " is OK", status = 200}
     else
-        return {body = instance .. ' is dead', status = 500}
+        return {body = instance .. " is dead", status = 500}
     end
 end
 
