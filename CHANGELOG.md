@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `is_healthy` function to rely on membership state
+
 ## [0.15.1] - 2022-09-20
 ### Added
 
