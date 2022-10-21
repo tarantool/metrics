@@ -43,14 +43,13 @@ g.test_cartridge_health_handler_member_state_configured_configuring = function()
     helpers.skip_cartridge_version_less("2.0.2")
     helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server("main")
-    main_server.net_box:eval(
-        [[
-        myself = require('membership').myself()
+    main_server:exec(function()
+        local myself = require('membership').myself()
 
         myself.payload.state='ConfiguringRoles'
         myself.payload.state_prev='RolesConfigured'
-    ]]
-    )
+    end)
+
     local resp = main_server:http_request("get", "/health", {raise = false})
     t.assert_equals(resp.status, 200)
 end
@@ -59,14 +58,13 @@ g.test_cartridge_health_handler_member_state_boxconfigured_configuring = functio
     helpers.skip_cartridge_version_less("2.0.2")
     helpers.upload_default_metrics_config(g.cluster)
     local main_server = g.cluster:server("main")
-    main_server.net_box:eval(
-        [[
-        myself = require('membership').myself()
+    main_server:exec(function()
+        local myself = require('membership').myself()
 
         myself.payload.state='ConfiguringRoles'
         myself.payload.state_prev='BoxConfigured'
-    ]]
-    )
+    end)
+
     local resp = main_server:http_request("get", "/health", {raise = false})
     t.assert_equals(resp.status, 500)
 end
