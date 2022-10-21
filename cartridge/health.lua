@@ -1,5 +1,5 @@
-local membership = require("membership")
-local argparse = require("cartridge.argparse")
+local membership = require('membership')
+local argparse = require('cartridge.argparse')
 
 -- Original private member_is_healthy function:
 -- https://github.com/tarantool/cartridge/blob/master/cartridge/rpc.lua
