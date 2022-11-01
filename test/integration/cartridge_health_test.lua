@@ -46,7 +46,6 @@ g.test_cartridge_health_handler_member_alive_state_configured_to_configuring = f
 
     main_server:exec(function()
         local membership = package.loaded['membership']
-        
         membership.myself = function()
             return {
                 status = 'alive',
@@ -69,7 +68,6 @@ g.test_cartridge_health_handler_member_suspect_state_configured_to_configuring =
 
     main_server:exec(function()
         local membership = package.loaded['membership']
-        
         membership.myself = function()
             return {
                 status = 'suspect',
@@ -92,7 +90,6 @@ g.test_cartridge_health_handler_member_alive_state_boxconfigured_to_configuring 
 
     main_server:exec(function()
         local membership = package.loaded['membership']
-
         membership.myself = function()
             return {
                 status = 'alive',
@@ -115,7 +112,6 @@ g.test_cartridge_health_handler_member_suspect_state_boxconfigured_to_configurin
 
     main_server:exec(function()
         local membership = package.loaded['membership']
-
         membership.myself = function()
             return {
                 status = 'suspect',
