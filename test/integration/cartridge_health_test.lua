@@ -14,6 +14,22 @@ g.after_all(function()
     fio.rmtree(g.cluster.datadir)
 end)
 
+g.after_each(function()
+    local main_server = g.cluster:server("main")
+    main_server:exec(function()
+        local membership = package.loaded['membership']
+        membership.myself = function()
+            return {
+                status = 'alive',
+                payload = {
+                    state='RolesConfigured',
+                    state_prev='ConfiguringRoles',
+                }
+            }
+        end
+    end)
+end)
+
 g.test_cartridge_health_handler = function()
     helpers.skip_cartridge_version_less('2.0.2')
     helpers.upload_default_metrics_config(g.cluster)
