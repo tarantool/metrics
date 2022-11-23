@@ -180,12 +180,11 @@ via Cartridge configuration.
     The metrics will be available on the path specified in ``path``, in the format
     specified in ``format``.
 
-#.  Enable the role in the interface:
+#.  Since version **0.6.0**, the metrics role is permanent and enabled on instances by default.
+    If you use old version of metrics, you should enable the role in the interface:
 
     ..  image:: images/role-enable.png
         :align: center
-
-    Since version **0.6.0**, the metrics role is permanent and enabled on instances by default.
 
 #.  After the role has been initialized, the default metrics will be enabled
     and the global label ``alias`` will be set.
