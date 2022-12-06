@@ -61,7 +61,7 @@ end
 
 function Shared:set(num, label_pairs)
     if num ~= nil and type(tonumber(num)) ~= 'number' then
-        log.error("Collector set value should be a number. In the next release it will raise an error")
+        error("Collector set value should be a number")
     end
     num = num or 0
     local key = self.make_key(label_pairs)
