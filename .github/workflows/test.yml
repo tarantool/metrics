@@ -48,6 +48,11 @@ jobs:
           curl -L https://tarantool.io/pre-release/2/installer.sh | bash
           sudo apt-get -y install tarantool
 
+      # Stop Mono server. This server starts and listens to 8084 port that is
+      # used for tests.
+      - name: 'Stop Mono server'
+        run: sudo kill -9 $(sudo lsof -t -i tcp:8084) || true
+
       - name: lint
         run: make lint
         env:
