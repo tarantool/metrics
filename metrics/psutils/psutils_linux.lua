@@ -2,9 +2,13 @@ local fio = require('fio')
 local string = require('string')
 local ffi = require('ffi')
 
-ffi.cdef[[
-    int get_nprocs_conf(void);
-]]
+local get_nprocs_conf = function() end
+if jit.os == 'Linux' then
+    ffi.cdef[[
+        int get_nprocs_conf(void);
+    ]]
+    get_nprocs_conf = ffi.C.get_nprocs_conf
+end
 
 local function get_cpu_time()
     local stat_file_path = '/proc/stat'
@@ -65,5 +69,5 @@ end
 return {
     get_cpu_time = get_cpu_time,
     get_process_cpu_time = get_process_cpu_time,
-    get_cpu_count = ffi.C.get_nprocs_conf,
+    get_cpu_count = get_nprocs_conf,
 }
