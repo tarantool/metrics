@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix `is_healthy` function to rely on membership state
 
+### Removed
+
+- Set non-number values in `gauge:set`
+- Deprecated metrics from previous releases
+
 ## [0.15.1] - 2022-09-20
 ### Added
 

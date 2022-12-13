@@ -430,11 +430,11 @@ General JIT metrics:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``lj_jit_snap_restore``
+        *   -   ``lj_jit_snap_restore_total``
             -   Overall number of snap restores
         *   -   ``lj_jit_trace_num``
             -   Number of JIT traces
-        *   -   ``lj_jit_trace_abort``
+        *   -   ``lj_jit_trace_abort_total``
             -   Overall number of abort traces
         *   -   ``lj_jit_mcode_size``
             -   Total size of allocated machine code areas
@@ -447,9 +447,9 @@ JIT strings:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``lj_strhash_hit``
+        *   -   ``lj_strhash_hit_total``
             -   Number of strings being interned
-        *   -   ``lj_strhash_miss``
+        *   -   ``lj_strhash_miss_total``
             -   Total number of string allocations
 
 GC steps:
@@ -460,17 +460,17 @@ GC steps:
         :widths: 25 75
         :header-rows: 0
 
-        *   -   ``lj_gc_steps_atomic``
+        *   -   ``lj_gc_steps_atomic_total``
             -   Count of incremental GC steps (atomic state)
-        *   -   ``lj_gc_steps_sweepstring``
+        *   -   ``lj_gc_steps_sweepstring_total``
             -   Count of incremental GC steps (sweepstring state)
-        *   -   ``lj_gc_steps_finalize``
+        *   -   ``lj_gc_steps_finalize_total``
             -   Count of incremental GC steps (finalize state)
-        *   -   ``lj_gc_steps_sweep``
+        *   -   ``lj_gc_steps_sweep_total``
             -   Count of incremental GC steps (sweep state)
-        *   -   ``lj_gc_steps_propagate``
+        *   -   ``lj_gc_steps_propagate_total``
             -   Count of incremental GC steps (propagate state)
-        *   -   ``lj_gc_steps_pause``
+        *   -   ``lj_gc_steps_pause_total``
             -   Count of incremental GC steps (pause state)
 
 Allocations:
@@ -489,11 +489,11 @@ Allocations:
             -   Number of allocated ``cdata`` objects
         *   -   ``lj_gc_udatanum``
             -   Number of allocated ``udata`` objects
-        *   -   ``lj_gc_freed``
+        *   -   ``lj_gc_freed_total``
             -   Total amount of freed memory
         *   -   ``lj_gc_memory``
             -   Current allocated Lua memory
-        *   -   ``lj_gc_allocated``
+        *   -   ``lj_gc_allocated_total``
             -   Total amount of allocated memory
 
 ..  _metrics-reference-psutils:

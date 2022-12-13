@@ -75,8 +75,6 @@ end
 g.test_inc_non_number = function()
     local c = metrics.gauge('gauge')
 
-    t.xfail('That test fails until collector will raise an error')
-
     t.assert_error_msg_contains('Collector set value should be a number', c.set, c, true)
 end
 
