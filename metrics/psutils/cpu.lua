@@ -30,7 +30,7 @@ local function update_cpu_metrics()
             thread_info.utime, utime_labels)
 
         local stime_labels = table.copy(labels)
-        stime_labels.kind = 'user'
+        stime_labels.kind = 'system'
         collectors_list.cpu_thread = utils.set_gauge('cpu_thread', 'Tarantool thread cpu time',
             thread_info.stime, stime_labels)
 
