@@ -1,4 +1,5 @@
 local metrics = require('metrics')
+local utils = require('metrics.utils')
 
 local default_metrics = {
     network             = require('metrics.tarantool.network'),
@@ -20,16 +21,6 @@ local default_metrics = {
     clock               = require('metrics.tarantool.clock'),
     event_loop          = require('metrics.tarantool.event_loop'),
 }
-
-local function delete_collectors(list)
-    if list == nil then
-        return
-    end
-    for _, collector in pairs(list) do
-        metrics.registry:unregister(collector)
-    end
-    table.clear(list)
-end
 
 local function enable(include, exclude)
     include = include or {}
@@ -53,12 +44,12 @@ local function enable(include, exclude)
                 metrics.register_callback(value.update)
             else
                 metrics.unregister_callback(value.update)
-                delete_collectors(value.list)
+                utils.delete_collectors(value.list)
             end
         elseif next(exclude) ~= nil then
             if exclude_map[name] ~= nil then
                 metrics.unregister_callback(value.update)
-                delete_collectors(value.list)
+                utils.delete_collectors(value.list)
             else
                 metrics.register_callback(value.update)
             end

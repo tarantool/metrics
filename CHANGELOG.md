@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Handle to clear psutils metrics
+
 ### Fixed
 
 - Fix `is_healthy` function to rely on membership state
