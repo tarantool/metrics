@@ -52,5 +52,5 @@ g.test_clean_thread_info = function()
     t.assert_gt(#list1, #list2)
     t.assert_gt(#observations1, #observations2)
     t.assert_gt(coio_count1, coio_count2)
-    t.assert_equals(#observations1 - #observations2, coio_count1 - coio_count2)
+    t.assert_equals(#observations1 - #observations2, 2 * (coio_count1 - coio_count2))
 end
