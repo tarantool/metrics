@@ -46,3 +46,7 @@ g.test_get_process_cpu_time = function()
     }
     t.assert_items_equals(psutils_linux.get_process_cpu_time(), expected)
 end
+
+g.test_get_cpu_count = function()
+    t.assert_gt(psutils_linux.get_cpu_count(), 0)
+end

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix `is_healthy` function to rely on membership state
 - Fix psutils time metrics
+- Fix missing psutils cpu count after clear
 
 ### Removed
 
