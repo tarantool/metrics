@@ -16,7 +16,7 @@ local function update_cpu_metrics()
     collectors_list.cpu_number = utils.set_gauge('cpu_number', 'The number of processors',
         psutils.get_cpu_count())
 
-    utils.set_gauge('cpu_time', 'Host CPU time', psutils.get_cpu_time())
+    collectors_list.cpu_time = utils.set_gauge('cpu_time', 'Host CPU time', psutils.get_cpu_time())
 
     local new_threads = {}
     for _, thread_info in ipairs(psutils.get_process_cpu_time()) do
@@ -50,7 +50,12 @@ local function update_cpu_metrics()
     threads = new_threads
 end
 
+local function clear_cpu_metrics()
+    utils.delete_collectors(collectors_list)
+end
+
 return {
     update = update_cpu_metrics,
     list = collectors_list,
+    clear = clear_cpu_metrics,
 }

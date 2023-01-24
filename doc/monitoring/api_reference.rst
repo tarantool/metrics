@@ -575,10 +575,12 @@ To enable CPU metrics, first register a callback function:
 
     local metrics = require('metrics')
 
-    metrics.register_callback(function()
+    local cpu_callback = function()
         local cpu_metrics = require('metrics.psutils.cpu')
         cpu_metrics.update()
-    end)
+    end
+
+    metrics.register_callback(cpu_callback)
 
 **Collected metrics example:**
 
@@ -602,6 +604,13 @@ To enable CPU metrics, first register a callback function:
 
     sum by (thread_name) (idelta(tnt_cpu_thread[$__interval]))
       / scalar(idelta(tnt_cpu_total[$__interval]) / tnt_cpu_count)
+
+To clear CPU metrics when you don't need them anymore, remove the callback and clear the collectors with a method:
+
+..  code-block:: lua
+
+    metrics.unregister_callback(cpu_callback)
+    cpu_metrics.clear()
 
 .. _metrics-api_reference-example:
 

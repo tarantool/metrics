@@ -63,3 +63,34 @@ g.test_cpu_count = function()
     t.assert_equals(#metric, 1)
     t.assert_gt(metric[1].value, 0)
 end
+
+local function check_cpu_metrics(presents)
+    local observations = metrics.collect()
+
+    local expected = {
+        'tnt_cpu_number',
+        'tnt_cpu_time',
+        'tnt_cpu_thread',
+    }
+
+    for _, metric_name in ipairs(expected) do
+        local metric = utils.find_metric(metric_name, observations)
+
+        if presents then
+            t.assert_not_equals(metric, nil)
+        else
+            t.assert_equals(metric, nil)
+        end
+    end
+end
+
+g.test_clear = function()
+    cpu.update()
+    check_cpu_metrics(true)
+
+    cpu.clear()
+    check_cpu_metrics(false)
+
+    cpu.update()
+    check_cpu_metrics(true)
+end

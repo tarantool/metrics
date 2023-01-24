@@ -26,4 +26,14 @@ function utils.box_is_configured()
     return is_configured
 end
 
+function utils.delete_collectors(list)
+    if list == nil then
+        return
+    end
+    for _, collector in pairs(list) do
+        metrics.registry:unregister(collector)
+    end
+    table.clear(list)
+end
+
 return utils
