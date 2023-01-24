@@ -1,14 +1,19 @@
+TTCTL := tt
+ifeq (,$(shell which tt 2>/dev/null))
+	TTCTL := tarantoolctl
+endif
+
 .PHONY: rpm
 rpm:
 	OS=el DIST=7 packpack/packpack
 
 .rocks: metrics-scm-1.rockspec
-	tarantoolctl rocks make
-	tarantoolctl rocks install luatest 0.5.7
-	tarantoolctl rocks install luacov 0.13.0
-	tarantoolctl rocks install luacheck 0.26.0
+	$(TTCTL) rocks make
+	$(TTCTL) rocks install luatest 0.5.7
+	$(TTCTL) rocks install luacov 0.13.0
+	$(TTCTL) rocks install luacheck 0.26.0
 	if [ -n '$(CARTRIDGE_VERSION)' ]; then \
-		tarantoolctl rocks install cartridge $(CARTRIDGE_VERSION); \
+		$(TTCTL) rocks install cartridge $(CARTRIDGE_VERSION); \
 	fi
 
 .PHONY: lint
