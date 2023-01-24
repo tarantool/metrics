@@ -80,9 +80,9 @@ function helpers.skip_cartridge_version_less(version)
 end
 
 function helpers.skip_cartridge_version_greater(version)
-    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or greater')
+    t.skip_if(cartridge_version == 'unknown', 'Cartridge version is unknown, must be v' .. version .. ' or less')
     t.skip_if(utils.is_version_greater(cartridge_version, version),
-        'Cartridge version is must be v' .. version .. ' or greater')
+        'Cartridge version is must be v' .. version .. ' or less')
 end
 
 return helpers
