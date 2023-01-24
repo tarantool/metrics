@@ -54,3 +54,12 @@ g.test_clean_thread_info = function()
     t.assert_gt(coio_count1, coio_count2)
     t.assert_equals(#observations1 - #observations2, 2 * (coio_count1 - coio_count2))
 end
+
+g.test_cpu_count = function()
+    cpu.update()
+    local observations = metrics.collect()
+    local metric = utils.find_metric('tnt_cpu_number', observations)
+    t.assert_not_equals(metric, nil)
+    t.assert_equals(#metric, 1)
+    t.assert_gt(metric[1].value, 0)
+end
