@@ -136,9 +136,6 @@ local function validate_config(conf_new)
     if type(conf_new['global-labels'] or {}) ~= 'table' then
         error('global-labels section must be a table', 0)
     end
-    if conf_new.exclude ~= nil and conf_new.include ~= nil then
-        error("don't use exclude and include sections together", 0)
-    end
 
     return validate_routes(conf_new.export) and validate_global_labels(conf_new['global-labels'])
 end

@@ -1,5 +1,6 @@
 local metrics_api = require('metrics.api')
 local utils = require('metrics.utils')
+local const = require('metrics.const')
 
 local default_metrics = {
     network             = require('metrics.tarantool.network'),
@@ -22,41 +23,51 @@ local default_metrics = {
     event_loop          = require('metrics.tarantool.event_loop'),
 }
 
-local function enable(include, exclude)
-    include = include or {}
+local function enable_impl(include, exclude)
+    include = include or const.ALL
     exclude = exclude or {}
-    if next(include) ~= nil and next(exclude) ~= nil then
-        error('Only one of "exclude" or "include" should present')
+
+    local include_map = {}
+
+    if include == const.ALL then
+        for name, _ in pairs(default_metrics) do
+            include_map[name] = true
+        end
+    elseif type(include) == 'table' then
+        for _, name in pairs(include) do
+            include_map[name] = true
+        end
+    elseif include == const.NONE then
+        include_map = {}
+    else
+        error('Unexpected value provided: include must be "all", {...} or "none"')
     end
 
-    local exclude_map = {}
-    for _, name in ipairs(exclude) do
-        exclude_map[name] = true
-    end
-    local include_map = {}
-    for _, name in ipairs(include) do
-        include_map[name] = true
+    for _, name in pairs(exclude) do
+        include_map[name] = false
     end
 
     for name, value in pairs(default_metrics) do
-        if next(include) ~= nil then
-            if include_map[name] ~= nil then
-                metrics_api.register_callback(value.update)
-            else
-                metrics_api.unregister_callback(value.update)
-                utils.delete_collectors(value.list)
-            end
-        elseif next(exclude) ~= nil then
-            if exclude_map[name] ~= nil then
-                metrics_api.unregister_callback(value.update)
-                utils.delete_collectors(value.list)
-            else
-                metrics_api.register_callback(value.update)
-            end
-        else
+        if include_map[name] then
             metrics_api.register_callback(value.update)
+        else
+            metrics_api.unregister_callback(value.update)
+            utils.delete_collectors(value.list)
         end
     end
+end
+
+local function is_empty_table(v)
+    return (type(v) == 'table') and (next(v) == nil)
+end
+
+local function enable(include, exclude)
+    -- Compatibility with v1.
+    if is_empty_table(include) then
+        include = const.ALL
+    end
+
+    return enable_impl(include, exclude)
 end
 
 return {

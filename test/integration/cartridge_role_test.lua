@@ -739,8 +739,9 @@ g.test_exclude_after_include = function()
     t.assert_equals(lj_metrics, 0)
 end
 
-g.test_exclude_and_include_metrics_raises_error = function()
-    assert_bad_config({
+g.test_exclude_and_include_metrics = function()
+    local server = g.cluster.main_server
+    server:upload_config({
         metrics = {
             export = {
                 {
@@ -748,8 +749,20 @@ g.test_exclude_and_include_metrics_raises_error = function()
                     format = 'json'
                 },
             },
-            include = { 'vinyl' },
-            exclude = { 'luajit' },
+            include = { 'info', 'operations' },
+            exclude = { 'operations' },
         }
-    }, "don't use exclude and include sections together")
+    })
+
+    local resp = server:http_request('get', '/metrics', {raise = false})
+    t.assert_equals(resp.status, 200)
+
+    local info_metrics = fun.iter(resp.json):filter(function(x)
+        return x.metric_name:find('tnt_info_')
+    end):length()
+    t.assert_gt(info_metrics, 0)
+    local op_metrics = fun.iter(resp.json):filter(function(x)
+        return x.metric_name:find('tnt_stats_op_total')
+    end):length()
+    t.assert_equals(op_metrics, 0)
 end

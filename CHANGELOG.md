@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Setup cartridge hotreload inside the role
+- Extend `enable_default_metrics()` API:
+  - `'all'` and `'none'` options for `include` argument,
+  - simultaneous `include` and `exclude` arguments
+    (`exclude` has higher priority)
 
 ## [0.16.0] - 2023-01-27
 ### Added

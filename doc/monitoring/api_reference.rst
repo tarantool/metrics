@@ -307,9 +307,14 @@ Metrics functions
 
     Enable Tarantool metric collection.
 
-    :param table include: table containing the names of the default metrics that you need to enable.
+    :param string/table include: ``'all'`` to enable all supported default metrics,
+        ``'none'`` to disable all default metrics,
+        table with names of the default metrics to enable a specific set of metrics
+        (``{}`` is the same as ``'all'`` for backward compatibility).
+        Default is ``'all'``.
 
-    :param table exclude: table containing the names of the default metrics that you need to exclude.
+    :param table exclude: table containing the names of the default metrics that you want to disable.
+        It has higher priority than ``include``. Default is ``{}``.
 
     Default metric names:
 
