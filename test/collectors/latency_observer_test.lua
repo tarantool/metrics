@@ -3,6 +3,7 @@ local g = t.group('latency_observer')
 
 local shared = require('metrics.collectors.shared')
 
+local clock = require('clock')
 local fiber = require('fiber')
 
 local function stub_observer(observe)
@@ -16,13 +17,20 @@ g.before_all(function()
     g.observer = stub_observer()
 end)
 
+local function sleep(time)
+    local start_time = clock.monotonic()
+    while (clock.monotonic() - start_time) < time do
+        fiber.yield()
+    end
+end
+
 local function work_fn(work_time, ...)
-    fiber.sleep(work_time)
+    sleep(work_time)
     return ...
 end
 
 local function work_fn_raise_error(work_time)
-    fiber.sleep(work_time)
+    sleep(work_time)
     error('caused error')
 end
 
@@ -70,8 +78,11 @@ g.test_time_measurement = function()
 
     local work_times = {0.3, 0.2, 0.1}
     for _, time in ipairs(work_times) do
+        local start_time = clock.monotonic()
         observer:observe_latency({}, work_fn, time)
-        t.assert_almost_equals(obs.value, time, 0.01)
+        local finish_time = clock.monotonic()
+        t.assert_ge(finish_time - start_time, obs.value)
+        t.assert_le(time, obs.value)
     end
 end
 
@@ -83,12 +94,15 @@ g.test_time_measurement_with_error = function()
 
     local work_times = {0.3, 0.2, 0.1}
     for _, time in ipairs(work_times) do
+        local start_time = clock.monotonic()
         pcall(function() observer:observe_latency(
             function(ok, _, _) return {status = tostring(ok)} end,
             work_fn_raise_error,
             time
         ) end)
+        local finish_time = clock.monotonic()
         t.assert_equals(obs.label_pairs, {status = 'false'})
-        t.assert_almost_equals(obs.value, time, 0.01)
+        t.assert_ge(finish_time - start_time, obs.value)
+        t.assert_le(time, obs.value)
     end
 end
