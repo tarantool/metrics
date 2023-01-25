@@ -17,10 +17,14 @@ local function update_fibers_metrics()
         fused = fused + f.memory.used
     end
 
-    collectors_list.fiber_amount = utils.set_gauge('fiber_amount', 'Amount of fibers', fibers)
-    collectors_list.fiber_csw = utils.set_gauge('fiber_csw', 'Fibers csw', csws)
-    collectors_list.fiber_memalloc = utils.set_gauge('fiber_memalloc', 'Fibers memalloc', falloc)
-    collectors_list.fiber_memused = utils.set_gauge('fiber_memused', 'Fibers memused', fused)
+    collectors_list.fiber_amount = utils.set_gauge('fiber_amount', 'Amount of fibers',
+        fibers, nil, nil, {default = true})
+    collectors_list.fiber_csw = utils.set_gauge('fiber_csw', 'Fibers csw',
+        csws, nil, nil, {default = true})
+    collectors_list.fiber_memalloc = utils.set_gauge('fiber_memalloc', 'Fibers memalloc',
+        falloc, nil, nil, {default = true})
+    collectors_list.fiber_memused = utils.set_gauge('fiber_memused', 'Fibers memused',
+        fused, nil, nil, {default = true})
 end
 
 return {

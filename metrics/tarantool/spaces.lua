@@ -34,7 +34,8 @@ local function update_spaces_metrics()
                 local l = table.copy(labels)
                 l.index_name = i.name
                 collectors_list.space_index_bsize =
-                    utils.set_gauge('space_index_bsize', 'Index bsize', i:bsize(), l)
+                    utils.set_gauge('space_index_bsize', 'Index bsize', i:bsize(), l,
+                        nil, {default = true})
                 total = total + i:bsize()
 
                 if spaces[space_name] ~= nil then
@@ -56,13 +57,16 @@ local function update_spaces_metrics()
             labels.engine = 'memtx'
 
             collectors_list.space_len =
-                utils.set_gauge('space_len' , 'Space length', sp:len(), labels)
+                utils.set_gauge('space_len' , 'Space length', sp:len(), labels,
+                    nil, {default = true})
 
             collectors_list.space_bsize =
-                utils.set_gauge('space_bsize', 'Space bsize', sp_bsize, labels)
+                utils.set_gauge('space_bsize', 'Space bsize', sp_bsize, labels,
+                    nil, {default = true})
 
             collectors_list.space_total_bsize =
-                utils.set_gauge('space_total_bsize', 'Space total bsize', sp_bsize + total, labels)
+                utils.set_gauge('space_total_bsize', 'Space total bsize', sp_bsize + total, labels,
+                    nil, {default = true})
             new_spaces[space_name].memtx_labels = labels
 
             spaces[space_name] = nil
@@ -71,7 +75,8 @@ local function update_spaces_metrics()
                 labels.engine = 'vinyl'
                 local count = sp:count()
                 collectors_list.vinyl_tuples =
-                    utils.set_gauge('vinyl_tuples', 'Vinyl space tuples count', count, labels)
+                    utils.set_gauge('vinyl_tuples', 'Vinyl space tuples count', count, labels,
+                        nil, {default = true})
                 new_spaces[space_name].vinyl_labels = labels
 
                 spaces[space_name] = nil

@@ -8,7 +8,8 @@ local function update_system_metrics()
         return
     end
 
-    collectors_list.cfg_current_time = utils.set_gauge('cfg_current_time', 'Tarantool cfg time', clock.time() + 0ULL)
+    collectors_list.cfg_current_time = utils.set_gauge('cfg_current_time', 'Tarantool cfg time', clock.time() + 0ULL,
+        nil, nil, {default = true})
 end
 
 return {

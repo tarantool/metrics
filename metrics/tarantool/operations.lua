@@ -11,7 +11,8 @@ local function update_operations_metrics()
 
     for k, v in pairs(current_stat) do
         collectors_list.stats_op_total =
-            utils.set_counter('stats_op_total', 'Total amount of operations', v.total, {operation = k:lower()})
+            utils.set_counter('stats_op_total', 'Total amount of operations',
+                v.total, {operation = k:lower()}, nil, {default = true})
     end
 end
 

@@ -25,8 +25,10 @@ local function update_clock_metrics()
         end
     end
 
-    collectors_list.clock_delta = utils.set_gauge('clock_delta', 'Clock difference', min_delta * 1e-6, {delta = 'min'})
-    collectors_list.clock_delta = utils.set_gauge('clock_delta', 'Clock difference', max_delta * 1e-6, {delta = 'max'})
+    collectors_list.clock_delta = utils.set_gauge('clock_delta', 'Clock difference',
+        min_delta * 1e-6, {delta = 'min'}, nil, {default = true})
+    collectors_list.clock_delta = utils.set_gauge('clock_delta', 'Clock difference',
+        max_delta * 1e-6, {delta = 'max'}, nil, {default = true})
 end
 
 return {

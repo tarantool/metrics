@@ -14,9 +14,10 @@ local threads = {}
 
 local function update_cpu_metrics()
     collectors_list.cpu_number = utils.set_gauge('cpu_number', 'The number of processors',
-        psutils.get_cpu_count())
+        psutils.get_cpu_count(), nil, nil, {default = true})
 
-    collectors_list.cpu_time = utils.set_gauge('cpu_time', 'Host CPU time', psutils.get_cpu_time())
+    collectors_list.cpu_time = utils.set_gauge('cpu_time', 'Host CPU time',
+        psutils.get_cpu_time(), nil, nil, {default = true})
 
     local new_threads = {}
     for _, thread_info in ipairs(psutils.get_process_cpu_time()) do
@@ -29,12 +30,12 @@ local function update_cpu_metrics()
         local utime_labels = table.copy(labels)
         utime_labels.kind = 'user'
         collectors_list.cpu_thread = utils.set_gauge('cpu_thread', 'Tarantool thread cpu time',
-            thread_info.utime, utime_labels)
+            thread_info.utime, utime_labels, nil, {default = true})
 
         local stime_labels = table.copy(labels)
         stime_labels.kind = 'system'
         collectors_list.cpu_thread = utils.set_gauge('cpu_thread', 'Tarantool thread cpu time',
-            thread_info.stime, stime_labels)
+            thread_info.stime, stime_labels, nil, {default = true})
 
         threads[thread_info.pid] = nil
         new_threads[thread_info.pid] = labels
