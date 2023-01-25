@@ -24,12 +24,13 @@ A collector represents one or more observations that change over time.
 counter
 ~~~~~~~
 
-..  function:: counter(name [, help])
+..  function:: counter(name [, help, metainfo])
 
     Register a new counter.
 
     :param string name: collector name. Must be unique.
     :param string help: collector description.
+    :param table metainfo: collector metainfo.
     :return: A counter object.
     :rtype: counter_obj
 
@@ -85,12 +86,13 @@ counter
 gauge
 ~~~~~
 
-..  function:: gauge(name [, help])
+..  function:: gauge(name [, help, metainfo])
 
     Register a new gauge.
 
     :param string name: collector name. Must be unique.
     :param string help: collector description.
+    :param table metainfo: collector metainfo.
 
     :return: A gauge object.
 
@@ -127,7 +129,7 @@ gauge
 histogram
 ~~~~~~~~~
 
-..  function:: histogram(name [, help, buckets])
+..  function:: histogram(name [, help, buckets, metainfo])
 
     Register a new histogram.
 
@@ -136,6 +138,7 @@ histogram
     :param table buckets: histogram buckets (an array of sorted positive numbers).
                           The infinity bucket (``INF``) is appended automatically.
                           Default: ``{.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}``.
+    :param table metainfo: collector metainfo.
 
     :return: A histogram object.
 
@@ -184,7 +187,7 @@ histogram
 summary
 ~~~~~~~
 
-..  function:: summary(name [, help, objectives, params])
+..  function:: summary(name [, help, objectives, params, metainfo])
 
     Register a new summary. Quantile computation is based on the
     `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
@@ -216,6 +219,8 @@ summary
         a trade-off between resources (memory and CPU for maintaining the bucket)
         and how smooth the time window moves.
         Default value: ``{max_age_time = math.huge, age_buckets_count = 1}``.
+
+    :param table metainfo: collector metainfo.
 
     :return: A summary object.
 

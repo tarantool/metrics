@@ -18,8 +18,9 @@ function Histogram.check_buckets(buckets)
     return true
 end
 
-function Histogram:new(name, help, buckets)
-    local obj = Shared.new(self, name, help)
+function Histogram:new(name, help, buckets, metainfo)
+    metainfo = table.copy(metainfo) or {}
+    local obj = Shared.new(self, name, help, metainfo)
 
     obj.buckets = buckets or DEFAULT_BUCKETS
     table.sort(obj.buckets)
@@ -27,9 +28,9 @@ function Histogram:new(name, help, buckets)
         obj.buckets[#obj.buckets+1] = INF
     end
 
-    obj.count_collector = Counter:new(name .. '_count', help)
-    obj.sum_collector = Counter:new(name .. '_sum', help)
-    obj.bucket_collector = Counter:new(name .. '_bucket', help)
+    obj.count_collector = Counter:new(name .. '_count', help, metainfo)
+    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo)
+    obj.bucket_collector = Counter:new(name .. '_bucket', help, metainfo)
 
     return obj
 end

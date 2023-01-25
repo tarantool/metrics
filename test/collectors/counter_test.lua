@@ -90,3 +90,16 @@ g.test_insert_non_number = function()
     local c = metrics.counter('cnt')
     t.assert_error_msg_contains('Counter increment should be a number', c.inc, c, true)
 end
+
+g.test_metainfo = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = metrics.counter('cnt', nil, metainfo)
+    t.assert_equals(c.metainfo, metainfo)
+end
+
+g.test_metainfo_immutable = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = metrics.counter('cnt', nil, metainfo)
+    metainfo['my_useful_info'] = 'there'
+    t.assert_equals(c.metainfo, {my_useful_info = 'here'})
+end

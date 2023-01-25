@@ -24,7 +24,9 @@ function Shared:new_class(kind, method_names)
     return setmetatable(class, {__index = methods})
 end
 
-function Shared:new(name, help)
+function Shared:new(name, help, metainfo)
+    metainfo = table.copy(metainfo) or {}
+
     if not name then
         error("Name should be set for %s")
     end
@@ -33,6 +35,7 @@ function Shared:new(name, help)
         help = help or "",
         observations = {},
         label_pairs = {},
+        metainfo = metainfo,
     }, self)
 end
 

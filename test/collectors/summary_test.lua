@@ -237,3 +237,20 @@ g.test_insert_non_number = function()
 
     t.assert_error_msg_contains('Summary observation should be a number', s.observe, s, true)
 end
+
+g.test_metainfo = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = Summary:new('collector', nil, nil, nil, metainfo)
+    t.assert_equals(c.metainfo, metainfo)
+    t.assert_equals(c.sum_collector.metainfo, metainfo)
+    t.assert_equals(c.count_collector.metainfo, metainfo)
+end
+
+g.test_metainfo_immutable = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = Summary:new('collector', nil, nil, nil, metainfo)
+    metainfo['my_useful_info'] = 'there'
+    t.assert_equals(c.metainfo, {my_useful_info = 'here'})
+    t.assert_equals(c.sum_collector.metainfo, {my_useful_info = 'here'})
+    t.assert_equals(c.count_collector.metainfo, {my_useful_info = 'here'})
+end

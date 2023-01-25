@@ -3,16 +3,16 @@ local metrics = require('metrics')
 local TNT_PREFIX = 'tnt_'
 local utils = {}
 
-function utils.set_gauge(name, description, value, labels, prefix)
+function utils.set_gauge(name, description, value, labels, prefix, metainfo)
     prefix = prefix or TNT_PREFIX
-    local gauge = metrics.gauge(prefix .. name, description)
+    local gauge = metrics.gauge(prefix .. name, description, metainfo)
     gauge:set(value, labels or {})
     return gauge
 end
 
-function utils.set_counter(name, description, value, labels, prefix)
+function utils.set_counter(name, description, value, labels, prefix, metainfo)
     prefix = prefix or TNT_PREFIX
-    local counter = metrics.counter(prefix .. name, description)
+    local counter = metrics.counter(prefix .. name, description, metainfo)
     counter:reset(labels or {})
     counter:inc(value, labels or {})
     return counter
