@@ -78,3 +78,15 @@ g.test_inc_non_number = function()
     t.assert_error_msg_contains('Collector set value should be a number', c.set, c, true)
 end
 
+g.test_metainfo = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = metrics.gauge('gauge', nil, metainfo)
+    t.assert_equals(c.metainfo, metainfo)
+end
+
+g.test_metainfo_immutable = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = metrics.gauge('gauge', nil, metainfo)
+    metainfo['my_useful_info'] = 'there'
+    t.assert_equals(c.metainfo, {my_useful_info = 'here'})
+end

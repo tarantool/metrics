@@ -56,32 +56,32 @@ local function clear()
     registry:clear()
 end
 
-local function counter(name, help)
-    checks('string', '?string')
-
-    return registry:find_or_create(Counter, name, help)
-end
-
-local function gauge(name, help)
-    checks('string', '?string')
-
-    return registry:find_or_create(Gauge, name, help)
-end
-
-local function histogram(name, help, buckets)
+local function counter(name, help, metainfo)
     checks('string', '?string', '?table')
+
+    return registry:find_or_create(Counter, name, help, metainfo)
+end
+
+local function gauge(name, help, metainfo)
+    checks('string', '?string', '?table')
+
+    return registry:find_or_create(Gauge, name, help, metainfo)
+end
+
+local function histogram(name, help, buckets, metainfo)
+    checks('string', '?string', '?table', '?table')
     if buckets ~= nil and not Histogram.check_buckets(buckets) then
         error('Invalid value for buckets')
     end
 
-    return registry:find_or_create(Histogram, name, help, buckets)
+    return registry:find_or_create(Histogram, name, help, buckets, metainfo)
 end
 
-local function summary(name, help, objectives, params)
+local function summary(name, help, objectives, params, metainfo)
     checks('string', '?string', '?table', {
         age_buckets_count = '?number',
         max_age_time = '?number',
-    })
+    }, '?table')
     if objectives ~= nil and not Summary.check_quantiles(objectives) then
         error('Invalid value for objectives')
     end
@@ -98,7 +98,7 @@ local function summary(name, help, objectives, params)
         error('Age buckets count and max age must be present only together')
     end
 
-    return registry:find_or_create(Summary, name, help, objectives, params)
+    return registry:find_or_create(Summary, name, help, objectives, params, metainfo)
 end
 
 local function set_global_labels(label_pairs)

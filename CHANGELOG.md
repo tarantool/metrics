@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle to clear psutils metrics
 - `invoke_callbacks` option for `metrics.collect()`
+- Ability to set metainfo for collectors
 
 ### Fixed
 

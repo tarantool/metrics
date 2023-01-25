@@ -30,3 +30,17 @@ g.test_remove_metric_by_label = function()
         {'test', 1, {a = 1, b = 2}},
     })
 end
+
+g.test_metainfo = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = Shared:new('collector', nil, metainfo)
+    t.assert_equals(c.metainfo, metainfo)
+end
+
+
+g.test_metainfo_immutable = function()
+    local metainfo = {my_useful_info = 'here'}
+    local c = Shared:new('collector', nil, metainfo)
+    metainfo['my_useful_info'] = 'there'
+    t.assert_equals(c.metainfo, {my_useful_info = 'here'})
+end

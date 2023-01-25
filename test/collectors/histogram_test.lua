@@ -97,3 +97,22 @@ g.test_insert_non_number = function()
 
     t.assert_error_msg_contains('Histogram observation should be a number', h.observe, h, true)
 end
+
+g.test_metainfo = function()
+    local metainfo = {my_useful_info = 'here'}
+    local h = metrics.histogram('hist', 'some histogram', {2, 4}, metainfo)
+    t.assert_equals(h.metainfo, metainfo)
+    t.assert_equals(h.sum_collector.metainfo, metainfo)
+    t.assert_equals(h.count_collector.metainfo, metainfo)
+    t.assert_equals(h.bucket_collector.metainfo, metainfo)
+end
+
+g.test_metainfo_immutable = function()
+    local metainfo = {my_useful_info = 'here'}
+    local h = metrics.histogram('hist', 'some histogram', {2, 4}, metainfo)
+    metainfo['my_useful_info'] = 'there'
+    t.assert_equals(h.metainfo, {my_useful_info = 'here'})
+    t.assert_equals(h.sum_collector.metainfo, {my_useful_info = 'here'})
+    t.assert_equals(h.count_collector.metainfo, {my_useful_info = 'here'})
+    t.assert_equals(h.bucket_collector.metainfo, {my_useful_info = 'here'})
+end
