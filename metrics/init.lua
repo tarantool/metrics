@@ -41,7 +41,14 @@ local function invoke_callbacks()
     return registry:invoke_callbacks()
 end
 
-local function collect()
+local function collect(opts)
+    checks({invoke_callbacks = '?boolean'})
+    opts = opts or {}
+
+    if opts.invoke_callbacks then
+        registry:invoke_callbacks()
+    end
+
     return registry:collect()
 end
 

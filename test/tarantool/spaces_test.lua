@@ -34,8 +34,7 @@ g.after_each(function()
 end)
 
 local function get_space_metrics(metric_name)
-    metrics.invoke_callbacks()
-    return fun.iter(metrics.collect()):filter(function(x)
+    return fun.iter(metrics.collect{invoke_callbacks = true}):filter(function(x)
         return x.metric_name:find(metric_name)
     end):map(function(m) return m.label_pairs end):totable()
 end
