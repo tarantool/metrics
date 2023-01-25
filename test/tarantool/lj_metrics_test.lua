@@ -19,10 +19,9 @@ g.test_lj_metrics = function()
     t.skip_if(metrics_available == false, 'metrics are not available')
 
     metrics.enable_default_metrics()
-    metrics.invoke_callbacks()
 
     local lj_metrics = {}
-    for _, v in pairs(metrics.collect()) do
+    for _, v in pairs(metrics.collect{invoke_callbacks = true}) do
         if v.metric_name:startswith(LJ_PREFIX) then
             table.insert(lj_metrics, v.metric_name)
         end

@@ -347,9 +347,13 @@ Metrics functions
 
     Note that both label names and values in ``label_pairs`` are treated as strings.
 
-..  function:: collect()
+..  function:: collect([opts])
 
     Collect observations from each collector.
+
+    :param table opts: table of collect options:
+
+      * ``invoke_callbacks`` -- if ``true``, ``invoke_callbacks()`` is triggerred before actual collect.
 
 ..  class:: registry
 
@@ -431,6 +435,7 @@ Metrics functions
 ..  function:: invoke_callbacks()
 
     Invoke all registered callbacks. Has to be called before each ``collect()``.
+    (Since version **0.16.0**, you may use ``collect{invoke_callbacks = true}`` instead.)
     If you're using one of the default exporters,
     ``invoke_callbacks()`` will be called by the exporter.
 

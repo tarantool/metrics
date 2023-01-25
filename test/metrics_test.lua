@@ -128,15 +128,14 @@ g.test_default_metrics_clear = function()
     metrics.enable_default_metrics()
     t.assert_equals(#metrics.collect(), 0)
 
-    metrics.invoke_callbacks()
-    t.assert(#metrics.collect() > 0)
+    t.assert(#metrics.collect{invoke_callbacks = true} > 0)
 
     metrics.clear()
     t.assert_equals(#metrics.collect(), 0)
+    t.assert_equals(#metrics.collect{invoke_callbacks = true}, 0)
 
     metrics.enable_default_metrics()
-    metrics.invoke_callbacks()
-    t.assert(#metrics.collect() > 0)
+    t.assert(#metrics.collect{invoke_callbacks = true} > 0)
 end
 
 g.test_hotreload_remove_callbacks = function()
@@ -155,4 +154,38 @@ g.test_hotreload_remove_callbacks = function()
     local len_after_hotreload = utils.len(Registry.callbacks)
 
     t.assert_equals(len_before_hotreload, len_after_hotreload)
+end
+
+local collect_invoke_callbacks_cases = {
+    default = {
+        args = nil,
+        value = 0,
+    },
+    ['true'] = {
+        args = {invoke_callbacks = true},
+        value = 1,
+    },
+    ['false'] = {
+        args = {invoke_callbacks = false},
+        value = 0,
+    },
+}
+
+for name, case in pairs(collect_invoke_callbacks_cases) do
+    g['test_collect_invoke_callbacks_' .. name] = function()
+        local c = metrics.counter('mycounter')
+
+        local callback = function()
+            c:inc()
+        end
+        metrics.register_callback(callback)
+
+        -- Initialize a value in the registry.
+        -- Otherwise collector would be empty.
+        c:reset()
+
+        local observations = metrics.collect(case.args)
+        local obs = utils.find_obs('mycounter', {}, observations)
+        t.assert_equals(obs.value, case.value)
+    end
 end
