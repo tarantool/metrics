@@ -333,6 +333,7 @@ Metrics functions
     *   ``event_loop``
 
     See :ref:`metrics reference <metrics-reference>` for details.
+    All metric collectors from the collection have ``metainfo.default = true``.
 
 ..  function:: set_global_labels(label_pairs)
 
@@ -614,6 +615,8 @@ To enable CPU metrics, first register a callback function:
 
     sum by (thread_name) (idelta(tnt_cpu_thread[$__interval]))
       / scalar(idelta(tnt_cpu_total[$__interval]) / tnt_cpu_count)
+
+All psutils metric collectors have ``metainfo.default = true``.
 
 To clear CPU metrics when you don't need them anymore, remove the callback and clear the collectors with a method:
 

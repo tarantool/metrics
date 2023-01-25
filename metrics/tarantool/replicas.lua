@@ -15,7 +15,8 @@ local function update_replicas_metrics()
             if replication_info then
                 local lsn = replication_info.lsn
                 collectors_list.replication_lsn =
-                    utils.set_gauge('replication_lsn', 'lsn for instance', lsn - v, {type = 'replica', id = k})
+                    utils.set_gauge('replication_lsn', 'lsn for instance',
+                        lsn - v, {type = 'replica', id = k}, nil, {default = true})
             end
         end
     else
@@ -27,7 +28,9 @@ local function update_replicas_metrics()
                         'replication_lsn',
                         'lsn for instance',
                         current_box_info.lsn - lsn,
-                        {type = 'master', id = k}
+                        {type = 'master', id = k},
+                        nil,
+                        {default = true}
                     )
                 end
             end

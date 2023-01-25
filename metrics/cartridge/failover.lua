@@ -18,7 +18,10 @@ local function update()
             utils.set_counter(
                 'cartridge_failover_trigger_total',
                 'Count of Cartridge Failover triggers',
-                trigger_cnt
+                trigger_cnt,
+                nil,
+                nil,
+                {default = true}
             )
     end
 end

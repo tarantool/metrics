@@ -70,8 +70,10 @@ end
 local function update_info_metrics()
     local cpu_time = ss_get_rusage()
     if cpu_time then
-        collectors_list.cpu_user_time = utils.set_gauge('cpu_user_time', 'CPU user time usage', cpu_time.ru_utime)
-        collectors_list.cpu_system_time = utils.set_gauge('cpu_system_time', 'CPU system time usage', cpu_time.ru_stime)
+        collectors_list.cpu_user_time = utils.set_gauge('cpu_user_time', 'CPU user time usage',
+            cpu_time.ru_utime, nil, nil, {default = true})
+        collectors_list.cpu_system_time = utils.set_gauge('cpu_system_time', 'CPU system time usage',
+            cpu_time.ru_stime, nil, nil, {default = true})
     end
 end
 

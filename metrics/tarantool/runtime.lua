@@ -8,7 +8,8 @@ local function update_runtime_metrics()
     for k, v in pairs(runtime_info) do
         if k ~= 'maxalloc' then
             local metric_name = 'runtime_' .. k
-            collectors_list[metric_name] = utils.set_gauge(metric_name, 'Runtime ' .. k, v)
+            collectors_list[metric_name] = utils.set_gauge(metric_name, 'Runtime ' .. k, v,
+                nil, nil, {default = true})
         end
     end
 end

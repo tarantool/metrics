@@ -94,3 +94,12 @@ g.test_clear = function()
     cpu.update()
     check_cpu_metrics(true)
 end
+
+g.test_default_metrics_metainfo = function()
+    cpu.update()
+
+    for k, c in pairs(metrics.collectors()) do
+        t.assert_equals(c.metainfo.default, true,
+            ('psutils collector %s has metainfo label "default"'):format(k))
+    end
+end
