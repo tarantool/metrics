@@ -10,7 +10,7 @@ local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
 local Summary = require('metrics.collectors.summary')
 
-local VERSION = '0.15.1-scm'
+local VERSION = '0.16.0'
 
 local registry = rawget(_G, '__metrics_registry')
 if not registry then
