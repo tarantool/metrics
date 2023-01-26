@@ -199,3 +199,38 @@ g.test_default_metrics_metainfo = function()
             ('default collector %s has metainfo label "default"'):format(k))
     end
 end
+
+local collect_default_only_cases = {
+    default = {
+        args = {invoke_callbacks = true},
+        custom_expected = true,
+    },
+    ['true'] = {
+        args = {invoke_callbacks = true, default_only = true},
+        custom_expected = false,
+    },
+    ['false'] = {
+        args = {invoke_callbacks = true, default_only = false},
+        custom_expected = true,
+    },
+}
+
+for name, case in pairs(collect_default_only_cases) do
+    g['test_collect_default_only_' .. name] = function()
+        metrics.enable_default_metrics()
+        local c = metrics.gauge('custom_metric')
+        c:set(42)
+
+        local observations = metrics.collect(case.args)
+
+        local default_obs = utils.find_metric('tnt_info_memory_lua', observations)
+        t.assert_not_equals(default_obs, nil)
+
+        local custom_obs = utils.find_metric('custom_metric', observations)
+        if case.custom_expected then
+            t.assert_not_equals(custom_obs, nil)
+        else
+            t.assert_equals(custom_obs, nil)
+        end
+    end
+end
