@@ -156,4 +156,5 @@ return {
     http_middleware = require('metrics.http_middleware'),
     collect = collect,
     VERSION = VERSION,
+    _VERSION = VERSION,
 }
