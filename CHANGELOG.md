@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to set metainfo for collectors
 - Set `metainfo.default` to `true` for all collectors
   from `enable_default_metrics()` and psutils collectors
+- `default_only` option for `metrics.collect()`
 
 ### Fixed
 

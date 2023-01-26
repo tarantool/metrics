@@ -360,6 +360,7 @@ Metrics functions
     :param table opts: table of collect options:
 
       * ``invoke_callbacks`` -- if ``true``, ``invoke_callbacks()`` is triggerred before actual collect.
+      * ``default_only`` -- if ``true``, observations contain only default metrics (``metainfo.default = true``).
 
 ..  class:: registry
 

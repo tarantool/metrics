@@ -41,15 +41,32 @@ local function invoke_callbacks()
     return registry:invoke_callbacks()
 end
 
+local function get_collector_values(collector, result)
+    for _, obs in ipairs(collector:collect()) do
+        table.insert(result, obs)
+    end
+end
+
 local function collect(opts)
-    checks({invoke_callbacks = '?boolean'})
+    checks({invoke_callbacks = '?boolean', default_only = '?boolean'})
     opts = opts or {}
 
     if opts.invoke_callbacks then
         registry:invoke_callbacks()
     end
 
-    return registry:collect()
+    local result = {}
+    for _, collector in pairs(registry.collectors) do
+        if opts.default_only then
+            if collector.metainfo.default then
+                get_collector_values(collector, result)
+            end
+        else
+            get_collector_values(collector, result)
+        end
+    end
+
+    return result
 end
 
 local function clear()
