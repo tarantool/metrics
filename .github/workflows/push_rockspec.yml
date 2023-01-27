@@ -38,8 +38,8 @@ jobs:
       - name: Push release rockspec
         run: |
           sed \
-            -e "s/branch = '.\+'/tag = '${GIT_TAG}'/g" \
-            -e "s/version = '.\+'/version = '${GIT_TAG}-1'/g" \
+            -e "s/branch = \".\+\"/tag = '${GIT_TAG}'/g" \
+            -e "s/version = \".\+\"/version = '${GIT_TAG}-1'/g" \
             ${{ env.ROCK_NAME }}-scm-1.rockspec > ${{ env.ROCK_NAME }}-${GIT_TAG}-1.rockspec
 
       - uses: tarantool/rocks.tarantool.org/github-action@master
