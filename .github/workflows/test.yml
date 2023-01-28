@@ -26,14 +26,14 @@ jobs:
           - "2.4.0"
           - "2.5.1"
           - "2.6.0"
-          - "2.7.7"
+          - "2.7.8"
         include:
           - tarantool: "2.x-latest"
-            cartridge: "2.7.7"
+            cartridge: "2.7.8"
           - tarantool: "2.x-latest"
             cartridge: ""
           - tarantool: "2.10"
-            cartridge: "2.7.7"
+            cartridge: "2.7.8"
           - tarantool: "2.10"
             cartridge: ""
     runs-on: ubuntu-20.04
