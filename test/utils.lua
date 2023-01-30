@@ -22,9 +22,11 @@ function utils.init()
     }
 end
 
-function utils.find_obs(metric_name, label_pairs, observations)
+function utils.find_obs(metric_name, label_pairs, observations, comparator)
+    comparator = comparator or t.assert_equals
+
     for _, obs in pairs(observations) do
-        local same_label_pairs = pcall(t.assert_equals, obs.label_pairs, label_pairs)
+        local same_label_pairs = pcall(comparator, obs.label_pairs, label_pairs)
         if obs.metric_name == metric_name and same_label_pairs then
             return obs
         end

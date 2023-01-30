@@ -57,7 +57,7 @@ Sample settings
     ..  code-block:: lua
 
         metrics = require('metrics')
-        metrics.enable_default_metrics()
+        metrics.cfg{}
         prometheus = require('metrics.plugins.prometheus')
         httpd = require('http.server').new('0.0.0.0', 8080)
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
@@ -70,7 +70,7 @@ Sample settings
         cartridge = require('cartridge')
         httpd = cartridge.service_get('httpd')
         metrics = require('metrics')
-        metrics.enable_default_metrics()
+        metrics.cfg{}
         prometheus = require('metrics.plugins.prometheus')
         httpd:route( { path = '/metrics' }, prometheus.collect_http)
 

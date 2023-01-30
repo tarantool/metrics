@@ -58,6 +58,8 @@ build = {
         ['metrics.tarantool.luajit']        = 'metrics/tarantool/luajit.lua',
         ['metrics.tarantool.vinyl']         = 'metrics/tarantool/vinyl.lua',
         ['metrics.utils']                   = 'metrics/utils.lua',
+        ['metrics.cfg']                     = 'metrics/cfg.lua',
+        ['metrics.stash']                   = 'metrics/stash.lua',
         ['cartridge.roles.metrics']         = 'cartridge/roles/metrics.lua',
         ['cartridge.health']                = 'cartridge/health.lua',
     }

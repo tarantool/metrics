@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `metrics.cfg{}` -- a single entrypoint to setup the module:
+  - `include` and `exclude` options with the same effect as in
+    `enable_default_metrics(include, exclude)` (but its deprecated
+    features already disabled);
+  - `labels` options with the same effect as `set_global_labels(labels)`;
+  - values and effect (like default metrics callbacks) are preserved
+    between reloads;
+  - does not deal with external features like cartridge HTTP setup
+
 ### Changed
 - Setup cartridge hotreload inside the role
 - Extend `enable_default_metrics()` API:

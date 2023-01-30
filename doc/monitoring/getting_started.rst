@@ -21,17 +21,12 @@ Next, require it in your code:
 
     local metrics = require('metrics')
 
-Set a global label for your metrics:
+Enable default Tarantool metrics such as network, memory, operations, etc.
+You may also set a global label for your metrics:
 
 ..  code-block:: lua
 
-    metrics.set_global_labels({alias = 'alias'})
-
-Enable default Tarantool metrics such as network, memory, operations, etc.:
-
-.. code-block:: lua
-
-    metrics.enable_default_metrics()
+    metrics.cfg{alias = 'alias'}
 
 Initialize the Prometheus exporter or export metrics in another format:
 

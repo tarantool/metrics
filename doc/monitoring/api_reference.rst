@@ -303,20 +303,25 @@ You can also set global labels by calling
 Metrics functions
 -----------------
 
-..  function:: enable_default_metrics([include, exclude])
+..  function:: cfg([config])
 
-    Enable Tarantool metric collection.
+    Entrypoint to setup the module.
 
-    :param string/table include: ``'all'`` to enable all supported default metrics,
-        ``'none'`` to disable all default metrics,
-        table with names of the default metrics to enable a specific set of metrics
-        (``{}`` is the same as ``'all'`` for backward compatibility).
-        Default is ``'all'``.
+    :param table config: module configuration options:
 
-    :param table exclude: table containing the names of the default metrics that you want to disable.
-        It has higher priority than ``include``. Default is ``{}``.
+      * ``cfg.include`` (string/table, default ``'all'``): ``'all`` to enable all
+        supported default metrics, ``'none'`` to disable all default metrics,
+        table with names of the default metrics to enable a specific set of metrics.
+      * ``cfg.exclude`` (table, default ``{}``): table containing the names of
+        the default metrics that you want to disable. Has higher priority
+        than ``cfg.include``.
+      * ``cfg.labels`` (table, default ``{}``): table containing label names as
+        string keys, label values as values.
 
-    Default metric names:
+    You can work with ``metrics.cfg`` as a table to read values, but you must call
+    ``metrics.cfg{}`` as a function to update them.
+
+    Supported default metric names (for ``cfg.include`` and ``cfg.exclude`` tables):
 
     *   ``network``
     *   ``operations``
@@ -340,12 +345,7 @@ Metrics functions
     See :ref:`metrics reference <metrics-reference>` for details.
     All metric collectors from the collection have ``metainfo.default = true``.
 
-..  function:: set_global_labels(label_pairs)
-
-    Set the global labels to be added to every observation.
-
-    :param table label_pairs: table containing label names as string keys,
-                              label values as values.
+    ``cfg.labels`` are the global labels to be added to every observation.
 
     Global labels are applied only to metric collection. They have no effect
     on how observations are stored.
@@ -357,6 +357,15 @@ Metrics functions
     some global label, the method argument value will be used.
 
     Note that both label names and values in ``label_pairs`` are treated as strings.
+
+..  function:: enable_default_metrics([include, exclude])
+
+    Same as ``metrics.cfg{include=include, exclude=exclude}``, but ``include={}`` is
+    treated as ``include='all'`` for backward compatibility.
+
+..  function:: set_global_labels(label_pairs)
+
+    Same as ``metrics.cfg{labels=label_pairs}``.
 
 ..  function:: collect([opts])
 
