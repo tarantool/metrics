@@ -2,6 +2,7 @@ local cartridge = require('cartridge')
 local argparse = require('cartridge.argparse')
 local hotreload_supported, hotreload = pcall(require, 'cartridge.hotreload')
 local metrics = require('metrics')
+local metrics_stash = require('metrics.stash')
 local log = require('log')
 
 local metrics_vars = require('cartridge.vars').new('metrics_vars')
@@ -222,6 +223,7 @@ local function init()
 
     if hotreload_supported then
         hotreload.whitelist_globals({'__metrics_registry'})
+        metrics_stash.setup_cartridge_reload()
     end
 end
 

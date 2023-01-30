@@ -250,3 +250,35 @@ g.test_cartridge_hotreload_reset_callbacks = function()
     end)
     t.assert_equals(len_before_hotreload, len_after_hotreload)
 end
+
+g.test_cartridge_hotreload_preserves_cfg_state = function()
+    local main_server = g.cluster:server('main')
+    local cfg_before_hotreload = main_server:eval([[
+        local metrics = require('metrics')
+        return metrics.cfg{include = {'operations'}}
+    ]])
+    local obs_before_hotreload = main_server:eval([[
+        local metrics = require('metrics')
+        return metrics.collect{invoke_callbacks = true}
+    ]])
+
+    reload_roles()
+
+    local cfg_after_hotreload = main_server:eval([[
+        local metrics = require('metrics')
+        return metrics.cfg
+    ]])
+    local obs_after_hotreload = main_server:eval([[
+        local metrics = require('metrics')
+        return metrics.collect{invoke_callbacks = true}
+    ]])
+
+    t.assert_equals(cfg_before_hotreload, cfg_after_hotreload,
+        "cfg values are preserved")
+
+    local op_before = utils.find_obs('tnt_stats_op_total', {operation = 'eval'},
+        obs_before_hotreload, t.assert_covers)
+    local op_after = utils.find_obs('tnt_stats_op_total', {operation = 'eval'},
+        obs_after_hotreload, t.assert_covers)
+    t.assert_gt(op_after.value, op_before.value, "metric callbacks enabled by cfg stay enabled")
+end
