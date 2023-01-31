@@ -3,6 +3,8 @@
 local t = require('luatest')
 local g = t.group('enable_default_metrics')
 
+local luatest_capture = require('luatest.capture')
+
 local metrics = require('metrics')
 local utils = require('test.utils')
 
@@ -113,4 +115,28 @@ g.test_invalid_include = function()
     t.assert_error_msg_contains(
         'Unexpected value provided: include must be "all", {...} or "none"',
         metrics.enable_default_metrics, 'everything')
+end
+
+local deprecated_cases = {
+    include_unknown = {
+        include = { 'http' },
+        warn = 'Unknown metrics "http" provided, this will raise an error in the future',
+    },
+    exclude_unknown = {
+        exclude = { 'http' },
+        warn = 'Unknown metrics "http" provided, this will raise an error in the future',
+    },
+}
+
+for name, case in pairs(deprecated_cases) do
+    g['test_' .. name] = function()
+        local capture = luatest_capture:new()
+        capture:enable()
+
+        metrics.enable_default_metrics(case.include, case.exclude)
+        local stdout = utils.fflush_main_server_output(nil, capture)
+        capture:disable()
+
+        t.assert_str_contains(stdout, case.warn)
+    end
 end
