@@ -84,20 +84,27 @@ local cases = {
     },
 }
 
-for name, case in pairs(cases) do
-    g['test_' .. name] = function()
-        metrics.enable_default_metrics(case.include, case.exclude)
+local methods = {
+    [''] = metrics.enable_default_metrics,
+    v2_ = require('metrics.tarantool').enable_v2,
+}
 
-        local observations = metrics.collect{invoke_callbacks = true}
+for prefix, method in pairs(methods) do
+    for name, case in pairs(cases) do
+        g['test_' .. prefix .. name] = function()
+            method(case.include, case.exclude)
 
-        for _, expected in ipairs(case.expected) do
-            local obs = utils.find_metric(expected, observations)
-            t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
-        end
+            local observations = metrics.collect{invoke_callbacks = true}
 
-        for _, not_expected in ipairs(case.not_expected) do
-            local obs = utils.find_metric(not_expected, observations)
-            t.assert_equals(obs, nil, ("metric %q not found"):format(not_expected))
+            for _, expected in ipairs(case.expected) do
+                local obs = utils.find_metric(expected, observations)
+                t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
+            end
+
+            for _, not_expected in ipairs(case.not_expected) do
+                local obs = utils.find_metric(not_expected, observations)
+                t.assert_equals(obs, nil, ("metric %q not found"):format(not_expected))
+            end
         end
     end
 end
@@ -108,14 +115,22 @@ g.test_invalid_include = function()
         metrics.enable_default_metrics, 'everything')
 end
 
+g.test_v2_invalid_include = function()
+    t.assert_error_msg_contains(
+        'Unexpected value provided: include must be "all", {...} or "none"',
+        require('metrics.tarantool').enable_v2, 'everything')
+end
+
 local deprecated_cases = {
     include_unknown = {
         include = { 'http' },
         warn = 'Unknown metrics "http" provided, this will raise an error in the future',
+        err = 'Unknown metrics "http" provided',
     },
     exclude_unknown = {
         exclude = { 'http' },
         warn = 'Unknown metrics "http" provided, this will raise an error in the future',
+        err = 'Unknown metrics "http" provided',
     },
 }
 
@@ -129,6 +144,12 @@ for name, case in pairs(deprecated_cases) do
         capture:disable()
 
         t.assert_str_contains(stdout, case.warn)
+    end
+
+    g['test_v2_' .. name] = function()
+        t.assert_error_msg_contains(
+            case.err,
+            require('metrics.tarantool').enable_v2, case.include, case.exclude)
     end
 end
 
@@ -156,5 +177,21 @@ g.test_empty_table_in_v1 = function()
     for _, expected in ipairs(expected_metrics) do
         local obs = utils.find_metric(expected, observations)
         t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
+    end
+end
+
+g.test_empty_table_in_v2 = function()
+    require('metrics.tarantool').enable_v2({})
+
+    local observations = metrics.collect{invoke_callbacks = true}
+
+    local unexpected_metrics = {
+        'tnt_info_uptime', 'tnt_info_memory_lua',
+        'tnt_net_sent_total', 'tnt_slab_arena_used',
+    }
+
+    for _, expected in ipairs(unexpected_metrics) do
+        local obs = utils.find_metric(expected, observations)
+        t.assert_equals(obs, nil, ("metric %q not found"):format(expected))
     end
 end
