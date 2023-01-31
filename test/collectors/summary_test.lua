@@ -7,9 +7,7 @@ local Summary = require('metrics.collectors.summary')
 local Quantile = require('metrics.quantile')
 local metrics = require('metrics')
 
-g.before_each = function()
-    metrics.clear()
-end
+g.before_each(metrics.clear)
 
 g.test_collect = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})

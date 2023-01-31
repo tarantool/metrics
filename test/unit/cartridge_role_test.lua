@@ -5,17 +5,17 @@ local helpers = require('test.helper')
 local t = require('luatest')
 local g = t.group()
 
-g.before_all = function()
+g.before_all(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
-end
+end)
 
-g.after_each = function()
+g.after_each(function()
     metrics.clear()
-end
+end)
 
-g.after_all = function()
+g.after_all(function()
     package.loaded['cartridge.argparse'] = nil
-end
+end)
 
 local function mock_argparse(params)
     package.loaded['cartridge.argparse'] = {
