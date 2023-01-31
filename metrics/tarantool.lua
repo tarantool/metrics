@@ -1,3 +1,5 @@
+local log = require("log")
+
 local metrics_api = require('metrics.api')
 local utils = require('metrics.utils')
 local const = require('metrics.const')
@@ -23,7 +25,17 @@ local default_metrics = {
     event_loop          = require('metrics.tarantool.event_loop'),
 }
 
-local function enable_impl(include, exclude)
+local function check_metrics_name(name, raise_if_unknown)
+    if default_metrics[name] == nil then
+        if raise_if_unknown then
+            error(string.format("Unknown metrics %q provided", name))
+        else
+            log.warn("Unknown metrics %q provided, this will raise an error in the future", name)
+        end
+    end
+end
+
+local function enable_impl(include, exclude, raise_if_unknown)
     include = include or const.ALL
     exclude = exclude or {}
 
@@ -35,6 +47,7 @@ local function enable_impl(include, exclude)
         end
     elseif type(include) == 'table' then
         for _, name in pairs(include) do
+            check_metrics_name(name, raise_if_unknown)
             include_map[name] = true
         end
     elseif include == const.NONE then
@@ -44,6 +57,7 @@ local function enable_impl(include, exclude)
     end
 
     for _, name in pairs(exclude) do
+        check_metrics_name(name, raise_if_unknown)
         include_map[name] = false
     end
 
@@ -67,7 +81,7 @@ local function enable(include, exclude)
         include = const.ALL
     end
 
-    return enable_impl(include, exclude)
+    return enable_impl(include, exclude, false)
 end
 
 return {
