@@ -3,10 +3,10 @@ local helpers = require('test.helper')
 local t = require('luatest')
 local g = t.group()
 
-g.before_all = function()
+g.before_all(function()
     t.skip_if(type(helpers) ~= 'table', 'Skip cartridge test')
     helpers.skip_cartridge_version_less('2.0.2')
-end
+end)
 
 g.test_cartridge_issues_before_cartridge_cfg = function()
     require('cartridge.issues')
