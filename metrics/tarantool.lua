@@ -87,6 +87,11 @@ local function enable(include, exclude)
     return enable_impl(include, exclude, false)
 end
 
+local function enable_v2(include, exclude)
+    return enable_impl(include, exclude, true)
+end
+
 return {
     enable = enable,
+    enable_v2 = enable_v2,
 }
