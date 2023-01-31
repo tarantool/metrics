@@ -78,6 +78,9 @@ end
 local function enable(include, exclude)
     -- Compatibility with v1.
     if is_empty_table(include) then
+        log.warn('Providing {} in enable_default_metrics include is treated ' ..
+                 'as a default value now (i.e. include all), ' ..
+                 'but it will change in the future. Use "all" instead')
         include = const.ALL
     end
 
