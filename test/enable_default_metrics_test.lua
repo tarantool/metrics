@@ -24,15 +24,6 @@ local cases = {
         },
         not_expected = {},
     },
-    v1_compatibility = {
-        include = {},
-        exclude = nil,
-        expected = {
-            'tnt_info_uptime', 'tnt_info_memory_lua',
-            'tnt_net_sent_total', 'tnt_slab_arena_used',
-        },
-        not_expected = {},
-    },
     include_all = {
         include = 'all',
         exclude = nil,
@@ -138,5 +129,32 @@ for name, case in pairs(deprecated_cases) do
         capture:disable()
 
         t.assert_str_contains(stdout, case.warn)
+    end
+end
+
+g.test_empty_table_in_v1 = function()
+    local capture = luatest_capture:new()
+    capture:enable()
+
+    metrics.enable_default_metrics({})
+    local stdout = utils.fflush_main_server_output(nil, capture)
+    capture:disable()
+
+    t.assert_str_contains(
+        stdout,
+        'Providing {} in enable_default_metrics include is treated ' ..
+        'as a default value now (i.e. include all), ' ..
+        'but it will change in the future. Use "all" instead')
+
+    local observations = metrics.collect{invoke_callbacks = true}
+
+    local expected_metrics = {
+        'tnt_info_uptime', 'tnt_info_memory_lua',
+        'tnt_net_sent_total', 'tnt_slab_arena_used',
+    }
+
+    for _, expected in ipairs(expected_metrics) do
+        local obs = utils.find_metric(expected, observations)
+        t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
     end
 end
