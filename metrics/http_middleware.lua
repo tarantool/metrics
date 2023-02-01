@@ -1,6 +1,13 @@
 local export = {}
 local log = require('log')
 
+local metrics_api = require('metrics.api')
+
+local collector_type = {
+    histogram = require('metrics.collectors.histogram'),
+    summary = require('metrics.collectors.summary'),
+}
+
 export.DEFAULT_HISTOGRAM_BUCKETS = {
     0.001,  0.0025, 0.005,  0.0075,
     0.01,   0.025,  0.05,   0.075,
@@ -38,8 +45,7 @@ function export.build_default_collector(type_name, name, help)
     else
         error('Unknown collector type_name: ' .. tostring(type_name))
     end
-    local class = require('metrics.collectors.' .. type_name)
-    return require('metrics').registry:register(class:new(name, help, unpack(extra)))
+    return metrics_api.registry:register(collector_type[type_name]:new(name, help, unpack(extra)))
 end
 
 function export.get_default_collector()
