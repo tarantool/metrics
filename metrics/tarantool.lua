@@ -1,4 +1,4 @@
-local metrics = require('metrics')
+local metrics_api = require('metrics.api')
 local utils = require('metrics.utils')
 
 local default_metrics = {
@@ -41,20 +41,20 @@ local function enable(include, exclude)
     for name, value in pairs(default_metrics) do
         if next(include) ~= nil then
             if include_map[name] ~= nil then
-                metrics.register_callback(value.update)
+                metrics_api.register_callback(value.update)
             else
-                metrics.unregister_callback(value.update)
+                metrics_api.unregister_callback(value.update)
                 utils.delete_collectors(value.list)
             end
         elseif next(exclude) ~= nil then
             if exclude_map[name] ~= nil then
-                metrics.unregister_callback(value.update)
+                metrics_api.unregister_callback(value.update)
                 utils.delete_collectors(value.list)
             else
-                metrics.register_callback(value.update)
+                metrics_api.register_callback(value.update)
             end
         else
-            metrics.register_callback(value.update)
+            metrics_api.register_callback(value.update)
         end
     end
 end
