@@ -1,18 +1,18 @@
-local metrics = require('metrics')
+local metrics_api = require('metrics.api')
 
 local TNT_PREFIX = 'tnt_'
 local utils = {}
 
 function utils.set_gauge(name, description, value, labels, prefix, metainfo)
     prefix = prefix or TNT_PREFIX
-    local gauge = metrics.gauge(prefix .. name, description, metainfo)
+    local gauge = metrics_api.gauge(prefix .. name, description, metainfo)
     gauge:set(value, labels or {})
     return gauge
 end
 
 function utils.set_counter(name, description, value, labels, prefix, metainfo)
     prefix = prefix or TNT_PREFIX
-    local counter = metrics.counter(prefix .. name, description, metainfo)
+    local counter = metrics_api.counter(prefix .. name, description, metainfo)
     counter:reset(labels or {})
     counter:inc(value, labels or {})
     return counter
@@ -31,7 +31,7 @@ function utils.delete_collectors(list)
         return
     end
     for _, collector in pairs(list) do
-        metrics.registry:unregister(collector)
+        metrics_api.registry:unregister(collector)
     end
     table.clear(list)
 end

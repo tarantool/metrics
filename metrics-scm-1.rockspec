@@ -23,6 +23,7 @@ build = {
 
     modules = {
         ['metrics']                         = 'metrics/init.lua',
+        ['metrics.api']                     = 'metrics/api.lua',
         ['metrics.registry']                = 'metrics/registry.lua',
         ['metrics.quantile']                = 'metrics/quantile.lua',
         ['metrics.http_middleware']         = 'metrics/http_middleware.lua',
