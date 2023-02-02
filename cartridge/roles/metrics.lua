@@ -1,5 +1,6 @@
 local cartridge = require('cartridge')
 local argparse = require('cartridge.argparse')
+local hotreload_supported, hotreload = pcall(require, 'cartridge.hotreload')
 local metrics = require('metrics')
 local log = require('log')
 
@@ -221,6 +222,10 @@ local function init()
         end
     end
     apply_routes(current_paths)
+
+    if hotreload_supported then
+        hotreload.whitelist_globals({'__metrics_registry'})
+    end
 end
 
 local function stop()
