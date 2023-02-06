@@ -3,10 +3,21 @@
 local t = require('luatest')
 local g = t.group('collectors')
 
+local luatest_capture = require('luatest.capture')
+
 local metrics = require('metrics')
 local utils = require('test.utils')
 
 g.before_all(utils.init)
+
+g.before_each(function()
+    -- Reset to defaults.
+    metrics.cfg{
+        include = 'all',
+        exclude = {},
+        labels = {},
+    }
+end)
 
 g.after_each(function()
     -- Delete all collectors and global labels
@@ -232,5 +243,30 @@ for name, case in pairs(collect_default_only_cases) do
         else
             t.assert_equals(custom_obs, nil)
         end
+    end
+end
+
+local control_characters_cases = {
+    in_global_label_key = function()
+        metrics.cfg{labels = {['lab\tval\tlab2'] = 'val2'}}
+    end,
+    in_global_label_value = function()
+        metrics.cfg{labels = {lab = 'val\tlab2\tval2'}}
+    end,
+}
+
+for name, case in pairs(control_characters_cases) do
+    g['test_control_characters_' .. name .. 'are_not_expected'] = function()
+        local capture = luatest_capture:new()
+        capture:enable()
+
+        case()
+
+        local stdout = utils.fflush_main_server_output(nil, capture)
+        capture:disable()
+
+        t.assert_str_contains(
+            stdout,
+            'Do not use control characters, this will raise an error in the future.')
     end
 end

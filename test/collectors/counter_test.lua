@@ -1,6 +1,8 @@
 local t = require('luatest')
 local g = t.group()
 
+local luatest_capture = require('luatest.capture')
+
 local metrics = require('metrics')
 local utils = require('test.utils')
 
@@ -102,4 +104,34 @@ g.test_metainfo_immutable = function()
     local c = metrics.counter('cnt', nil, metainfo)
     metainfo['my_useful_info'] = 'there'
     t.assert_equals(c.metainfo, {my_useful_info = 'here'})
+end
+
+local control_characters_cases = {
+    in_name = function()
+        metrics.counter('cnt\tlab')
+    end,
+    in_observation_label_key = function()
+        local collector = metrics.counter('cnt')
+        collector:inc(1, {['lab\tval\tlab2'] = 'val2'})
+    end,
+    in_observation_label_value = function()
+        local collector = metrics.counter('cnt')
+        collector:inc(1, {lab = 'val\tlab2\tval2'})
+    end,
+}
+
+for name, case in pairs(control_characters_cases) do
+    g['test_control_characters_' .. name .. 'are_not_expected'] = function()
+        local capture = luatest_capture:new()
+        capture:enable()
+
+        case()
+
+        local stdout = utils.fflush_main_server_output(nil, capture)
+        capture:disable()
+
+        t.assert_str_contains(
+            stdout,
+            'Do not use control characters, this will raise an error in the future.')
+    end
 end

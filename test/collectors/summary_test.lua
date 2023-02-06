@@ -1,6 +1,8 @@
 local t = require('luatest')
 local g = t.group()
 
+local luatest_capture = require('luatest.capture')
+
 local utils = require('test.utils')
 
 local Summary = require('metrics.collectors.summary')
@@ -251,4 +253,34 @@ g.test_metainfo_immutable = function()
     t.assert_equals(c.metainfo, {my_useful_info = 'here'})
     t.assert_equals(c.sum_collector.metainfo, {my_useful_info = 'here'})
     t.assert_equals(c.count_collector.metainfo, {my_useful_info = 'here'})
+end
+
+local control_characters_cases = {
+    in_name = function()
+        Summary:new('latency\tlab', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+    end,
+    in_observation_label_key = function()
+        local collector = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+        collector:observe(1, {['lab\tval\tlab2'] = 'val2'})
+    end,
+    in_observation_label_value = function()
+        local collector = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+        collector:observe(1, {lab = 'val\tlab2\tval2'})
+    end,
+}
+
+for name, case in pairs(control_characters_cases) do
+    g['test_control_characters_' .. name .. 'are_not_expected'] = function()
+        local capture = luatest_capture:new()
+        capture:enable()
+
+        case()
+
+        local stdout = utils.fflush_main_server_output(nil, capture)
+        capture:disable()
+
+        t.assert_str_contains(
+            stdout,
+            'Do not use control characters, this will raise an error in the future.')
+    end
 end

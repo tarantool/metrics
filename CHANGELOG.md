@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Passing nonexistent metrics to `enable_default_metrics()`
 - Using `{}` as `include` in `enable_default_metrics()`
   to enable all metrics
+- Control characters in collector kind, name, observation and global labels
 
 ## [0.16.0] - 2023-01-27
 ### Added

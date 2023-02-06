@@ -3,6 +3,7 @@
 local checks = require('checks')
 
 local Registry = require('metrics.registry')
+local string_utils = require('metrics.string_utils')
 
 local Counter = require('metrics.collectors.counter')
 local Gauge = require('metrics.collectors.gauge')
@@ -116,10 +117,12 @@ local function set_global_labels(label_pairs)
     label_pairs = label_pairs or {}
 
     -- Verify label table
-    for k, _ in pairs(label_pairs) do
+    for k, v in pairs(label_pairs) do
         if type(k) ~= 'string' then
             error(("bad label key (string expected, got %s)"):format(type(k)))
         end
+        string_utils.check_symbols(k)
+        string_utils.check_symbols(v)
     end
 
     registry:set_labels(label_pairs)

@@ -2,6 +2,8 @@ local clock = require('clock')
 local fiber = require('fiber')
 local log = require('log')
 
+local string_utils = require('metrics.string_utils')
+
 local Shared = {}
 
 -- Create collector class with the list of instance methods copied from
@@ -19,6 +21,8 @@ function Shared:new_class(kind, method_names)
     for _, name in pairs(method_names) do
         methods[name] = self[name]
     end
+
+    string_utils.check_symbols(kind)
     local class = {kind = kind}
     class.__index = class
     return setmetatable(class, {__index = methods})
@@ -30,6 +34,8 @@ function Shared:new(name, help, metainfo)
     if not name then
         error("Name should be set for %s")
     end
+    string_utils.check_symbols(name)
+
     return setmetatable({
         name = name,
         help = help or "",
@@ -49,6 +55,8 @@ function Shared.make_key(label_pairs)
     end
     local parts = {}
     for k, v in pairs(label_pairs) do
+        string_utils.check_symbols(k)
+        string_utils.check_symbols(v)
         table.insert(parts, k .. '\t' .. v)
     end
     table.sort(parts)

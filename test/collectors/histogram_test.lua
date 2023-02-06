@@ -1,6 +1,8 @@
 local t = require('luatest')
 local g = t.group()
 
+local luatest_capture = require('luatest.capture')
+
 local metrics = require('metrics')
 local Histogram = require('metrics.collectors.histogram')
 local utils = require('test.utils')
@@ -115,4 +117,34 @@ g.test_metainfo_immutable = function()
     t.assert_equals(h.sum_collector.metainfo, {my_useful_info = 'here'})
     t.assert_equals(h.count_collector.metainfo, {my_useful_info = 'here'})
     t.assert_equals(h.bucket_collector.metainfo, {my_useful_info = 'here'})
+end
+
+local control_characters_cases = {
+    in_name = function()
+        metrics.histogram('hist\tlab', nil, {2, 4})
+    end,
+    in_observation_label_key = function()
+        local collector = metrics.histogram('hist', nil, {2, 4})
+        collector:observe(1, {['lab\tval\tlab2'] = 'val2'})
+    end,
+    in_observation_label_value = function()
+        local collector = metrics.histogram('hist', nil, {2, 4})
+        collector:observe(1, {lab = 'val\tlab2\tval2'})
+    end,
+}
+
+for name, case in pairs(control_characters_cases) do
+    g['test_control_characters_' .. name .. 'are_not_expected'] = function()
+        local capture = luatest_capture:new()
+        capture:enable()
+
+        case()
+
+        local stdout = utils.fflush_main_server_output(nil, capture)
+        capture:disable()
+
+        t.assert_str_contains(
+            stdout,
+            'Do not use control characters, this will raise an error in the future.')
+    end
 end
