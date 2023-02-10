@@ -270,3 +270,52 @@ for name, case in pairs(control_characters_cases) do
             'Do not use control characters, this will raise an error in the future.')
     end
 end
+
+g.test_collect_extended = function()
+    local res_plain = metrics.collect{invoke_callbacks = true}
+    local res_extended = metrics.collect{invoke_callbacks = true, extended_format=true}
+
+    local count = 0
+    for _, collector_obs in pairs(res_extended) do
+        t.assert_type(collector_obs.name, 'string')
+        t.assert_type(collector_obs.name_prefix, 'string')
+        t.assert_type(collector_obs.kind, 'string')
+        t.assert_type(collector_obs.help, 'string')
+        t.assert_type(collector_obs.metainfo, 'table')
+        t.assert_gt(collector_obs.timestamp, 0)
+        t.assert_type(collector_obs.observations, 'table')
+
+        for _, obs_group in pairs(collector_obs.observations) do
+            count = count + utils.len(obs_group)
+        end
+    end
+
+    t.assert_equals(count, #res_plain, "No observations lost in extended format")
+end
+
+local function observations_covers_by_key(res_1, res_2)
+    for coll_key, coll_obs_1 in pairs(res_1) do
+        t.assert_type(res_2[coll_key], 'table', "Collector info found")
+        local coll_obs_2 = res_2[coll_key]
+        t.assert_equals(coll_obs_1.name, coll_obs_2.name)
+        t.assert_equals(coll_obs_1.kind, coll_obs_2.kind)
+
+        for group_name, obs_group_1 in pairs(coll_obs_1.observations) do
+            local obs_group_2 = coll_obs_2.observations[group_name]
+            t.assert_type(obs_group_2, 'table', "Observation group found")
+            for key, obs_1 in pairs(obs_group_1) do
+                local obs_2 = obs_group_2[key]
+                t.assert_type(obs_2, 'table', "Observation found")
+                t.assert_equals(obs_1.label_pairs, obs_2.label_pairs)
+            end
+        end
+    end
+end
+
+g.test_collect_extended_keys = function()
+    local res_1 = metrics.collect{invoke_callbacks = true, extended_format=true}
+    local res_2 = metrics.collect{invoke_callbacks = true, extended_format=true}
+
+    observations_covers_by_key(res_1, res_2)
+    observations_covers_by_key(res_2, res_1)
+end

@@ -149,6 +149,8 @@ gauge
 
         Sets the observation for ``label_pairs`` to ``num``.
 
+    ..  _metrics-api_reference-gauge_collect:
+
     ..  method:: collect(opts)
 
         :param table opts: table of collect options:
@@ -208,6 +210,8 @@ histogram
                                   observe new counter values.
                                   Note that both label names and values in ``label_pairs``
                                   are treated as strings.
+
+    ..  _metrics-api_reference-histogram_collect:
 
     ..  method:: collect(opts)
 
@@ -339,6 +343,8 @@ summary
                                   the observed value is added to each bucket.
                                   Note that both label names and values in ``label_pairs``
                                   are treated as strings.
+
+    ..  _metrics-api_reference-summary_collect:
 
     ..  method:: collect(opts)
 
@@ -508,6 +514,12 @@ Metrics functions
 
       * ``invoke_callbacks`` -- if ``true``, ``invoke_callbacks()`` is triggerred before actual collect.
       * ``default_only`` -- if ``true``, observations contain only default metrics (``metainfo.default = true``).
+      * ``extended_format`` -- if ``true``, collects extended format output from all collectors
+        (see :ref:`counter_obj:collect{extended_format = true} <metrics-api_reference-counter_collect>`,
+        :ref:`gauge_obj:collect{extended_format = true} <metrics-api_reference-gauge_collect>`,
+        :ref:`histogram_obj:collect{extended_format = true} <metrics-api_reference-histogram_collect>`,
+        :ref:`summary_obj:collect{extended_format = true} <metrics-api_reference-summary_collect>`)
+        and returns a map instead of an array.
 
 ..  class:: registry
 
