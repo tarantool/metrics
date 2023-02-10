@@ -1,3 +1,4 @@
+local string_utils = require('metrics.string_utils')
 local Shared = require('metrics.collectors.shared')
 local Counter = require('metrics.collectors.counter')
 local Quantile = require('metrics.quantile')
@@ -5,14 +6,21 @@ local Quantile = require('metrics.quantile')
 local fiber = require('fiber')
 
 local Summary = Shared:new_class('summary', {'observe_latency'})
+Summary.COUNT_SUFFIX = 'count'
+Summary.SUM_SUFFIX = 'sum'
+Summary.QUANTILE_SUFFIX = ''
 
 function Summary:new(name, help, objectives, params, metainfo)
     params = params or {}
     metainfo = table.copy(metainfo) or {}
     local obj = Shared.new(self, name, help, metainfo)
 
-    obj.count_collector = Counter:new(name .. '_count', help, metainfo)
-    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo)
+    obj.count_collector = Counter:new(
+        string_utils.build_name(name, Summary.COUNT_SUFFIX),
+        help, metainfo)
+    obj.sum_collector = Counter:new(
+        string_utils.build_name(name, Summary.SUM_SUFFIX),
+        help, metainfo)
     obj.objectives = objectives
     obj.max_age_time = params.max_age_time
     obj.age_buckets_count = params.age_buckets_count or 1
@@ -100,7 +108,9 @@ function Summary:remove(label_pairs)
     end
 end
 
-function Summary:collect_quantiles()
+function Summary:collect_quantiles(opts)
+    opts = opts or {}
+
     if not self.objectives or next(self.observations) == nil then
         return {}
     end
@@ -114,19 +124,28 @@ function Summary:collect_quantiles()
         for _, objective in ipairs(self.quantiles) do
             local label_pairs = table.deepcopy(self:append_global_labels(observation.label_pairs))
             label_pairs.quantile = objective
-            local obs = {
-                metric_name = self.name,
-                label_pairs = label_pairs,
-                value = Quantile.Query(observation.buckets[observation.head_bucket_index], objective),
-                timestamp = fiber.time64(),
-            }
-            table.insert(result, obs)
+
+            local value = Quantile.Query(observation.buckets[observation.head_bucket_index], objective)
+
+            if opts.extended_format then
+                result[self.make_key(label_pairs)] = {
+                    label_pairs = label_pairs,
+                    value = value,
+                }
+            else
+                table.insert(result, {
+                    metric_name = self.name,
+                    label_pairs = label_pairs,
+                    value = value,
+                    timestamp = fiber.time64(),
+                })
+            end
         end
     end
     return result
 end
 
-function Summary:collect()
+function Summary:_collect_v1_implementation()
     local result = {}
     for _, obs in ipairs(self.count_collector:collect()) do
         table.insert(result, obs)
@@ -138,6 +157,30 @@ function Summary:collect()
         table.insert(result, obs)
     end
     return result
+end
+
+function Summary._collect_v2_observations()
+    error("Not supported for complex collectors")
+end
+
+function Summary:_collect_v2_implementation()
+    return {
+        name = self.name,
+        name_prefix = self.name_prefix,
+        kind = self.kind,
+        help = self.help,
+        metainfo = self.metainfo,
+        timestamp = fiber.time64(),
+        observations = {
+            [Summary.COUNT_SUFFIX] = self.count_collector:_collect_v2_observations(),
+            [Summary.SUM_SUFFIX] = self.sum_collector:_collect_v2_observations(),
+            [Summary.QUANTILE_SUFFIX] = self:collect_quantiles{extended_format = true},
+        }
+    }
+end
+
+function Summary.collect_observations()
+    error('Not supported for complex collectors')
 end
 
 -- debug function to get observation quantiles from summary
