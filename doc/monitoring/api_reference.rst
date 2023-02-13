@@ -209,11 +209,57 @@ histogram
                                   Note that both label names and values in ``label_pairs``
                                   are treated as strings.
 
-    ..  method:: collect()
+    ..  method:: collect(opts)
 
-        Return a concatenation of ``counter_obj:collect()`` across all internal
-        counters of ``histogram_obj``. For the description of ``observation``,
-        see :ref:`counter_obj:collect() <metrics-api_reference-counter_collect>`.
+        :param table opts: table of collect options:
+
+          * ``extended_format`` -- use extended format in the output.
+
+        :return: A concatenation of ``observation`` objects for a given counter (by default or if
+          ``extended format`` is ``false``). Otherwise returns a map with collector
+          description and structured observations.
+
+        ..  code-block:: lua
+
+            histogram_obj:collect{extended_format = false}
+
+            {
+                -- an observation
+                {
+                    label_pairs: table,          -- `label_pairs` key-value table
+                    timestamp: ctype<uint64_t>,  -- observation time (in microseconds)
+                    value: number,               -- current value
+                    metric_name: string,         -- metric name
+                },
+                -- another observation...
+            }
+
+        ..  code-block:: lua
+
+            histogram_obj:collect{extended_format = true}
+
+            {
+                name: string, -- collector name
+                name_prefix: string, -- collector name_prefix
+                kind: string, -- collector kind
+                help: string, -- collector help
+                metainfo: table, -- collector metainfo
+                timestamp: ctype<uint64_t>,  -- observation time (in microseconds)
+                observations = {
+                    count = { -- map of count observations
+                        -- an observation
+                        key: string = {
+                            label_pairs: table,          -- `label_pairs` key-value table
+                            value: number,               -- current value
+                        },
+                        -- another observation...
+                    },
+                    sum = { -- map of sum observations
+                    },
+                    bucket = { -- map of bucket observations
+                    },
+                }
+            }
 
     ..  method:: remove(label_pairs)
 

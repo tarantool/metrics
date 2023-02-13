@@ -1,3 +1,7 @@
+local fiber = require('fiber')
+
+local string_utils = require('metrics.string_utils')
+
 local Shared = require('metrics.collectors.shared')
 local Counter = require('metrics.collectors.counter')
 
@@ -6,6 +10,9 @@ local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
 local Histogram = Shared:new_class('histogram', {'observe_latency'})
+Histogram.COUNT_SUFFIX = 'count'
+Histogram.SUM_SUFFIX = 'sum'
+Histogram.BUCKET_SUFFIX = 'bucket'
 
 function Histogram.check_buckets(buckets)
     local prev = -math.huge
@@ -28,9 +35,15 @@ function Histogram:new(name, help, buckets, metainfo)
         obj.buckets[#obj.buckets+1] = INF
     end
 
-    obj.count_collector = Counter:new(name .. '_count', help, metainfo)
-    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo)
-    obj.bucket_collector = Counter:new(name .. '_bucket', help, metainfo)
+    obj.count_collector = Counter:new(
+        string_utils.build_name(name, Histogram.COUNT_SUFFIX),
+        help, metainfo)
+    obj.sum_collector = Counter:new(
+        string_utils.build_name(name, Histogram.SUM_SUFFIX),
+        help, metainfo)
+    obj.bucket_collector = Counter:new(
+        string_utils.build_name(name, Histogram.BUCKET_SUFFIX),
+        help, metainfo)
 
     return obj
 end
@@ -77,7 +90,7 @@ function Histogram:remove(label_pairs)
     end
 end
 
-function Histogram:collect()
+function Histogram:_collect_v1_implementation()
     local result = {}
     for _, obs in ipairs(self.count_collector:collect()) do
         table.insert(result, obs)
@@ -89,6 +102,26 @@ function Histogram:collect()
         table.insert(result, obs)
     end
     return result
+end
+
+function Histogram._collect_v2_observations()
+    error("Not supported for complex collectors")
+end
+
+function Histogram:_collect_v2_implementation()
+    return {
+        name = self.name,
+        name_prefix = self.name_prefix,
+        kind = self.kind,
+        help = self.help,
+        metainfo = self.metainfo,
+        timestamp = fiber.time64(),
+        observations = {
+            [Histogram.COUNT_SUFFIX] = self.count_collector:_collect_v2_observations(),
+            [Histogram.SUM_SUFFIX] = self.sum_collector:_collect_v2_observations(),
+            [Histogram.BUCKET_SUFFIX] = self.bucket_collector:_collect_v2_observations(),
+        }
+    }
 end
 
 return Histogram

@@ -6,6 +6,15 @@ local function check_symbols(s)
     end
 end
 
+local function build_name(prefix, suffix)
+    if #suffix == 0 then
+        return prefix
+    end
+
+    return prefix .. '_' .. suffix
+end
+
 return {
     check_symbols = check_symbols,
+    build_name = build_name,
 }

@@ -148,3 +148,42 @@ for name, case in pairs(control_characters_cases) do
             'Do not use control characters, this will raise an error in the future.')
     end
 end
+
+g.test_collect_extended = function()
+    local buckets = {2, 4}
+    local bucket_count = #buckets + 1
+    local c = metrics.histogram('histogram', nil, buckets, {my_useful_info = 'here'})
+    c:observe(3, {mylabel = 'myvalue1'})
+    c:observe(2, {mylabel = 'myvalue2'})
+
+    local res = c:collect{extended_format = true}
+    t.assert_type(res, 'table')
+    t.assert_equals(res.name, c.name)
+    t.assert_equals(res.name_suffix, c.name_suffix)
+    t.assert_equals(res.kind, c.kind)
+    t.assert_equals(res.help, c.help)
+    t.assert_equals(res.metainfo, c.metainfo)
+    t.assert_gt(res.timestamp, 0)
+    t.assert_type(res.observations, 'table')
+
+    t.assert_equals(utils.len(res.observations.bucket), 2 * bucket_count)
+    t.assert_equals(utils.len(res.observations.sum), 2)
+    t.assert_equals(utils.len(res.observations.count), 2)
+
+    for k, _ in pairs(res.observations.sum) do
+        t.assert_type(res.observations.count[k], 'table', "Each sum observation has corresponding count")
+    end
+
+    for _, section in ipairs({'count', 'sum', 'bucket'}) do
+        for _, v in pairs(res.observations[section]) do
+            t.assert_type(v.value, 'number')
+            t.assert_type(v.label_pairs, 'table')
+            t.assert_type(v.label_pairs['mylabel'], 'string')
+        end
+    end
+end
+
+g.test_internal_collect_observations = function()
+    local c = metrics.histogram('histogram', nil, {2, 4}, {my_useful_info = 'here'})
+    t.assert_error_msg_contains('Not supported', function() c:_collect_v2_observations() end)
+end

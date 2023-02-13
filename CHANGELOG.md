@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `shared_collector_obj:collect()`;
   - `counter_obj:collect()`;
   - `gauge_obj:collect()`;
+  - `histogram_obj:collect()`;
 
 ### Changed
 - Setup cartridge hotreload inside the role
