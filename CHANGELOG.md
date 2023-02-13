@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - values and effect (like default metrics callbacks) are preserved
     between reloads;
   - does not deal with external features like cartridge HTTP setup
+- name prefixes for collectors
 
 ### Changed
 - Setup cartridge hotreload inside the role

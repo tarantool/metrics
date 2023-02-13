@@ -82,3 +82,34 @@ for name, case in pairs(control_characters_cases) do
             'Do not use control characters, this will raise an error in the future.')
     end
 end
+
+local name_prefix_cases = {
+    without_suffix = {
+        name = 'my_metric',
+        name_prefix = 'my_metric',
+    },
+    with_current_suffix = {
+        name = 'my_metric_current',
+        name_prefix = 'my_metric',
+    },
+    with_total_suffix = {
+        name = 'my_metric_total',
+        name_prefix = 'my_metric',
+    },
+    with_current_not_as_suffix = {
+        name = 'electrical_current_value',
+        name_prefix = 'electrical_current_value',
+    },
+    with_total_not_as_suffix = {
+        name = 'sold_total_overdose_dvds',
+        name_prefix = 'sold_total_overdose_dvds',
+    },
+}
+
+for name, case in pairs(name_prefix_cases) do
+    g['test_name_prefix_if_' .. name] = function()
+        local class = Shared:new_class(case.name .. '_class', {'inc'})
+        local c = class:new(case.name)
+        t.assert_equals(c.name_prefix, case.name_prefix)
+    end
+end

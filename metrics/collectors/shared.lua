@@ -38,6 +38,7 @@ function Shared:new(name, help, metainfo)
 
     return setmetatable({
         name = name,
+        name_prefix = name:gsub('_total$', ''):gsub('_current$', ''),
         help = help or "",
         observations = {},
         label_pairs = {},
