@@ -135,3 +135,26 @@ for name, case in pairs(control_characters_cases) do
             'Do not use control characters, this will raise an error in the future.')
     end
 end
+
+g.test_collect_extended = function()
+    local c = metrics.counter('cnt', nil, {my_useful_info = 'here'})
+    c:inc(3, {mylabel = 'myvalue1'})
+    c:inc(2, {mylabel = 'myvalue2'})
+
+    local res = c:collect{extended_format = true}
+    t.assert_type(res, 'table')
+    t.assert_equals(res.name, c.name)
+    t.assert_equals(res.name_prefix, c.name_prefix)
+    t.assert_equals(res.kind, c.kind)
+    t.assert_equals(res.help, c.help)
+    t.assert_equals(res.metainfo, c.metainfo)
+    t.assert_gt(res.timestamp, 0)
+    t.assert_type(res.observations, 'table')
+    t.assert_type(res.observations[''], 'table')
+    t.assert_equals(utils.len(res.observations['']), 2)
+    for _, v in pairs(res.observations['']) do
+        t.assert_type(v.value, 'number')
+        t.assert_type(v.label_pairs, 'table')
+        t.assert_type(v.label_pairs['mylabel'], 'string')
+    end
+end

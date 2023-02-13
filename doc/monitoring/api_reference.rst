@@ -51,18 +51,54 @@ counter
 
     ..  _metrics-api_reference-counter_collect:
 
-    ..  method:: collect()
+    ..  method:: collect(opts)
 
-        :return: Array of ``observation`` objects for a given counter.
+        :param table opts: table of collect options:
+
+          * ``extended_format`` -- use extended format in the output.
+
+        :return: Array of ``observation`` objects for a given counter (by default or if
+          ``extended format`` is ``false``). Otherwise returns a map with collector
+          description and structured observations.
 
         ..  code-block:: lua
 
+            counter_obj:collect{extended_format = false}
+
             {
-                label_pairs: table,          -- `label_pairs` key-value table
-                timestamp: ctype<uint64_t>,  -- current system time (in microseconds)
-                value: number,               -- current value
-                metric_name: string,         -- collector
+                -- an observation
+                {
+                    label_pairs: table,          -- `label_pairs` key-value table
+                    timestamp: ctype<uint64_t>,  -- observation time (in microseconds)
+                    value: number,               -- current value
+                    metric_name: string,         -- metric name
+                },
+                -- another observation...
             }
+
+        ..  code-block:: lua
+
+            counter_obj:collect{extended_format = true}
+
+            {
+                name: string, -- collector name
+                name_prefix: string, -- collector name prefix
+                kind: string, -- collector kind
+                help: string, -- collector help
+                metainfo: table, -- collector metainfo
+                timestamp: ctype<uint64_t>,  -- observation time (in microseconds)
+                observations = {
+                    [''] = { -- map of observations
+                        -- an observation
+                        key: string = {
+                            label_pairs: table,          -- `label_pairs` key-value table
+                            value: number,               -- current value
+                        },
+                        -- another observation...
+                    }
+                }
+            }
+
 
         :rtype: table
 
@@ -113,10 +149,13 @@ gauge
 
         Sets the observation for ``label_pairs`` to ``num``.
 
-    ..  method:: collect()
+    ..  method:: collect(opts)
 
-        Returns an array of ``observation`` objects for a given gauge.
-        For the description of ``observation``, see
+        :param table opts: table of collect options:
+
+          * ``extended_format`` -- use extended format in the output.
+
+        Returns format is the same as for
         :ref:`counter_obj:collect() <metrics-api_reference-counter_collect>`.
 
     ..  method:: remove(label_pairs)

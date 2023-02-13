@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     between reloads;
   - does not deal with external features like cartridge HTTP setup
 - name prefixes for collectors
+- exhaustive output for export and aggregating with `extended_format` option:
+  - `shared_collector_obj:collect()`;
+  - `counter_obj:collect()`;
+  - `gauge_obj:collect()`;
 
 ### Changed
 - Setup cartridge hotreload inside the role

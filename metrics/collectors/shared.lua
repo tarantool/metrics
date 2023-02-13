@@ -16,6 +16,9 @@ function Shared:new_class(kind, method_names)
     table.insert(method_names, 'make_key')
     table.insert(method_names, 'append_global_labels')
     table.insert(method_names, 'collect')
+    table.insert(method_names, '_collect_v1_implementation')
+    table.insert(method_names, '_collect_v2_implementation')
+    table.insert(method_names, '_collect_v2_observations')
     table.insert(method_names, 'remove')
     local methods = {}
     for _, name in pairs(method_names) do
@@ -151,7 +154,7 @@ function Shared:append_global_labels(label_pairs)
     return extended_label_pairs
 end
 
-function Shared:collect()
+function Shared:_collect_v1_implementation()
     if next(self.observations) == nil then
         return {}
     end
@@ -166,6 +169,43 @@ function Shared:collect()
         table.insert(result, obs)
     end
     return result
+end
+
+function Shared:_collect_v2_observations()
+    local observations = {}
+
+    for key, value in pairs(self.observations) do
+        local obs = {
+            label_pairs = self:append_global_labels(self.label_pairs[key]),
+            value = value,
+        }
+        observations[key] = obs
+    end
+    return observations
+end
+
+function Shared:_collect_v2_implementation()
+    return {
+        name = self.name,
+        name_prefix = self.name_prefix,
+        kind = self.kind,
+        help = self.help,
+        metainfo = self.metainfo,
+        timestamp = fiber.time64(),
+        observations = {
+            [''] = self:_collect_v2_observations(),
+        }
+    }
+end
+
+function Shared:collect(opts)
+    opts = opts or {}
+
+    if opts.extended_format then
+        return self:_collect_v2_implementation()
+    else
+        return self:_collect_v1_implementation()
+    end
 end
 
 return Shared
