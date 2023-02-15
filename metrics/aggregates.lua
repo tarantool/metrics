@@ -5,6 +5,8 @@ local Gauge = require('metrics.collectors.gauge')
 local mksec_in_sec = 1e6
 
 local RATE_SUFFIX = 'per_second'
+local MIN_SUFFIX = 'min'
+local MAX_SUFFIX = 'max'
 
 local function compute_rate_value(time_delta, obs_prev, obs)
     if obs_prev == nil then
@@ -66,13 +68,81 @@ local function compute_counter_rate(output_with_aggregates_prev, output, coll_ke
     }
 end
 
+local function compute_extremum_value(obs_prev, obs, method)
+    if obs_prev == nil then
+        return {
+            label_pairs = obs.label_pairs,
+            value = obs.value,
+        }
+    end
+
+    return {
+        label_pairs = obs.label_pairs,
+        -- math.min and math.max doesn't work with cdata.
+        value = method(tonumber(obs_prev.value), tonumber(obs.value))
+    }
+end
+
+local function compute_gauge_extremum(output_with_aggregates_prev, output, coll_key, coll_obs,
+                                      extremum_method, extremum_suffix, extremum_help_line)
+    local name = string_utils.build_name(coll_obs.name_prefix, extremum_suffix)
+    local kind = coll_obs.kind
+    local registry_key = string_utils.build_registry_key(name, kind)
+
+    if output[registry_key] ~= nil then
+        -- If, for any reason, registry collision had happenned,
+        -- we assume that there is already an aggregate metric with the
+        -- similar meaning.
+        return registry_key, output[registry_key]
+    end
+
+    local known_extremum
+    if output_with_aggregates_prev[registry_key] then -- previous extremum
+        known_extremum = output_with_aggregates_prev[registry_key]
+    elseif output_with_aggregates_prev[coll_key] then -- previous value
+        known_extremum = output_with_aggregates_prev[coll_key]
+    else -- only current observation
+        known_extremum = coll_obs
+    end
+
+    local values = {}
+
+    for key, obs in pairs(coll_obs.observations['']) do
+        local obs_prev = known_extremum.observations[''][key]
+        values[key] = compute_extremum_value(obs_prev, obs, extremum_method)
+    end
+
+    return registry_key, {
+        name = name,
+        name_prefix = coll_obs.name_prefix,
+        help = extremum_help_line .. coll_obs.name,
+        kind = kind,
+        metainfo = coll_obs.metainfo,
+        timestamp = coll_obs.timestamp,
+        observations = {[''] = values}
+    }
+end
+
+local function compute_gauge_min(output_with_aggregates_prev, output, coll_key, coll_obs)
+    return compute_gauge_extremum(output_with_aggregates_prev, output, coll_key, coll_obs,
+                                  math.min, MIN_SUFFIX, "Minimum of ")
+end
+
+local function compute_gauge_max(output_with_aggregates_prev, output, coll_key, coll_obs)
+    return compute_gauge_extremum(output_with_aggregates_prev, output, coll_key, coll_obs,
+                                  math.max, MAX_SUFFIX, "Maximum of ")
+end
+
 
 local default_kind_rules = {
     [Counter.kind] = { 'rate' },
+    [Gauge.kind] = { 'min', 'max' },
 }
 
 local rule_processors = {
     rate = compute_counter_rate,
+    min = compute_gauge_min,
+    max = compute_gauge_max,
 }
 
 local function compute(output_with_aggregates_prev, output, kind_rules)

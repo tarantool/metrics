@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `metrics.collect()`;
 - tools to compute metrics aggregates:
   - per second rate for counters;
+  - min and max for gauges;
 
 ### Changed
 - Setup cartridge hotreload inside the role

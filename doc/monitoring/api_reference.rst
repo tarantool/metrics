@@ -612,7 +612,9 @@ Metrics functions
     Supported aggregates:
 
       * ``rate`` for counter collectors: per second rate of value change for the last
-        two observations.
+        two observations;
+      * ``min`` for gauge collectors: minimal value for the history of observations;
+      * ``max`` for gauge collectors: maximal value for the history of observations.
 
     :param table output_with_aggregates_prev: a previous result of this method call.
         Use ``nil`` if this is the first invokation. You may use
