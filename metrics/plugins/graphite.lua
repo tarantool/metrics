@@ -1,6 +1,7 @@
 local socket = require('socket')
 local fiber = require('fiber')
 local metrics = require('metrics')
+local string_utils = require('metrics.string_utils')
 local checks = require('checks')
 local log = require('log')
 local fun = require('fun')
@@ -36,22 +37,63 @@ function graphite.format_observation(prefix, obs)
     return graph
 end
 
+graphite.internal = {}
+function graphite.internal.collect_and_push_v1(opts)
+    metrics.invoke_callbacks()
+    for _, c in pairs(metrics.collectors()) do
+        for _, obs in ipairs(c:collect()) do
+            local data = graphite.format_observation(opts.prefix, obs)
+            local numbytes = opts.sock:sendto(opts.host, opts.port, data)
+            if numbytes == nil then
+                log.error('Error while sending to host %s port %s data %s',
+                          opts.host, opts.port, data)
+            end
+        end
+    end
+end
+
+function graphite.format_output(output, opts)
+    local result = {}
+    for _, coll_obs in pairs(output) do
+        for group_name, obs_group in pairs(coll_obs.observations) do
+            local metric_name = string_utils.build_name(coll_obs.name, group_name)
+            for _, obs in pairs(obs_group) do
+                local formatted_obs = graphite.format_observation(opts.prefix,
+                    {
+                        metric_name = metric_name,
+                        label_pairs = obs.label_pairs,
+                        timestamp = coll_obs.timestamp,
+                        value = obs.value
+                    })
+                table.insert(result, formatted_obs)
+            end
+        end
+    end
+
+    return result
+end
+
+function graphite.send_formatted(formatted_output, opts)
+    for _, data in ipairs(formatted_output) do
+        local numbytes = opts.sock:sendto(opts.host, opts.port, data)
+        if numbytes == nil then
+            log.error('Error while sending to host %s port %s data %s',
+                      opts.host, opts.port, data)
+        end
+    end
+end
+
+function graphite.internal.collect_and_push_v2(opts)
+    local output = metrics.collect{invoke_callbacks = true, extended_format = true}
+    local formatted_output = graphite.format_output(output, opts)
+    graphite.send_formatted(formatted_output, opts)
+end
+
 local function graphite_worker(opts)
     fiber.name('metrics_graphite_worker')
 
     while true do
-        metrics.invoke_callbacks()
-        for _, c in pairs(metrics.collectors()) do
-            for _, obs in ipairs(c:collect()) do
-                local data = graphite.format_observation(opts.prefix, obs)
-                local numbytes = opts.sock:sendto(opts.host, opts.port, data)
-                if numbytes == nil then
-                    log.error('Error while sending to host %s port %s data %s',
-                              opts.host, opts.port, data)
-                end
-            end
-        end
-
+        graphite.internal.collect_and_push_v2(opts)
         fiber.sleep(opts.send_interval)
     end
 end

@@ -153,3 +153,69 @@ g.test_graphite_kills_previous_fibers_on_init = function()
     fiber.yield() -- let cancelled fibers disappear from fiber.info()
     t.assert_equals(count_workers(), 1)
 end
+
+g.test_collect_and_push_preseves_format = function(group)
+    -- Prepare some data for all collector types.
+    metrics.cfg{include = 'all', exclude = {}, labels = {alias = 'router-3'}}
+
+    local c = metrics.counter('cnt', nil, {my_useful_info = 'here'})
+    c:inc(3, {mylabel = 'myvalue1'})
+    c:inc(2, {mylabel = 'myvalue2'})
+
+    c = metrics.gauge('gauge', nil, {my_useful_info = 'here'})
+    c:set(3, {mylabel = 'myvalue1'})
+    c:set(2, {mylabel = 'myvalue2'})
+
+    c = metrics.histogram('histogram', nil, {2, 4}, {my_useful_info = 'here'})
+    c:observe(3, {mylabel = 'myvalue1'})
+    c:observe(2, {mylabel = 'myvalue2'})
+
+    local port_v1 = 22003
+    group.sock_v1 = socket('AF_INET', 'SOCK_DGRAM', 'udp')
+    group.sock_v1:bind('127.0.0.1', port_v1)
+    local port_v2 = 22004
+    group.sock_v2 = socket('AF_INET', 'SOCK_DGRAM', 'udp')
+    group.sock_v2:bind('127.0.0.1', port_v2)
+
+    graphite.internal.collect_and_push_v1({
+        prefix = 'tarantool',
+        host = '127.0.0.1',
+        port = port_v1,
+        sock = group.sock_v1,
+    })
+    graphite.internal.collect_and_push_v2({
+        prefix = 'tarantool',
+        host = '127.0.0.1',
+        port = port_v2,
+        sock = group.sock_v2,
+    })
+
+    local output_v2 = ''
+    while true do
+        local output_v2_part = group.sock_v2:recvfrom(200)
+        if output_v2_part == nil or output_v2_part == '' then
+            break
+        end
+
+        output_v2 = output_v2 .. ' ' .. output_v2_part
+    end
+
+    while true do
+        local output_v1_part = group.sock_v1:recvfrom(200)
+        if output_v1_part == nil or output_v1_part == '' then
+            break
+        end
+
+        t.assert_str_contains(output_v2, output_v1_part:split(' ')[1])
+    end
+end
+
+g.after_test('test_collect_and_push_preseves_format', function(group)
+    if group.sock_v1 then
+        group.sock_v1:close()
+    end
+
+    if group.sock_v2 then
+        group.sock_v2:close()
+    end
+end)
