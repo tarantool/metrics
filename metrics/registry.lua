@@ -1,3 +1,5 @@
+local string_utils = require('metrics.string_utils')
+
 local Registry = {}
 Registry.__index = Registry
 
@@ -15,7 +17,7 @@ function Registry:clear()
 end
 
 function Registry:find(kind, name)
-    return self.collectors[name .. kind]
+    return self.collectors[string_utils.build_registry_key(name, kind)]
 end
 
 function Registry:find_or_create(class, name, ...)
@@ -34,12 +36,12 @@ function Registry:register(collector)
         error('Already registered')
     end
     collector:set_registry(self)
-    self.collectors[collector.name .. collector.kind] = collector
+    self.collectors[string_utils.build_registry_key(collector.name, collector.kind)] = collector
     return collector
 end
 
 function Registry:unregister(collector)
-    self.collectors[collector.name .. collector.kind] = nil
+    self.collectors[string_utils.build_registry_key(collector.name, collector.kind)] = nil
 end
 
 function Registry:invoke_callbacks()

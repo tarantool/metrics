@@ -14,7 +14,12 @@ local function build_name(prefix, suffix)
     return prefix .. '_' .. suffix
 end
 
+local function build_registry_key(name, kind)
+    return name .. kind
+end
+
 return {
     check_symbols = check_symbols,
     build_name = build_name,
+    build_registry_key = build_registry_key,
 }
