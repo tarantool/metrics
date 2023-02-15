@@ -7,9 +7,13 @@ local stash = {}
 -- @tfield string cfg
 --  Stash for metrics module configuration.
 --
+-- @tfield string flight_recorder
+--  Stash for flight recorder plugin data.
+--
 stash.name = {
     cfg = '__metrics_cfg',
-    cfg_internal = '__metrics_cfg_internal'
+    cfg_internal = '__metrics_cfg_internal',
+    flight_recorder = '__flight_recorder',
 }
 
 --- Setup Tarantool Cartridge reload.

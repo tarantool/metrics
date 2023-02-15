@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - per second rate for counters;
   - min and max for gauges;
   - average for histograms and summaries;
+- plugin to export extended format data with aggregates to Flight recorder
 
 ### Changed
 - Setup cartridge hotreload inside the role

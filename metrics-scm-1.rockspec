@@ -36,6 +36,7 @@ build = {
         ['metrics.plugins.graphite']        = 'metrics/plugins/graphite.lua',
         ['metrics.plugins.prometheus']      = 'metrics/plugins/prometheus.lua',
         ['metrics.plugins.json']            = 'metrics/plugins/json.lua',
+        ['metrics.plugins.flight_recorder'] = 'metrics/plugins/flight_recorder.lua',
         ['metrics.tarantool']               = 'metrics/tarantool.lua',
         ['metrics.tarantool.fibers']        = 'metrics/tarantool/fibers.lua',
         ['metrics.tarantool.info']          = 'metrics/tarantool/info.lua',

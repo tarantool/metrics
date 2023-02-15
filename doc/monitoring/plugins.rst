@@ -199,6 +199,54 @@ Use the JSON plugin with Tarantool ``http.server`` as follows:
         end
     )
 
+Flight recorder
+~~~~~~~~~~~~~~~
+
+Usage
+^^^^^
+
+Import the plugin:
+
+..  code-block:: lua
+
+    local flight_recorder_exporter = require('metrics.plugins.flight_recorder')
+
+..  module:: metrics.plugins.flight_recorder
+
+..  function:: export()
+
+    :return: extended format output with aggregates
+
+        ..  code-block:: yaml
+
+            - tnt_net_per_thread_connections_mingauge:
+                name: tnt_net_per_thread_connections_min
+                name_prefix: tnt_net_per_thread_connections
+                kind: gauge
+                metainfo:
+                  aggregate: true
+                  default: true
+                timestamp: 1676478112824745
+                observations:
+                  '':
+                    "thread\t1":
+                      label_pairs:
+                        thread: '1'
+                      value: 0
+            ...
+
+..  function:: plain_format(output)
+
+    :return: human-readable form of output
+
+        ..  code-block:: text
+
+            tnt_info_memory_lua_max{alias=router-4} 10237204
+            tnt_info_memory_lua_min{alias=router-4} 1921790
+            tnt_info_memory_lua{alias=router-4} 2733335
+            tnt_info_uptime{alias=router-4} 1052
+            ...
+
 .. _metrics-plugins-custom:
 
 Creating custom plugins
