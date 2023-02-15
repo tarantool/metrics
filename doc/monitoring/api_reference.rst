@@ -609,6 +609,11 @@ Metrics functions
 
     API to extend metrics output with various metrics based on their kind.
 
+    Supported aggregates:
+
+      * ``rate`` for counter collectors: per second rate of value change for the last
+        two observations.
+
     :param table output_with_aggregates_prev: a previous result of this method call.
         Use ``nil`` if this is the first invokation. You may use
         ``metrics.collect{extended_format = true}`` result instead, but in this case
