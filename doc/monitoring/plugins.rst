@@ -199,58 +199,6 @@ Use the JSON plugin with Tarantool ``http.server`` as follows:
         end
     )
 
-..  _metrics-plugins-plugin-specific_api:
-
-Plugin-specific API
--------------------
-
-Use the following methods **only when developing a new plugin**.
-
-..  module:: metrics
-
-..  function:: invoke_callbacks()
-
-    Invoke a function registered via
-    ``metrics.register_callback(<callback>)``.
-    Used in exporters.
-
-..  function:: collectors()
-
-    List all collectors in the registry. Designed to be used in exporters.
-
-    :return: A list of created collectors.
-
-..  class:: collector_object
-
-    ..  method:: collect()
-
-        ..  note::
-
-            You'll probably want to use ``metrics.collectors()`` instead.
-
-        Equivalent to:
-
-        ..  code-block:: lua
-
-            for _, c in pairs(metrics.collectors()) do
-                for _, obs in ipairs(c:collect()) do
-                    ...  -- handle observation
-                end
-            end
-
-        :return: A concatenation of ``observation`` objects across all created collectors.
-
-            ..  code-block:: lua
-
-                {
-                    label_pairs: table,         -- `label_pairs` key-value table
-                    timestamp: ctype<uint64_t>, -- current system time (in microseconds)
-                    value: number,              -- current value
-                    metric_name: string,        -- collector
-                }
-
-        :rtype: table
-
 .. _metrics-plugins-custom:
 
 Creating custom plugins
@@ -260,17 +208,23 @@ Include the following in your main export function:
 
 ..  code-block:: lua
 
-    -- Invoke all callbacks registered via `metrics.register_callback(<callback-function>)`
-    metrics.invoke_callbacks()
+    local metrics = require('metrics')
+    local string_utils = require('metrics.string_utils')
 
-    -- Loop over collectors
-    for _, c in pairs(metrics.collectors()) do
-        ...
+    -- Collect up-to-date metrics with extended format.
+    local output = metrics.collect{invoke_callbacks = true, extended_format = true}
 
-        -- Loop over instant observations in the collector
-        for _, obs in pairs(c:collect()) do
-            -- Export observation `obs`
-            ...
+    for _, coll_obs in pairs(output) do
+        -- Serialize collector info like coll_obs.name, coll_obs.help,
+        -- coll_obs.kind and coll_obs.timestamp
+
+        for group_name, obs_group in pairs(coll_obs.observations) do
+            -- Common way to build metric name.
+            local metric_name = string_utils.build_name(coll_obs.name, group_name)
+
+            for _, obs in pairs(obs_group) do
+                -- Serialize observation info: obs.value and obs.label_pairs
+
+            end
         end
-
     end
