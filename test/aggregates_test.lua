@@ -65,6 +65,105 @@ local function get_gauge_example(timestamp, value1, value2)
     return res
 end
 
+local function get_histogram_example(timestamp, count_1, sum_1, count_2, sum_2)
+    return {
+        http_server_request_latencyhistogram = {
+            name = 'http_server_request_latency',
+            name_prefix = 'http_server_request_latency',
+            kind = 'histogram',
+            help = 'HTTP server request latency',
+            metainfo = { default = true },
+            timestamp = timestamp,
+            observations = {
+                count = {
+                    ["code\t200"] = {
+                        label_pairs = { alias = 'router', code = '200' },
+                        value = count_1,
+                    },
+                    ["code\t400"] = {
+                        label_pairs = { alias = 'router', code = '400' },
+                        value = count_2,
+                    }
+                },
+                sum = {
+                    ["code\t200"] = {
+                        label_pairs = { alias = 'router', code = '200' },
+                        value = sum_1,
+                    },
+                    ["code\t400"] = {
+                        label_pairs = { alias = 'router', code = '400' },
+                        value = sum_2,
+                    }
+                },
+                bucket = {
+                    ["code\t200\tle\t0.1"] = {
+                        label_pairs = { alias = 'router', code = '200', le = '0.1' },
+                        value = 2064, -- Not used anywhere, so don't fill.
+                    },
+                    ["code\t200\tle\tinf"] = {
+                        label_pairs = { alias = 'router', code = '200', le = 'inf' },
+                        value = count_1,
+                    },
+                    ["code\t400\tle\t0.1"] = {
+                        label_pairs = { alias = 'router', code = '400', le = '0.1' },
+                        value = 323, -- Not used anywhere, so don't fill.
+                    },
+                    ["code\t400\tle\ttinf"] = {
+                        label_pairs = { alias = 'router', code = '400', le = 'tinf' },
+                        value = count_2,
+                    },
+                }
+            }
+        }
+    }
+end
+
+local function get_summary_example(timestamp, count_1, sum_1, count_2, sum_2)
+    return {
+        http_server_request_latencysummary = {
+            name = 'http_server_request_latency',
+            name_prefix = 'http_server_request_latency',
+            kind = 'summary',
+            help = 'HTTP server request latency',
+            metainfo = { default = true },
+            timestamp = timestamp,
+            observations = {
+                count = {
+                    ["code\t200"] = {
+                        label_pairs = { alias = 'router', code = '200' },
+                        value = count_1,
+                    },
+                    ["code\t400"] = {
+                        label_pairs = { alias = 'router', code = '400' },
+                        value = count_2,
+                    }
+                },
+                sum = {
+                    ["code\t200"] = {
+                        label_pairs = { alias = 'router', code = '200' },
+                        value = sum_1,
+                    },
+                    ["code\t400"] = {
+                        label_pairs = { alias = 'router', code = '400' },
+                        value = sum_2,
+                    }
+                },
+                [''] = {
+                    ["code\t200\tquantile\t0.5"] = {
+                        label_pairs = { alias = 'router', code = '200', le = '0.5' },
+                        value = 2064, -- Not used anywhere, so don't fill.
+                    },
+                    ["code\t400\tquantile\t0.5"] = {
+                        label_pairs = { alias = 'router', code = '400', le = '0.5' },
+                        value = 323,
+                    },
+                }
+            }
+
+        }
+    }
+end
+
 g.test_unknown_rule = function()
     local output = get_counter_example(1676364616294847ULL, 14148, 3204)
 
@@ -242,4 +341,43 @@ g.test_gauge_min_max_disabled = function()
 
     t.assert_equals(utils.len(output_with_aggregates_2), 1,
         "No min or max computed due to options")
+end
+
+local average_cases = {
+    histogram = get_histogram_example,
+    summary = get_summary_example,
+}
+
+for k, generator in pairs(average_cases) do
+    g['test_' .. k .. '_average'] = function()
+        local output = generator(1676364616294847ULL, 20000, 10000, 1000, 150)
+
+        local output_with_aggregates = metrics.compute_aggregates(nil, output)
+        t.assert_equals(utils.len(output_with_aggregates), 2,
+            "Average computed for a single observation")
+
+        local average_obs = output_with_aggregates['http_server_request_latency_averagegauge']
+        t.assert_not_equals(average_obs, nil, "Average computed")
+        t.assert_equals(average_obs.name, 'http_server_request_latency_average')
+        t.assert_equals(average_obs.name_prefix, 'http_server_request_latency')
+        t.assert_equals(average_obs.kind, 'gauge')
+        t.assert_equals(average_obs.help, 'Average value (over all time) of http_server_request_latency')
+        t.assert_equals(average_obs.metainfo.default, true)
+        t.assert_equals(average_obs.timestamp, 1676364616294847ULL)
+        t.assert_equals(average_obs.observations['']['code\t200'].label_pairs,
+            { alias = 'router', code = '200' })
+        t.assert_almost_equals(average_obs.observations['']['code\t200'].value, 10000 / 20000)
+        t.assert_equals(average_obs.observations['']['code\t400'].label_pairs,
+            { alias = 'router', code = '400' })
+        t.assert_almost_equals(average_obs.observations['']['code\t400'].value, 150 / 1000)
+    end
+
+    g['test_' .. k .. '_average_disabled'] = function()
+        local output = generator(1676364616294847ULL, 20000, 10000, 1000, 150)
+
+        local opts = {[k] = {}}
+        local output_with_aggregates = metrics.compute_aggregates(nil, output, opts)
+        t.assert_equals(utils.len(output_with_aggregates), 1,
+            "No average computed due to options")
+    end
 end
