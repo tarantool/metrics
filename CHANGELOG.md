@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `histogram_obj:collect()`;
   - `summary_obj:collect()`;
   - `metrics.collect()`;
+- tools to compute metrics aggregates
 
 ### Changed
 - Setup cartridge hotreload inside the role

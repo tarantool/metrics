@@ -5,6 +5,7 @@ local const = require('metrics.const')
 local cfg = require('metrics.cfg')
 local http_middleware = require('metrics.http_middleware')
 local tarantool = require('metrics.tarantool')
+local aggregates = require('metrics.aggregates')
 
 local VERSION = '0.16.0-scm'
 
@@ -29,6 +30,7 @@ return {
     cfg = cfg.cfg,
     http_middleware = http_middleware,
     collect = api.collect,
+    compute_aggregates = aggregates.compute,
     VERSION = VERSION,
     _VERSION = VERSION,
 }

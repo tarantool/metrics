@@ -61,6 +61,7 @@ build = {
         ['metrics.cfg']                     = 'metrics/cfg.lua',
         ['metrics.stash']                   = 'metrics/stash.lua',
         ['metrics.string_utils']            = 'metrics/string_utils.lua',
+        ['metrics.aggregates']              = 'metrics/aggregates.lua',
         ['cartridge.roles.metrics']         = 'cartridge/roles/metrics.lua',
         ['cartridge.health']                = 'cartridge/health.lua',
     }

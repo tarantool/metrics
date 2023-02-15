@@ -605,6 +605,24 @@ Metrics functions
     If you're using one of the default exporters,
     ``invoke_callbacks()`` will be called by the exporter.
 
+..  function:: compute_aggregates(output_with_aggregates_prev, output, kind_rules)
+
+    API to extend metrics output with various metrics based on their kind.
+
+    :param table output_with_aggregates_prev: a previous result of this method call.
+        Use ``nil`` if this is the first invokation. You may use
+        ``metrics.collect{extended_format = true}`` result instead, but in this case
+        result will ignore some historical info.
+
+    :param table output: result of ``metrics.collect{extended_format = true}``.
+
+    :param table kind_rules: table of computation rules applied to all obervations based
+        on collector kind. Format is as follows:
+        ``{ counter = { 'rate' }, gauge = { 'min', 'max' }}``. Computes all supported
+        aggregates by default.
+
+    :return: Table with all ``output`` entries and their aggregates.
+
 ..  _metrics-api_reference-role_functions:
 
 Metrics role API
