@@ -78,3 +78,27 @@ g.test_number64_ull_value_parses_to_json_number = function()
     t.assert_not_equals(type(obs_ull.value), 'string', 'number64 is not casted to string on export')
     t.assert_equals(obs_ull.value, 9007199254740992ULL, 'number64 ULL parsed to corrent number value')
 end
+
+g.test_collect_and_serialize_preserves_format = function()
+    -- Prepare some data for all collector types.
+    metrics.cfg{include = 'all', exclude = {}, labels = {alias = 'router-3'}}
+
+    local c = metrics.counter('cnt', nil, {my_useful_info = 'here'})
+    c:inc(3, {mylabel = 'myvalue1'})
+    c:inc(2, {mylabel = 'myvalue2'})
+
+    c = metrics.gauge('gauge', nil, {my_useful_info = 'here'})
+    c:set(3, {mylabel = 'myvalue1'})
+    c:set(2, {mylabel = 'myvalue2'})
+
+    c = metrics.histogram('histogram', nil, {2, 4}, {my_useful_info = 'here'})
+    c:observe(3, {mylabel = 'myvalue1'})
+    c:observe(2, {mylabel = 'myvalue2'})
+
+    local output_v1 = json.decode(json_exporter.internal.collect_and_serialize_v1())
+    local output_v2 = json.decode(json_exporter.internal.collect_and_serialize_v2())
+
+    for _, obs in ipairs(output_v1) do
+        utils.find_obs(obs.metric_name, obs.label_pairs, output_v2)
+    end
+end
