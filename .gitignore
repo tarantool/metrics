@@ -13,3 +13,5 @@ prometheus-input
 doc/.doctrees/
 doc/output/
 doc/locale/en/
+
+*.lua.c
