@@ -23,6 +23,10 @@ jobs:
         uses: tarantool/actions/check-module-version@master
         with:
           module-name: 'metrics'
+          version-pre-extraction-hook: |
+            local rock_utils = require('test.rock_utils')
+            rock_utils.remove_builtin('metrics')
+            rock_utils.assert_nonbuiltin('metrics')
 
   push-scm-rockspec:
     runs-on: [ ubuntu-20.04 ]
