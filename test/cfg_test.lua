@@ -33,6 +33,16 @@ local function clean_server(g)
     fio.rmtree(g.tmpdir)
 end
 
+local function is_metrics_configured_with_box_cfg(server)
+    return server:eval([[
+        if type(box.cfg) ~= 'table' then
+            return false
+        end
+
+        return box.cfg.metrics ~= nil
+    ]])
+end
+
 group.before_all(utils.init)
 
 group.before_each(function()
@@ -47,6 +57,12 @@ end)
 group.before_test('test_default', create_server)
 
 group.test_default = function(g)
+    t.skip_if(
+        is_metrics_configured_with_box_cfg(g.server),
+        "Tarantool configures built-in metrics with box.cfg on its own, " ..
+        "can't test clean instance"
+    )
+
     local cfg = g.server:eval([[
         local metrics = require('metrics')
         return metrics.cfg{}
@@ -75,6 +91,12 @@ group.after_test('test_default', clean_server)
 group.before_test('test_read_before_init', create_server)
 
 group.test_read_before_init = function(g)
+    t.skip_if(
+        is_metrics_configured_with_box_cfg(g.server),
+        "Tarantool configures built-in metrics with box.cfg on its own, " ..
+        "can't test clean instance"
+    )
+
     t.assert_error_msg_contains(
         'Call metrics.cfg{} first',
         function()
