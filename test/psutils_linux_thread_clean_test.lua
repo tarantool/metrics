@@ -24,7 +24,7 @@ g.test_clean_thread_info = function()
 
     local threads = {}
     for _, obs in ipairs(thread_obs) do
-        threads[obs.label_pairs.thread_name] = true
+        threads[obs.label_pairs.thread_pid] = true
     end
 
     -- After box.cfg{}, there should be at least tx (tarantool), iproto and wal.
