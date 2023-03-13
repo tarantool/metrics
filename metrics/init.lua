@@ -6,7 +6,7 @@ local cfg = require('metrics.cfg')
 local http_middleware = require('metrics.http_middleware')
 local tarantool = require('metrics.tarantool')
 
-local VERSION = '0.16.0-scm'
+local VERSION = require('metrics.version')
 
 return {
     registry = api.registry,
