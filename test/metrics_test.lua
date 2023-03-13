@@ -1,6 +1,7 @@
 #!/usr/bin/env tarantool
 
 local t = require('luatest')
+local luatest_capture = require('luatest.capture')
 local g = t.group('collectors')
 
 local metrics = require('metrics')
@@ -237,4 +238,18 @@ end
 
 g.test_version = function()
     t.assert_type(require('metrics')._VERSION, 'string')
+end
+
+g.test_deprecated_version = function()
+    local capture = luatest_capture:new()
+    capture:enable()
+
+    t.assert_type(require('metrics').VERSION, 'string')
+    local stdout = utils.fflush_main_server_output(nil, capture)
+    capture:disable()
+
+    t.assert_str_contains(
+        stdout,
+        "require('metrics').VERSION is deprecated, " ..
+        "use require('metrics')._VERSION instead.")
 end
