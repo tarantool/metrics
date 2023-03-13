@@ -234,3 +234,7 @@ for name, case in pairs(collect_default_only_cases) do
         end
     end
 end
+
+g.test_version = function()
+    t.assert_type(require('metrics')._VERSION, 'string')
+end
