@@ -1,5 +1,7 @@
 -- vim: ts=4:sw=4:sts=4:expandtab
 
+local log = require('log')
+
 local api = require('metrics.api')
 local const = require('metrics.const')
 local cfg = require('metrics.cfg')
@@ -8,7 +10,7 @@ local tarantool = require('metrics.tarantool')
 
 local VERSION = require('metrics.version')
 
-return {
+return setmetatable({
     registry = api.registry,
 
     counter = api.counter,
@@ -29,6 +31,15 @@ return {
     cfg = cfg.cfg,
     http_middleware = http_middleware,
     collect = api.collect,
-    VERSION = VERSION,
     _VERSION = VERSION,
-}
+}, {
+    __index = function(_, key)
+        if key == 'VERSION' then
+            log.warn("require('metrics').VERSION is deprecated, " ..
+                     "use require('metrics')._VERSION instead.")
+            return VERSION
+        end
+
+        return nil
+    end
+})
