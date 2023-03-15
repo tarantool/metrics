@@ -9,32 +9,23 @@ local utils = require('test.utils')
 local root = fio.dirname(fio.dirname(fio.abspath(package.search('test.helper'))))
 
 local function create_server(g)
-    g.tmpdir = fio.tempdir()
     g.server = t.Server:new({
-        command = fio.pathjoin(
-            fio.dirname(debug.sourcedir()),
-            'test', 'entrypoint', 'srv_basic_pure.lua'
-        ),
-        workdir = g.tmpdir,
-        net_box_port = 3031,
-        net_box_credentials = {user = 'guest', password = nil},
+        alias = 'myserver',
         env = {
             LUA_PATH = root .. '/?.lua;' ..
                 root .. '/?/init.lua;' ..
                 root .. '/.rocks/share/tarantool/?.lua'
-        },
+        }
     })
-    g.server:start()
-    t.helpers.retrying({}, function() g.server:connect_net_box() end)
+    g.server:start{wait_until_ready = true}
 end
 
 local function clean_server(g)
-    g.server:stop()
-    fio.rmtree(g.tmpdir)
+    g.server:drop()
 end
 
-local function is_metrics_configured_with_box_cfg(server)
-    return server:eval([[
+local function is_metrics_configured_with_box_cfg(srv)
+    return srv:eval([[
         if type(box.cfg) ~= 'table' then
             return false
         end
