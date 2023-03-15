@@ -9,7 +9,7 @@ rpm:
 
 .rocks: metrics-scm-1.rockspec
 	$(TTCTL) rocks make
-	$(TTCTL) rocks install luatest 0.5.7
+	$(TTCTL) rocks install luatest # master newer than 0.5.7 required
 	$(TTCTL) rocks install luacov 0.13.0
 	$(TTCTL) rocks install luacheck 0.26.0
 	if [ -n '$(CARTRIDGE_VERSION)' ]; then \
