@@ -17,3 +17,4 @@ doc/locale/en/
 *.lua.c
 
 build.luarocks
+packpack
