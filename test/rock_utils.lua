@@ -10,7 +10,7 @@ local function traverse_rock(func, name)
     end
 end
 
--- Metrics may have table cross-references.
+-- Package may have table cross-references.
 local MAX_DEPTH = 8
 
 -- Package functions contain useful debug info.
@@ -39,8 +39,12 @@ local function traverse_pkg_func(func, name, pkg, max_depth)
     end
 end
 
-local function remove_builtin_pkg(name, _)
+local function remove_loaded_pkg(name, _)
     package.loaded[name] = nil
+end
+
+local function remove_builtin_pkg(name, _)
+    remove_loaded_pkg(name)
     if loaders_ok then
         loaders.builtin[name] = nil
     end
@@ -70,11 +74,22 @@ local function remove_builtin_rock(name)
     traverse_rock(remove_builtin_pkg, name)
 end
 
+local function remove_loaded_rock(name)
+    traverse_rock(remove_loaded_pkg, name)
+end
+
+local function remove_override_rock(name)
+    loaders.override_builtin_disable()
+    traverse_rock(remove_loaded_pkg, name)
+end
+
 local function assert_nonbuiltin_rock(name)
+    require(name)
     traverse_rock(assert_nonbuiltin_pkg, name)
 end
 
 local function assert_builtin_rock(name)
+    require(name)
     traverse_rock(assert_builtin_pkg, name)
 end
 
@@ -82,4 +97,6 @@ return {
     assert_builtin = assert_builtin_rock,
     assert_nonbuiltin = assert_nonbuiltin_rock,
     remove_builtin = remove_builtin_rock,
+    remove_loaded = remove_loaded_rock,
+    remove_override = remove_override_rock,
 }
