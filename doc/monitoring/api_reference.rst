@@ -305,7 +305,7 @@ Metrics functions
 
 ..  function:: cfg([config])
 
-    Entrypoint to setup the module.
+    Entrypoint to setup the module. Since 0.17.0.
 
     :param table config: module configuration options:
 
