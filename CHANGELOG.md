@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `'all'` and `'none'` options for `include` argument,
   - simultaneous `include` and `exclude` arguments
     (`exclude` has higher priority)
+- Override built-in metrics, if installed
 
 ### Deprecated
 - Passing nonexistent metrics to `enable_default_metrics()`

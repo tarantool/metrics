@@ -23,10 +23,14 @@ Easy collecting, storing and manipulating metrics timeseriess.
 mkdir -p %{br_luapkgdir}
 cp -rv metrics %{br_luapkgdir}
 cp -rv cartridge %{br_luapkgdir}
+mkdir %{br_luapkgdir}/override
+cp -rv metrics %{br_luapkgdir}/override
+cp -rv cartridge %{br_luapkgdir}/override
 
 %files
      %{luapkgdir}/metrics
      %{luapkgdir}/cartridge
+     %{luapkgdir}/override
 
 %doc README.md
 %doc doc/monitoring/getting_started.rst
