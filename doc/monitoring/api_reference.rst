@@ -193,7 +193,7 @@ summary
     `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
     algorithm.
 
-    :param string   name: сollector name. Must be unique.
+    :param string   name: collector name. Must be unique.
     :param string   help: collector description.
     :param table objectives: a list of "targeted" φ-quantiles in the ``{quantile = error, ... }`` form.
         Example: ``{[0.5]=0.01, [0.9]=0.01, [0.99]=0.01}``.
@@ -277,7 +277,9 @@ Labels
 
 All collectors support providing ``label_pairs`` on data modification.
 A label is a piece of metainfo that you associate with a metric in the key-value format.
-See tags in Graphite and labels in Prometheus.
+For details, see `tags in Graphite <https://graphite.readthedocs.io/en/latest/tags.html>`_ and
+`labels in Prometheus <https://prometheus.io/docs/practices/naming/#labels>`_.
+
 Labels are used to differentiate between the characteristics of a thing being
 measured. For example, in a metric associated with the total number of HTTP
 requests, you can represent methods and statuses as label pairs:
@@ -373,7 +375,7 @@ Metrics functions
 
     :param table opts: table of collect options:
 
-      * ``invoke_callbacks`` -- if ``true``, ``invoke_callbacks()`` is triggerred before actual collect.
+      * ``invoke_callbacks`` -- if ``true``, ``invoke_callbacks()`` is triggered before actual collect.
       * ``default_only`` -- if ``true``, observations contain only default metrics (``metainfo.default = true``).
 
 ..  class:: registry
@@ -527,9 +529,18 @@ with ``metrics = require('cartridge.roles.metrics')`` specified in your ``init.l
 Collecting HTTP request latency statistics
 ------------------------------------------
 
-``metrics`` also provides middleware for monitoring HTTP
+The ``metrics`` module provides middleware for monitoring HTTP
 (set by the `http <https://github.com/tarantool/http>`_ module)
 latency statistics.
+The latency collector observes both latency information and the number of invocations.
+The metrics collected by HTTP middleware are separated by a set of labels:
+
+*   route (``path``)
+*   method (``method``)
+*   HTTP status code (``status``)
+
+For each route that you want to track, you must specify the middleware explicitly.
+The middleware does not cover the 404 errors.
 
 ..  module:: metrics.http_middleware
 
@@ -576,7 +587,7 @@ latency statistics.
 
 ..  function:: v1(handler, collector)
 
-    Latency measuring wrap-up for the HTTP ver. 1.x.x handler. Returns a wrapped handler.
+    Latency measuring wrap-up for the HTTP ver. ``1.x.x`` handler. Returns a wrapped handler.
 
     :param function handler: handler function.
     :param collector: middleware collector object.
@@ -585,7 +596,97 @@ latency statistics.
 
     **Usage:** ``httpd:route(route, http_middleware.v1(request_handler, collector))``
 
-    See `GitHub for a more detailed example <https://github.com/tarantool/metrics/blob/master/example/HTTP/latency_v1.lua>`__.
+    **Example:**
+
+    ..  code-block:: lua
+
+        #!/usr/bin/env tarantool
+        package.path = package.path .. ";../?.lua"
+
+        local json = require('json')
+        local fiber = require('fiber')
+        local metrics = require('metrics')
+        local log = require('log')
+        local http_middleware = metrics.http_middleware
+
+        -- Configure HTTP routing
+        local ip = '127.0.0.1'
+        local port = 12345
+        local httpd = require('http.server').new(ip, port) -- HTTP ver. 1.x.x
+        local route = { path = '/path', method = 'POST' }
+
+        -- Route handler
+        local handler = function(req)
+            for _ = 1, 10 do
+                fiber.sleep(0.1)
+            end
+
+            return { status = 200, body = req.body }
+        end
+
+        -- Configure summary latency collector
+        local collector = http_middleware.build_default_collector('summary')
+
+        -- Set route handler with summary latency collection
+        httpd:route(route, http_middleware.v1(handler, collector))
+        -- Start HTTP routing
+        httpd:start()
+
+        -- Set HTTP client, make some request
+        local http_client = require("http.client") -- HTTP ver. 1.x.x
+        http_client.post('http://' .. ip .. ':' .. port .. route.path, json.encode({ body = 'text' }))
+
+        -- Collect the metrics
+        log.info(metrics.collect())
+        --[[
+
+        - label_pairs:
+            path: /path
+            method: POST
+            status: 200
+          timestamp: 1588951616500768
+          value: 1
+          metric_name: path_latency_count
+
+        - label_pairs:
+            path: /path
+            method: POST
+            status: 200
+          timestamp: 1588951616500768
+          value: 1.0240110000595
+           metric_name: path_latency_sum
+
+         - label_pairs:
+             path: /path
+             method: POST
+             status: 200
+             quantile: 0.5
+           timestamp: 1588951616500768
+           value: 1.0240110000595
+           metric_name: path_latency
+
+         - label_pairs:
+             path: /path
+             method: POST
+             status: 200
+             quantile: 0.9
+           timestamp: 1588951616500768
+           value: 1.0240110000595
+           metric_name: path_latency
+
+         - label_pairs:
+             path: /path
+             method: POST
+             status: 200
+             quantile: 0.99
+           timestamp: 1588951616500768
+           value: 1.0240110000595
+           metric_name: path_latency
+
+        --]]
+
+        -- Exit event loop
+        os.exit()
 
 ..  _metrics-api_reference-cpu_usage_metrics:
 
