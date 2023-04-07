@@ -31,24 +31,26 @@ local function update_info_metrics()
     end
 
     for k, v in pairs(info.replication) do
-        if v.upstream ~= nil then
-            collectors_list.replication_lag =
-                utils.set_gauge('replication_lag', 'Replication lag',
-                    v.upstream.lag, {stream = 'upstream', id = k}, nil, {default = true})
-            collectors_list.replication_status =
-                utils.set_gauge('replication_status', 'Replication status',
-                    v.upstream.status == 'follow' and 1 or 0, {stream = 'upstream', id = k},
-                    nil, {default = true})
-        end
-        if v.downstream ~= nil then
-            collectors_list.replication_lag =
-                utils.set_gauge('replication_lag', 'Replication lag',
-                    v.downstream.lag, {stream = 'downstream', id = k},
-                    nil, {default = true})
-            collectors_list.replication_status =
-                utils.set_gauge('replication_status', 'Replication status',
-                    v.downstream.status == 'follow' and 1 or 0, {stream = 'downstream', id = k},
-                    nil, {default = true})
+        if k ~= info.id then
+            if v.upstream ~= nil then
+                collectors_list.replication_lag =
+                    utils.set_gauge('replication_lag', 'Replication lag',
+                        v.upstream.lag, {stream = 'upstream', id = k}, nil, {default = true})
+                collectors_list.replication_status =
+                    utils.set_gauge('replication_status', 'Replication status',
+                        v.upstream.status == 'follow' and 1 or 0, {stream = 'upstream', id = k},
+                        nil, {default = true})
+            end
+            if v.downstream ~= nil then
+                collectors_list.replication_lag =
+                    utils.set_gauge('replication_lag', 'Replication lag',
+                        v.downstream.lag, {stream = 'downstream', id = k},
+                        nil, {default = true})
+                collectors_list.replication_status =
+                    utils.set_gauge('replication_status', 'Replication status',
+                        v.downstream.status == 'follow' and 1 or 0, {stream = 'downstream', id = k},
+                        nil, {default = true})
+            end
         end
     end
 
