@@ -20,5 +20,5 @@ jobs:
       - name: Remove dev server deployment at ${{env.DEPLOYMENT_NAME}}
         uses: strumwolf/delete-deployment-environment@v2
         with:
-          token: "${{ secrets.TARANTOOLBOT_TOKEN }}"
+          token: "${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}"
           environment: "translation-${{env.BRANCH_NAME}}"
