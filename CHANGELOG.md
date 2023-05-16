@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Don't export self replication status.
+- Function ``set_is_health_handler`` has been added to role ``cartridge.roles.metrics``,
+  allowing you to set your own handle to check health
+  [tarantool/cartridge#2097](https://github.com/tarantool/cartridge/issues/2097).
+  Main case - customizing the healthcheck response format.
 
 ## [0.17.0] - 2023-03-23
 ### Added

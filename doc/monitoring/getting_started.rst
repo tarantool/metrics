@@ -93,6 +93,23 @@ which the load balancer can use to check the current state of any Tarantool inst
 If the instance is ready to accept the load, it will return a response with a 200 status code,
 and if not, with a 500 status code.
 
+If you need a custom healthckeck response, then you will need to replace the default handler with your own. Example:
+
+.. code-block:: lua
+
+	local metrics = require('cartridge.roles.metrics')
+
+	metrics.set_is_health_handler(function(req)
+		local health = require('cartridge.health')
+		local resp = req:render{
+			json = {
+				my_healthcheck_format = health.is_healthy()
+			}
+		}
+		resp.status = 200
+		return resp
+	end)
+
 .. _monitoring-getting_started-cartridge_role:
 
 Cartridge role

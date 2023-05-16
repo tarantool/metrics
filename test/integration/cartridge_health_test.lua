@@ -30,6 +30,15 @@ g.after_each(function()
     end)
 end)
 
+g.after_test('test_metrics_custom_is_health_handler', function()
+    local main_server = g.cluster:server('main')
+    main_server:exec(function()
+        local cartridge = require('cartridge')
+        local metrics = cartridge.service_get('metrics')
+        metrics.set_is_health_handler(nil)
+    end)
+end)
+
 g.test_cartridge_health_handler = function()
     helpers.skip_cartridge_version_less('2.0.2')
     helpers.upload_default_metrics_config(g.cluster)
@@ -141,4 +150,28 @@ g.test_cartridge_health_handler_member_suspect_state_boxconfigured_to_configurin
 
     local resp = main_server:http_request("get", "/health", {raise = false})
     t.assert_equals(resp.status, 500)
+end
+
+g.test_metrics_custom_is_health_handler = function()
+    local main_server = g.cluster:server('main')
+    main_server:exec(function()
+        local cartridge = require('cartridge')
+        local metrics = cartridge.service_get('metrics')
+        metrics.set_is_health_handler(function(req)
+            local health = require('cartridge.health')
+            local resp = req:render{
+                json = {
+                    my_healthcheck_format = health.is_healthy()
+                }
+            }
+            resp.status = 200
+            return resp
+        end)
+    end)
+
+    helpers.upload_default_metrics_config(g.cluster)
+    local resp = main_server:http_request('get', '/health', {raise = false})
+    t.assert_equals(resp.status, 200)
+    t.assert_equals(type(resp.json), 'table')
+    t.assert_equals(resp.json, { my_healthcheck_format = true })
 end
