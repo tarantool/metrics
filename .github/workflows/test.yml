@@ -19,23 +19,8 @@ jobs:
           - "2.6"
           - "2.7"
           - "2.8"
-        cartridge:
-          - ""
-          - "1.2.0"
-          - "2.1.2"
-          - "2.4.0"
-          - "2.5.1"
-          - "2.6.0"
-          - "2.7.8"
-        include:
-          - tarantool: "2.x-latest"
-            cartridge: "2.7.8"
-          - tarantool: "2.x-latest"
-            cartridge: ""
-          - tarantool: "2.10"
-            cartridge: "2.7.8"
-          - tarantool: "2.10"
-            cartridge: ""
+          - "2.10"
+          - "2.x-latest"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -58,8 +43,6 @@ jobs:
 
       - name: lint
         run: make lint
-        env:
-          CARTRIDGE_VERSION: ${{ matrix.cartridge }}
 
       - name: test
         run: make test_with_coverage_report
@@ -91,8 +74,6 @@ jobs:
           go-version: '1.15'
 
       - name: promtool test
-        env:
-          CARTRIDGE_VERSION: '2.7.5'
         run: |
           GO111MODULE=on go get github.com/prometheus/prometheus/cmd/promtool@a6be548dbc17780d562a39c0e4bd0bd4c00ad6e2
           make test_promtool

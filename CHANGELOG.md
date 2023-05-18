@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Don't export self replication status.
 
+### Removed
+
+- `cartridge.roles.metrics` moved to [cartridge-metrics-role](https://github.com/tarantool/cartridge-metrics-role) repository
+  (**incompatible change**).
+
 ## [0.17.0] - 2023-03-23
 ### Added
 - `metrics.cfg{}` -- a single entrypoint to setup the module:

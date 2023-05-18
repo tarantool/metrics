@@ -12,9 +12,6 @@ rpm:
 	$(TTCTL) rocks install luatest # master newer than 0.5.7 required
 	$(TTCTL) rocks install luacov 0.13.0
 	$(TTCTL) rocks install luacheck 0.26.0
-	if [ -n '$(CARTRIDGE_VERSION)' ]; then \
-		$(TTCTL) rocks install cartridge $(CARTRIDGE_VERSION); \
-	fi
 
 .PHONY: lint
 lint: .rocks
