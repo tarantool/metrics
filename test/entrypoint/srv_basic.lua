@@ -24,6 +24,8 @@ metrics.cfg({
     include = {
         'cartridge_issues',
         'cartridge_failover',
+        'info',
+        'clock',
     }
 })
 
