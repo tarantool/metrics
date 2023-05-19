@@ -6,7 +6,7 @@ local fio = require('fio')
 local metrics = require('metrics')
 local utils = require('test.utils')
 
-local root = fio.dirname(fio.dirname(fio.abspath(package.search('test.utils'))))
+local root = fio.dirname(fio.dirname(fio.abspath(package.search('test.helper'))))
 
 local function create_server(g)
     g.server = t.Server:new({
