@@ -11,9 +11,7 @@ errors.set_deprecation_handler(function(err)
 end)
 
 local ok, err = errors.pcall('CartridgeCfgError', cartridge.cfg, {
-    roles = {
-        'cartridge.roles.metrics',
-    },
+    roles = {},
     roles_reload_allowed = os.getenv('TARANTOOL_ROLES_RELOAD_ALLOWED') == 'true' or nil,
 })
 if not ok then
