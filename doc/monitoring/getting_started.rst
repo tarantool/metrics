@@ -122,7 +122,7 @@ via Cartridge configuration.
 
         dependencies = {
             ...
-            'metrics >= 0.17.0-1',
+            'metrics == 0.17.0-1',
             ...
         }
 
