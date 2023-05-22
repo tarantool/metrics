@@ -105,16 +105,28 @@ via Cartridge configuration.
 
 **Usage**
 
-#.  Add the ``metrics`` package to the dependencies in the ``.rockspec`` file.
-    Make sure that you are using version **0.3.0** or higher.
+#.  Add ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file.
 
     .. code-block:: lua
 
         dependencies = {
             ...
-            'metrics >= 0.3.0-1',
+            'cartridge-metrics-role >= 0.1.0-1',
             ...
         }
+
+    If you're using older version of metrics package, you need to add ``metrics`` package
+    instead of ``cartridge-metrics-role``.
+
+    .. code-block:: lua
+
+        dependencies = {
+            ...
+            'metrics == 0.17.0-1',
+            ...
+        }
+
+    Cartridge role is present in package versions from **0.3.0** to **0.17.0**.
 
 #.  Make sure that ``cartridge.roles.metrics`` is included
     in the roles list in ``cartridge.cfg``

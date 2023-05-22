@@ -11,9 +11,7 @@ errors.set_deprecation_handler(function(err)
 end)
 
 local ok, err = errors.pcall('CartridgeCfgError', cartridge.cfg, {
-    roles = {
-        'cartridge.roles.metrics',
-    },
+    roles = {},
     roles_reload_allowed = os.getenv('TARANTOOL_ROLES_RELOAD_ALLOWED') == 'true' or nil,
 })
 if not ok then
@@ -21,14 +19,23 @@ if not ok then
     os.exit(1)
 end
 
-local metrics = require('cartridge.roles.metrics')
-metrics.set_export({
-    {
-        path = '/health',
-        format = 'health'
-    },
-    {
-        path = '/metrics',
-        format = 'json'
-    },
+local metrics = require('metrics')
+metrics.cfg({
+    include = {
+        'cartridge_issues',
+        'cartridge_failover',
+        'info',
+        'clock',
+    }
 })
+
+local httpd = cartridge.service_get('httpd')
+
+httpd:route({
+    method = 'GET',
+    name = '/metrics',
+    path = '/metrics'
+}, function(req)
+    local json_exporter = require('metrics.plugins.json')
+    return req:render({ text = json_exporter.export() })
+end)

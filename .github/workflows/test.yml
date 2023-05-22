@@ -92,7 +92,7 @@ jobs:
 
       - name: promtool test
         env:
-          CARTRIDGE_VERSION: '2.7.5'
+          CARTRIDGE_VERSION: '2.7.8'
         run: |
           GO111MODULE=on go get github.com/prometheus/prometheus/cmd/promtool@a6be548dbc17780d562a39c0e4bd0bd4c00ad6e2
           make test_promtool
