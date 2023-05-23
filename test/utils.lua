@@ -137,4 +137,9 @@ function utils.fflush_main_server_output(server, capture)
     return captured
 end
 
+
+-- Empty by default. Empty LUA_PATH satisfies built-in package tests.
+-- For tarantool/metrics, LUA_PATH is set up through test.helper
+utils.LUA_PATH = nil
+
 return utils
