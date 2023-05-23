@@ -1,20 +1,14 @@
 local t = require('luatest')
 local group = t.group('cfg')
 
-local fio = require('fio')
-
 local metrics = require('metrics')
 local utils = require('test.utils')
-
-local root = fio.dirname(fio.dirname(fio.abspath(package.search('test.helper'))))
 
 local function create_server(g)
     g.server = t.Server:new({
         alias = 'myserver',
         env = {
-            LUA_PATH = root .. '/?.lua;' ..
-                root .. '/?/init.lua;' ..
-                root .. '/.rocks/share/tarantool/?.lua'
+            LUA_PATH = utils.LUA_PATH
         }
     })
     g.server:start{wait_until_ready = true}

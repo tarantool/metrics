@@ -6,6 +6,13 @@ require('test.rock_utils').assert_nonbuiltin('metrics')
 
 local fio = require('fio')
 local utils = require('test.utils')
+
+local root = fio.dirname(fio.dirname(fio.abspath(package.search('test.utils'))))
+
+package.loaded['test.utils'].LUA_PATH = root .. '/?.lua;' ..
+    root .. '/?/init.lua;' ..
+    root .. '/.rocks/share/tarantool/?.lua'
+
 local t = require('luatest')
 local ok, cartridge_helpers = pcall(require, 'cartridge.test-helpers')
 if not ok then
