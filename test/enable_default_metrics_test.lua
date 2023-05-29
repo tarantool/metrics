@@ -3,15 +3,15 @@
 local t = require('luatest')
 local g = t.group('enable_default_metrics')
 
-local luatest_capture = require('luatest.capture')
-
-local metrics = require('metrics')
 local utils = require('test.utils')
 
-g.before_all(utils.init)
+g.before_all(utils.create_server)
+g.after_all(utils.drop_server)
 
-g.after_each(function()
-    metrics.clear()
+g.after_each(function(cg)
+    cg.server:exec(function()
+        require('metrics').clear()
+    end)
 end)
 
 local cases = {
@@ -85,40 +85,49 @@ local cases = {
 }
 
 local methods = {
-    [''] = metrics.enable_default_metrics,
-    v2_ = require('metrics.tarantool').enable_v2,
+    [''] = {lib = 'metrics', func = 'enable_default_metrics'},
+    v2_ = {lib = 'metrics.tarantool', func = 'enable_v2'},
 }
 
 for prefix, method in pairs(methods) do
     for name, case in pairs(cases) do
-        g['test_' .. prefix .. name] = function()
-            method(case.include, case.exclude)
+        g['test_' .. prefix .. name] = function(cg)
+            cg.server:exec(function(method, case) -- luacheck: ignore 433
+                local metrics = require('metrics')
+                local utils = require('test.utils') -- luacheck: ignore 431
 
-            local observations = metrics.collect{invoke_callbacks = true}
+                require(method.lib)[method.func](case.include, case.exclude)
 
-            for _, expected in ipairs(case.expected) do
-                local obs = utils.find_metric(expected, observations)
-                t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
-            end
+                local observations = metrics.collect{invoke_callbacks = true}
 
-            for _, not_expected in ipairs(case.not_expected) do
-                local obs = utils.find_metric(not_expected, observations)
-                t.assert_equals(obs, nil, ("metric %q not found"):format(not_expected))
-            end
+                for _, expected in ipairs(case.expected) do
+                    local obs = utils.find_metric(expected, observations)
+                    t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
+                end
+
+                for _, not_expected in ipairs(case.not_expected) do
+                    local obs = utils.find_metric(not_expected, observations)
+                    t.assert_equals(obs, nil, ("metric %q not found"):format(not_expected))
+                end
+            end, {method, case})
         end
     end
 end
 
-g.test_invalid_include = function()
-    t.assert_error_msg_contains(
-        'Unexpected value provided: include must be "all", {...} or "none"',
-        metrics.enable_default_metrics, 'everything')
+g.test_invalid_include = function(cg)
+    cg.server:exec(function()
+        t.assert_error_msg_contains(
+            'Unexpected value provided: include must be "all", {...} or "none"',
+            require('metrics').enable_default_metrics, 'everything')
+    end)
 end
 
-g.test_v2_invalid_include = function()
-    t.assert_error_msg_contains(
-        'Unexpected value provided: include must be "all", {...} or "none"',
-        require('metrics.tarantool').enable_v2, 'everything')
+g.test_v2_invalid_include = function(cg)
+    cg.server:exec(function()
+        t.assert_error_msg_contains(
+            'Unexpected value provided: include must be "all", {...} or "none"',
+            require('metrics.tarantool').enable_v2, 'everything')
+    end)
 end
 
 local deprecated_cases = {
@@ -135,63 +144,71 @@ local deprecated_cases = {
 }
 
 for name, case in pairs(deprecated_cases) do
-    g['test_' .. name] = function()
-        local capture = luatest_capture:new()
-        capture:enable()
+    g['test_' .. name] = function(cg)
+        cg.server:exec(function(case) -- luacheck: ignore 433
+            require('metrics').enable_default_metrics(case.include, case.exclude)
+        end, {case})
 
-        metrics.enable_default_metrics(case.include, case.exclude)
-        local stdout = utils.fflush_main_server_output(nil, capture)
-        capture:disable()
-
-        t.assert_str_contains(stdout, case.warn)
+        t.assert_not_equals(cg.server:grep_log(case.warn), nil)
     end
 
-    g['test_v2_' .. name] = function()
-        t.assert_error_msg_contains(
-            case.err,
-            require('metrics.tarantool').enable_v2, case.include, case.exclude)
-    end
-end
-
-g.test_empty_table_in_v1 = function()
-    local capture = luatest_capture:new()
-    capture:enable()
-
-    metrics.enable_default_metrics({})
-    local stdout = utils.fflush_main_server_output(nil, capture)
-    capture:disable()
-
-    t.assert_str_contains(
-        stdout,
-        'Providing {} in enable_default_metrics include is treated ' ..
-        'as a default value now (i.e. include all), ' ..
-        'but it will change in the future. Use "all" instead')
-
-    local observations = metrics.collect{invoke_callbacks = true}
-
-    local expected_metrics = {
-        'tnt_info_uptime', 'tnt_info_memory_lua',
-        'tnt_net_sent_total', 'tnt_slab_arena_used',
-    }
-
-    for _, expected in ipairs(expected_metrics) do
-        local obs = utils.find_metric(expected, observations)
-        t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
+    g['test_v2_' .. name] = function(cg)
+        cg.server:exec(function(case) -- luacheck: ignore 433
+            t.assert_error_msg_contains(
+                case.err,
+                require('metrics.tarantool').enable_v2, case.include, case.exclude)
+        end, {case})
     end
 end
 
-g.test_empty_table_in_v2 = function()
-    require('metrics.tarantool').enable_v2({})
+g.test_empty_table_in_v1 = function(cg)
+    cg.server:exec(function()
+        require('metrics').enable_default_metrics({})
+    end)
 
-    local observations = metrics.collect{invoke_callbacks = true}
+    -- local warn = 'Providing {} in enable_default_metrics include is treated ' ..
+    --     'as a default value now (i.e. include all), ' ..
+    --     'but it will change in the future. Use "all" instead'
+    local warn = 'Providing {} in enable_default_metrics include is treated ' ..
+        'as a default value now %(i.e. include all%), ' ..
+        'but it will change in the future. Use "all" instead'
+    t.assert_not_equals(cg.server:grep_log(warn), nil)
 
-    local unexpected_metrics = {
-        'tnt_info_uptime', 'tnt_info_memory_lua',
-        'tnt_net_sent_total', 'tnt_slab_arena_used',
-    }
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
 
-    for _, expected in ipairs(unexpected_metrics) do
-        local obs = utils.find_metric(expected, observations)
-        t.assert_equals(obs, nil, ("metric %q not found"):format(expected))
-    end
+        local observations = metrics.collect{invoke_callbacks = true}
+
+        local expected_metrics = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        }
+
+        for _, expected in ipairs(expected_metrics) do
+            local obs = utils.find_metric(expected, observations)
+            t.assert_not_equals(obs, nil, ("metric %q found"):format(expected))
+        end
+    end)
+end
+
+g.test_empty_table_in_v2 = function(cg)
+    cg.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+
+        require('metrics.tarantool').enable_v2({})
+
+        local observations = metrics.collect{invoke_callbacks = true}
+
+        local unexpected_metrics = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        }
+
+        for _, expected in ipairs(unexpected_metrics) do
+            local obs = utils.find_metric(expected, observations)
+            t.assert_equals(obs, nil, ("metric %q not found"):format(expected))
+        end
+    end)
 end

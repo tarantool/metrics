@@ -1,17 +1,20 @@
 #!/usr/bin/env tarantool
 
 local t = require('luatest')
-local luatest_capture = require('luatest.capture')
 local g = t.group('collectors')
 
 local metrics = require('metrics')
 local utils = require('test.utils')
 
-g.before_all(utils.init)
+g.before_all(utils.create_server)
+g.after_all(utils.drop_server)
 
-g.after_each(function()
+g.after_each(function(cg)
     -- Delete all collectors and global labels
     metrics.clear()
+    cg.server:exec(function()
+        require('metrics').clear()
+    end)
 end)
 
 g.test_global_labels = function()
@@ -124,37 +127,46 @@ g.test_global_labels = function()
     t.assert_equals(obs_bucket_inf_hist_2.value, 1, "bucket +inf has 1 value: 2; observation global label has changed")
 end
 
-g.test_default_metrics_clear = function()
-    metrics.clear()
-    metrics.enable_default_metrics()
-    t.assert_equals(#metrics.collect(), 0)
+g.test_default_metrics_clear = function(cg)
+    cg.server:exec(function()
+        local metrics = require('metrics') -- luacheck: ignore 431
 
-    t.assert(#metrics.collect{invoke_callbacks = true} > 0)
+        metrics.clear()
+        metrics.enable_default_metrics()
+        t.assert_equals(#metrics.collect(), 0)
 
-    metrics.clear()
-    t.assert_equals(#metrics.collect(), 0)
-    t.assert_equals(#metrics.collect{invoke_callbacks = true}, 0)
+        t.assert(#metrics.collect{invoke_callbacks = true} > 0)
 
-    metrics.enable_default_metrics()
-    t.assert(#metrics.collect{invoke_callbacks = true} > 0)
+        metrics.clear()
+        t.assert_equals(#metrics.collect(), 0)
+        t.assert_equals(#metrics.collect{invoke_callbacks = true}, 0)
+
+        metrics.enable_default_metrics()
+        t.assert(#metrics.collect{invoke_callbacks = true} > 0)
+    end)
 end
 
-g.test_hotreload_remove_callbacks = function()
-    metrics.enable_default_metrics()
+g.test_hotreload_remove_callbacks = function(cg)
+    cg.server:exec(function()
+        local metrics = require('metrics') -- luacheck: ignore 431
+        local utils = require('test.utils') -- luacheck: ignore 431
 
-    local Registry = rawget(_G, '__metrics_registry')
-    local len_before_hotreload = utils.len(Registry.callbacks)
-    t.assert_gt(len_before_hotreload, 0)
+        metrics.enable_default_metrics()
 
-    package.loaded['metrics'] = nil
+        local Registry = rawget(_G, '__metrics_registry')
+        local len_before_hotreload = utils.len(Registry.callbacks)
+        t.assert_gt(len_before_hotreload, 0)
 
-    metrics = require('metrics')
-    metrics.enable_default_metrics()
+        package.loaded['metrics'] = nil
 
-    Registry = rawget(_G, '__metrics_registry')
-    local len_after_hotreload = utils.len(Registry.callbacks)
+        metrics = require('metrics')
+        metrics.enable_default_metrics()
 
-    t.assert_equals(len_before_hotreload, len_after_hotreload)
+        Registry = rawget(_G, '__metrics_registry')
+        local len_after_hotreload = utils.len(Registry.callbacks)
+
+        t.assert_equals(len_before_hotreload, len_after_hotreload)
+    end)
 end
 
 local collect_invoke_callbacks_cases = {
@@ -191,14 +203,17 @@ for name, case in pairs(collect_invoke_callbacks_cases) do
     end
 end
 
-g.test_default_metrics_metainfo = function()
-    metrics.enable_default_metrics()
-    metrics.invoke_callbacks()
+g.test_default_metrics_metainfo = function(cg)
+    cg.server:exec(function()
+        local metrics = require('metrics') -- luacheck: ignore 431
+        metrics.enable_default_metrics()
+        metrics.invoke_callbacks()
 
-    for k, c in pairs(metrics.collectors()) do
-        t.assert_equals(c.metainfo.default, true,
-            ('default collector %s has metainfo label "default"'):format(k))
-    end
+        for k, c in pairs(metrics.collectors()) do
+            t.assert_equals(c.metainfo.default, true,
+                ('default collector %s has metainfo label "default"'):format(k))
+        end
+    end)
 end
 
 local collect_default_only_cases = {
@@ -217,22 +232,27 @@ local collect_default_only_cases = {
 }
 
 for name, case in pairs(collect_default_only_cases) do
-    g['test_collect_default_only_' .. name] = function()
-        metrics.enable_default_metrics()
-        local c = metrics.gauge('custom_metric')
-        c:set(42)
+    g['test_collect_default_only_' .. name] = function(cg)
+        cg.server:exec(function(case) -- luacheck: ignore 433
+            local metrics = require('metrics') -- luacheck: ignore 431
+            local utils = require('test.utils') -- luacheck: ignore 431
 
-        local observations = metrics.collect(case.args)
+            metrics.enable_default_metrics()
+            local c = metrics.gauge('custom_metric')
+            c:set(42)
 
-        local default_obs = utils.find_metric('tnt_info_memory_lua', observations)
-        t.assert_not_equals(default_obs, nil)
+            local observations = metrics.collect(case.args)
 
-        local custom_obs = utils.find_metric('custom_metric', observations)
-        if case.custom_expected then
-            t.assert_not_equals(custom_obs, nil)
-        else
-            t.assert_equals(custom_obs, nil)
-        end
+            local default_obs = utils.find_metric('tnt_info_memory_lua', observations)
+            t.assert_not_equals(default_obs, nil)
+
+            local custom_obs = utils.find_metric('custom_metric', observations)
+            if case.custom_expected then
+                t.assert_not_equals(custom_obs, nil)
+            else
+                t.assert_equals(custom_obs, nil)
+            end
+        end, {case})
     end
 end
 
@@ -240,16 +260,12 @@ g.test_version = function()
     t.assert_type(require('metrics')._VERSION, 'string')
 end
 
-g.test_deprecated_version = function()
-    local capture = luatest_capture:new()
-    capture:enable()
+g.test_deprecated_version = function(cg)
+    cg.server:exec(function()
+        t.assert_type(require('metrics').VERSION, 'string')
+    end)
 
-    t.assert_type(require('metrics').VERSION, 'string')
-    local stdout = utils.fflush_main_server_output(nil, capture)
-    capture:disable()
-
-    t.assert_str_contains(
-        stdout,
-        "require('metrics').VERSION is deprecated, " ..
-        "use require('metrics')._VERSION instead.")
+    local warn = "require%('metrics'%).VERSION is deprecated, " ..
+        "use require%('metrics'%)._VERSION instead."
+    t.assert_not_equals(cg.server:grep_log(warn), nil)
 end

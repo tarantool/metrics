@@ -1,22 +1,7 @@
 local t = require('luatest')
 local group = t.group('cfg')
 
-local metrics = require('metrics')
 local utils = require('test.utils')
-
-local function create_server(g)
-    g.server = t.Server:new({
-        alias = 'myserver',
-        env = {
-            LUA_PATH = utils.LUA_PATH
-        }
-    })
-    g.server:start{wait_until_ready = true}
-end
-
-local function clean_server(g)
-    g.server:drop()
-end
 
 local function is_metrics_configured_with_box_cfg(srv)
     return srv:eval([[
@@ -28,18 +13,26 @@ local function is_metrics_configured_with_box_cfg(srv)
     ]])
 end
 
-group.before_all(utils.init)
+group.before_all(utils.create_server)
 
-group.before_each(function()
+group.after_all(utils.drop_server)
+
+group.before_each(function(g)
     -- Reset to defaults.
-    metrics.cfg{
-        include = 'all',
-        exclude = {},
-        labels = {},
-    }
+    g.server:exec(function()
+        require('metrics').cfg{
+            include = 'all',
+            exclude = {},
+            labels = {},
+        }
+    end)
 end)
 
-group.before_test('test_default', create_server)
+group.before_test('test_default', function(g)
+    -- Need clean unconfigured server.
+    utils.drop_server(g)
+    utils.create_server(g)
+end)
 
 group.test_default = function(g)
     t.skip_if(
@@ -71,9 +64,11 @@ group.test_default = function(g)
     end
 end
 
-group.after_test('test_default', clean_server)
-
-group.before_test('test_read_before_init', create_server)
+group.before_test('test_read_before_init', function(g)
+    -- Need clean unconfigured server.
+    utils.drop_server(g)
+    utils.create_server(g)
+end)
 
 group.test_read_before_init = function(g)
     t.skip_if(
@@ -92,101 +87,131 @@ group.test_read_before_init = function(g)
         end)
 end
 
-group.after_test('test_read_before_init', clean_server)
-
-group.test_table_value = function()
-    metrics.cfg{
-        include = {'info'}
-    }
-    t.assert_equals(metrics.cfg.include, {'info'})
+group.test_table_value = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        metrics.cfg{
+            include = {'info'}
+        }
+        t.assert_equals(metrics.cfg.include, {'info'})
+    end)
 end
 
-group.test_change_value = function()
-    local cfg = metrics.cfg{
-        include = {'info'},
-    }
-    t.assert_equals(cfg['include'], {'info'})
+group.test_change_value = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local cfg = metrics.cfg{
+            include = {'info'},
+        }
+        t.assert_equals(cfg['include'], {'info'})
+    end)
 end
 
-group.test_table_is_immutable = function()
-    t.assert_error_msg_contains(
-        'Use metrics.cfg{} instead',
-        function()
-            metrics.cfg.include = {'info'}
-        end
-    )
+group.test_table_is_immutable = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
 
-    t.assert_error_msg_contains(
-        'Use metrics.cfg{} instead',
-        function()
-            metrics.cfg.newfield = 'newvalue'
-        end
-    )
+        t.assert_error_msg_contains(
+            'Use metrics.cfg{} instead',
+            function()
+                metrics.cfg.include = {'info'}
+            end
+        )
+
+        t.assert_error_msg_contains(
+            'Use metrics.cfg{} instead',
+            function()
+                metrics.cfg.newfield = 'newvalue'
+            end
+        )
+    end)
 end
 
-group.test_include = function()
-    metrics.cfg{
-        include = {'info'},
-    }
+group.test_include = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
 
-    local default_metrics = metrics.collect{invoke_callbacks = true}
-    local uptime = utils.find_metric('tnt_info_uptime', default_metrics)
-    t.assert_not_equals(uptime, nil)
-    local memlua = utils.find_metric('tnt_info_memory_lua', default_metrics)
-    t.assert_equals(memlua, nil)
+        metrics.cfg{
+            include = {'info'},
+        }
+
+        local default_metrics = metrics.collect{invoke_callbacks = true}
+        local uptime = utils.find_metric('tnt_info_uptime', default_metrics)
+        t.assert_not_equals(uptime, nil)
+        local memlua = utils.find_metric('tnt_info_memory_lua', default_metrics)
+        t.assert_equals(memlua, nil)
+    end)
 end
 
-group.test_exclude = function()
-    metrics.cfg{
-        exclude = {'memory'},
-    }
+group.test_exclude = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
 
-    local default_metrics = metrics.collect{invoke_callbacks = true}
-    local uptime = utils.find_metric('tnt_info_uptime', default_metrics)
-    t.assert_not_equals(uptime, nil)
-    local memlua = utils.find_metric('tnt_info_memory_lua', default_metrics)
-    t.assert_equals(memlua, nil)
+        metrics.cfg{
+            exclude = {'memory'},
+        }
+
+        local default_metrics = metrics.collect{invoke_callbacks = true}
+        local uptime = utils.find_metric('tnt_info_uptime', default_metrics)
+        t.assert_not_equals(uptime, nil)
+        local memlua = utils.find_metric('tnt_info_memory_lua', default_metrics)
+        t.assert_equals(memlua, nil)
+    end)
 end
 
-group.test_include_with_exclude = function()
-    metrics.cfg{
-        include = {'info', 'memory'},
-        exclude = {'memory'},
-    }
+group.test_include_with_exclude = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
 
-    local default_metrics = metrics.collect{invoke_callbacks = true}
-    local uptime = utils.find_metric('tnt_info_uptime', default_metrics)
-    t.assert_not_equals(uptime, nil)
-    local memlua = utils.find_metric('tnt_info_memory_lua', default_metrics)
-    t.assert_equals(memlua, nil)
+        metrics.cfg{
+            include = {'info', 'memory'},
+            exclude = {'memory'},
+        }
+
+        local default_metrics = metrics.collect{invoke_callbacks = true}
+        local uptime = utils.find_metric('tnt_info_uptime', default_metrics)
+        t.assert_not_equals(uptime, nil)
+        local memlua = utils.find_metric('tnt_info_memory_lua', default_metrics)
+        t.assert_equals(memlua, nil)
+    end)
 end
 
-group.test_include_none = function()
-    metrics.cfg{
-        include = 'none',
-        exclude = {'memory'},
-    }
+group.test_include_none = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
 
-    local default_metrics = metrics.collect{invoke_callbacks = true}
-    t.assert_equals(default_metrics, {})
+        metrics.cfg{
+            include = 'none',
+            exclude = {'memory'},
+        }
+
+        local default_metrics = metrics.collect{invoke_callbacks = true}
+        t.assert_equals(default_metrics, {})
+    end)
 end
 
-group.test_labels = function()
-    metrics.cfg{
-        labels = {mylabel = 'myvalue'},
-    }
+group.test_labels = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
 
-    local default_metrics = metrics.collect{invoke_callbacks = true}
-    local uptime = utils.find_obs('tnt_info_uptime', {mylabel = 'myvalue'}, default_metrics)
-    t.assert_equals(uptime.label_pairs, {mylabel = 'myvalue'})
+        metrics.cfg{
+            labels = {mylabel = 'myvalue'},
+        }
 
-    metrics.cfg{
-        labels = {},
-    }
+        local default_metrics = metrics.collect{invoke_callbacks = true}
+        local uptime = utils.find_obs('tnt_info_uptime', {mylabel = 'myvalue'}, default_metrics)
+        t.assert_equals(uptime.label_pairs, {mylabel = 'myvalue'})
 
-    default_metrics = metrics.collect{invoke_callbacks = true}
-    uptime = utils.find_obs('tnt_info_uptime', {}, default_metrics)
-    t.assert_equals(uptime.label_pairs, {})
+        metrics.cfg{
+            labels = {},
+        }
+
+        default_metrics = metrics.collect{invoke_callbacks = true}
+        uptime = utils.find_obs('tnt_info_uptime', {}, default_metrics)
+        t.assert_equals(uptime.label_pairs, {})
+    end)
 end
-
-

@@ -2,24 +2,21 @@ local t = require('luatest')
 
 local fun = require('fun')
 local metrics = require('metrics')
-local fio = require('fio')
-local clock = require('clock')
-local fiber = require('fiber')
-local log = require('log')
 
 local utils = {}
 
-local tempdir = fio.tempdir()
-t.after_suite(function()
-    fio.rmtree(tempdir)
-end)
+function utils.create_server(g)
+    g.server = t.Server:new({
+        alias = 'myserver',
+        env = {
+            LUA_PATH = utils.LUA_PATH
+        }
+    })
+    g.server:start{wait_until_ready = true}
+end
 
-function utils.init()
-    box.cfg{
-        memtx_dir = tempdir,
-        vinyl_dir = tempdir,
-        wal_dir = tempdir,
-    }
+function utils.drop_server(g)
+    g.server:drop()
 end
 
 function utils.find_obs(metric_name, label_pairs, observations, comparator)
@@ -110,33 +107,6 @@ function utils.clear_spaces()
         end
     end
 end
-
--- Based on https://github.com/tarantool/crud/blob/5717e87e1f8a6fb852c26181524fafdbc7a472d8/test/helper.lua#L533-L544
-function utils.fflush_main_server_output(server, capture)
-    -- Sometimes we have a delay here. This hack helps to wait for the end of
-    -- the output. It shouldn't take much time.
-    local helper_msg = "metrics fflush message"
-    if server then
-        server.net_box:eval([[
-            require('log').error(...)
-        ]], {helper_msg})
-    else
-        log.error(helper_msg)
-    end
-
-    local max_wait_timeout = 10
-    local start_time = clock.monotonic()
-
-    local captured = ""
-    while (not string.find(captured, helper_msg, 1, true))
-    and (clock.monotonic() - start_time < max_wait_timeout) do
-        local captured_part = capture:flush()
-        captured = captured .. (captured_part.stdout or "") .. (captured_part.stderr or "")
-        fiber.yield()
-    end
-    return captured
-end
-
 
 -- Empty by default. Empty LUA_PATH satisfies built-in package tests.
 -- For tarantool/metrics, LUA_PATH is set up through test.helper

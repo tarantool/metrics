@@ -11,7 +11,8 @@ local root = fio.dirname(fio.dirname(fio.abspath(package.search('test.utils'))))
 
 package.loaded['test.utils'].LUA_PATH = root .. '/?.lua;' ..
     root .. '/?/init.lua;' ..
-    root .. '/.rocks/share/tarantool/?.lua'
+    root .. '/.rocks/share/tarantool/?.lua;' ..
+    root .. '/.rocks/share/tarantool/?/init.lua'
 
 local t = require('luatest')
 local ok, cartridge_helpers = pcall(require, 'cartridge.test-helpers')

@@ -8,8 +8,6 @@ local metrics = require('metrics')
 local json = require('json')
 local utils = require('test.utils')
 
-g.before_all(utils.init)
-
 g.after_each(function()
     -- Delete all collectors and global labels
     metrics.clear()
