@@ -82,6 +82,61 @@ local cases = {
             'tnt_info_memory_lua',
         },
     },
+    tt3_cfg_include_all = {
+        include = { 'all' },
+        exclude = nil,
+        expected = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        },
+        not_expected = {},
+    },
+    tt3_cfg_exclude_all = {
+        include = nil,
+        exclude = { 'all' },
+        expected = {},
+        not_expected = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        },
+    },
+    tt3_cfg_exclude_from_include_all = {
+        include = { 'all' },
+        exclude = { 'memory' },
+        expected = {
+            'tnt_info_uptime', 'tnt_net_sent_total', 'tnt_slab_arena_used',
+        },
+        not_expected = {
+            'tnt_info_memory_lua',
+        },
+    },
+    tt3_cfg_include_some_exclude_all = {
+        include = { 'memory' },
+        exclude = { 'all' },
+        expected = {},
+        not_expected = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        },
+    },
+    tt3_cfg_include_exclude_all = {
+        include = { 'all' },
+        exclude = { 'all' },
+        expected = {},
+        not_expected = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        },
+    },
+    tt3_cfg_include_all_and_specific = {
+        include = { 'memory', 'all' },
+        exclude = nil,
+        expected = {
+            'tnt_info_uptime', 'tnt_info_memory_lua',
+            'tnt_net_sent_total', 'tnt_slab_arena_used',
+        },
+        not_expected = {},
+    },
 }
 
 local methods = {
