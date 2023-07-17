@@ -7,7 +7,7 @@ endif
 rpm:
 	OS=el DIST=7 packpack/packpack
 
-.rocks: metrics-scm-1.rockspec
+.rocks: metrics-scm-1.rockspec metrics/*.lua metrics/*/*.lua
 	$(TTCTL) rocks make
 	$(TTCTL) rocks install luatest # master newer than 0.5.7 required
 	$(TTCTL) rocks install luacov 0.13.0
