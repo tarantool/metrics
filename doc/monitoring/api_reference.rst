@@ -325,6 +325,7 @@ Metrics functions
 
     Supported default metric names (for ``cfg.include`` and ``cfg.exclude`` tables):
 
+    *   ``all`` (metasection including all metrics)
     *   ``network``
     *   ``operations``
     *   ``system``

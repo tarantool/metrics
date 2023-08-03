@@ -25,6 +25,11 @@ local default_metrics = {
     event_loop          = require('metrics.tarantool.event_loop'),
 }
 
+local all_metrics_map = {}
+for name, _ in pairs(default_metrics) do
+    all_metrics_map[name] = true
+end
+
 local function check_metrics_name(name, raise_if_unknown)
     if default_metrics[name] == nil then
         if raise_if_unknown then
@@ -42,13 +47,15 @@ local function enable_impl(include, exclude, raise_if_unknown)
     local include_map = {}
 
     if include == const.ALL then
-        for name, _ in pairs(default_metrics) do
-            include_map[name] = true
-        end
+        include_map = table.deepcopy(all_metrics_map)
     elseif type(include) == 'table' then
         for _, name in pairs(include) do
-            check_metrics_name(name, raise_if_unknown)
-            include_map[name] = true
+            if name == const.ALL then -- metasection "all"
+                include_map = table.deepcopy(all_metrics_map)
+            else
+                check_metrics_name(name, raise_if_unknown)
+                include_map[name] = true
+            end
         end
     elseif include == const.NONE then
         include_map = {}
@@ -57,8 +64,12 @@ local function enable_impl(include, exclude, raise_if_unknown)
     end
 
     for _, name in pairs(exclude) do
-        check_metrics_name(name, raise_if_unknown)
-        include_map[name] = false
+        if name == const.ALL then -- metasection "all"
+            include_map = {}
+        else
+            check_metrics_name(name, raise_if_unknown)
+            include_map[name] = false
+        end
     end
 
     for name, value in pairs(default_metrics) do
