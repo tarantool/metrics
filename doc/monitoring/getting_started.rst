@@ -26,7 +26,7 @@ You may also set a global label for your metrics:
 
 ..  code-block:: lua
 
-    metrics.cfg{alias = 'alias'}
+    metrics.cfg{labels = {alias = 'alias'}}
 
 Initialize the Prometheus exporter or export metrics in another format:
 
