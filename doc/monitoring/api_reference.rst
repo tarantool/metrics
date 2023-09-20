@@ -95,12 +95,12 @@ The design is based on the `Prometheus counter <https://prometheus.io/docs/conce
 gauge
 ~~~~~
 
-A gauge is a metric that represents a single numerical value that can arbitrarily go up and down.
+A gauge is a metric that denotes a single numerical value that can arbitrarily increase and decrease.
 
-Gauges are typically used for measured values like temperatures or current memory usage, but also "counts" that
-can go up and down, like the number of concurrent requests.
+The gauge type is typically used for measured values like temperature or current memory usage. Also,
+it might be used for the values that can go up or down, for example, the number of concurrent requests.
 
-The design is based on [the Prometheus gauge](https://prometheus.io/docs/concepts/metric_types/#gauge).
+The design is based on the `Prometheus gauge <https://prometheus.io/docs/concepts/metric_types/#gauge>`__.
 
 ..  function:: gauge(name [, help, metainfo])
 
@@ -145,29 +145,27 @@ The design is based on [the Prometheus gauge](https://prometheus.io/docs/concept
 histogram
 ~~~~~~~~~
 
-The metric of an application, similar to a "histogram," is used for collecting and analyzing
+A histogram is used for collecting and analyzing
 statistical data about the distribution of values of a specific indicator within the application.
 Unlike metrics that only allow to track the average value or quantity of events, a histogram allows
 us to see a detailed picture of the distribution of values and uncover hidden dependencies.
 
 Histograms are used in situations where we do not want or cannot store individual
-measurements (because there can be too many of them), but we will have enough summarized information
-to understand the overall pattern (in this case, the distribution of values across ranges).
+measurements (because there are too many of them), but aggregated information (in this case,
+the distribution of values across ranges) will be satisfying enough to understand the pattern.
 
 Each histogram provides several measurements:
 
-- Total count (_count)
-- Sum of measured values (_sum)
-- Distribution across buckets (_bucket)
+- total count (``_count``)
+- sum of measured values (``_sum``)
+- distribution across buckets (``_bucket``)
 
-Let's examine the third group of measurements in detail. Let's say we are interested in the magnitude of
-the Demo value. And we want to know how often the measured value falls into a specific range (bucket):
+Consider the following problem: we want to know how often the observed value is in the specific range (bucket).
 
 ..  image:: images/histogram-buckets.png
     :align: center
 
-We are taking measurements. Let's say as a result of these measurements, we obtained the following
-values: 8, 7, 6, 8, 1, 7, 4, 8.
+For example, let observed values be 8, 7, 6, 8, 1, 7, 4, 8.
 
 Thus, in the ranges:
 
@@ -218,7 +216,7 @@ Thus, in the ranges:
 ..  image:: images/histogram.png
     :align: center
 
-The metric will also display the count of measurements and their sum:
+The metric also displays the count of measurements and their sum:
 
 ..  code-block:: json
 
@@ -239,9 +237,9 @@ The metric will also display the count of measurements and their sum:
         "value": 49
       },
 
-The design is based on [the Prometheus histogram](https://prometheus.io/docs/concepts/metric_types/#histogram).
+The design is based on the `Prometheus histogram <https://prometheus.io/docs/concepts/metric_types/#histogram>`__.
 
-Usage:
+**Usage**
 
 ..  function:: histogram(name [, help, buckets, metainfo])
 
@@ -301,18 +299,18 @@ Usage:
 summary
 ~~~~~~~
 
-An application metric of the "summary" type is also used for collecting statistical data
+A summary metric is used for collecting statistical data
 about the distribution of values of a specific indicator within the application.
 
-A summary metric also provides several indicators:
+Each summary provides several measurements:
 
-- Total count of measurements;
-- Sum of measured values;
-- Values at specific quantiles.
+- total count of measurements
+- sum of measured values
+- values at specific quantiles
 
 Similar to histograms, a summary also operates with value ranges. However, unlike histograms,
-it uses quantiles (quantile, defined by a number between 0 and 1) for this purpose. In this case,
-there's no need to define fixed boundaries like in histograms. Here ranges depend
+it uses quantiles (defined by a number between 0 and 1) for this purpose. In this case,
+it is not required to define fixed boundaries like in histograms. Here ranges depend
 on the measured values and the number of measurements.
 
 Let's sort the example series of measurements in ascending order:
@@ -323,9 +321,9 @@ Thus:
 - Quantile 0 is the value of the first, minimum element. In this example, it's 1.
 - Quantile 1 is the value of the last, maximum element. In this example, it's 8.
 - Quantile 0.5 is the value of the median element. In this example, it's 7. This means that the smaller
-  half of our measurements gives a spread of values ​​from 1 to 7. The larger one, from 7 to 8.
+  half of our measurements gives a spread of values from 1 to 7. The larger one, from 7 to 8.
 
-It's worth noting that calculating quantiles requires resources, so it makes sense to calculate no
+Note that calculating quantiles requires resources, so it makes sense to calculate no
 more than one, for example: 0.95 - the majority of measurements.
 
 With a large number of measurements per second, a significant amount of memory would be required to
@@ -340,7 +338,7 @@ uses a sliding window divided into sections (buckets) where measurements are sto
 ..  image:: images/summary-buckets.png
     :align: center
 
-Let's note that "buckets" in histograms and "buckets" in quantiles within summaries have different meanings.
+Note that "buckets" in histograms and "buckets" in quantiles within summaries have different meanings.
 
 In conclusion:
 
@@ -362,7 +360,8 @@ In conclusion:
         }
     )
 
-A metric like the one provided in the example above will return the following values for the specified quantiles:
+A metric like the one provided in the example above returns the following measurements for
+the specified quantiles:
 
 ..  code-block:: json
 
@@ -415,9 +414,9 @@ It also exposes the count of measurements and the sum of observations:
         "value": 49
       },
 
-Summary used design [Prometheus](https://prometheus.io/docs/concepts/metric_types/#summary).
+The design is based on the `Prometheus summary <https://prometheus.io/docs/concepts/metric_types/#summary>`__.
 
-Usage:
+**Usage**
 
 ..  function:: summary(name [, help, objectives, params, metainfo])
 
