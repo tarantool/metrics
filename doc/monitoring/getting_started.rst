@@ -153,9 +153,9 @@ To enable the collection of HTTP metrics, you need wrap handler with a function
     -- Start HTTP routing
     httpd:start()
 
-.. hint::
+.. note::
     By default, the ``http_middleware`` uses the ``histogram`` collector for backward compatibility reasons.
-    For collecting HTTP metrics, it's recommended to use ``summary``.
+    To collect HTTP metrics, use the ``summary`` type instead.
 
 
 You can collect all HTTP metrics with a single collector.
