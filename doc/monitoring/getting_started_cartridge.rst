@@ -1,7 +1,7 @@
 .. _getting_started_cartridge:
 
-Getting started (Cartridge application)
-=======================================
+Getting started: Cartridge application
+======================================
 
 .. _getting_started_cartridge-how_to_use:
 
@@ -10,19 +10,19 @@ How to use
 
 The ``metrics`` module is tightly integrated with
 the `Cartridge <https://www.tarantool.io/en/doc/latest/book/cartridge/>`__ framework. To enable this
-integration, a permanent role called "metrics" has been introduced.
+integration, a permanent role called ``metrics`` has been introduced.
 
-To enable this role, the following steps are required:
+To enable this role, follow the steps below.
 
-1. Install metrics rock
+Installing metrics rock
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Install the latest version of Metrics. For instructions to install the Metrics
-rock :ref:`view the install documentation <_install-the_usual_way>`.
+First, install the latest version of ``metrics``. For details,
+:ref:`check the installation guide <_install-the_usual_way>`.
 
-Additionally, you need to install the separate ``cartridge-metrics-role`` rock. Here's how you can do it:
+Also, you need to install the separate ``cartridge-metrics-role`` rock. To do this:
 
-#. Add the ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file.
+#. Add the ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file:
 
     .. code-block:: lua
 
@@ -32,7 +32,7 @@ Additionally, you need to install the separate ``cartridge-metrics-role`` rock. 
             ...
         }
 
-#.  Next, to install the missing dependencies, you need to execute the following command:
+#.  Next, install the missing dependencies:
 
     .. code-block:: shell
 
@@ -123,8 +123,8 @@ and calling it with ``require`` like a regular package:
 Additional steps for older versions of the metrics module
 ---------------------------------------------------------
 
-Since version **0.6.0**, the metrics role is permanent and enabled on instances by default.
-If you use old version of metrics, you should enable the role in the interface:
+Since version **0.6.0**, the ``metrics`` role is permanent and enabled on instances by default.
+If you use an old version of ``metrics``, you nees to enable the role in the interface first:
 
 ..  image:: images/role-enable.png
     :align: center
@@ -136,8 +136,8 @@ Adding metrics to HTTP API commands of the application
 
 You can connect the standard metric ``http_server_request_latency`` to your application's HTTP API
 commands. This metric records the number of invocations and the total execution time (latency) of
-each individual command. To do this, you need to wrap each API handler with the function
-``metrics.http_middleware.v1(...)``.
+each individual command. To do this, wrap each API handler with
+the ``metrics.http_middleware.v1(...)`` function.
 
 Example:
 
@@ -156,7 +156,7 @@ Example:
     server:start()
 
 When calling the ``cartridge.service_get('metrics')`` command as an application (usually in a router),
-you need to add a dependency of this role on the role of metrics:
+add a dependency of this role on the role of ``metrics``:
 
 .. code-block:: lua
 
@@ -196,8 +196,8 @@ new data on these calls is available:
         "value": 0.00008015199273359
     },
 
-The default type for this metric is ``Histogram``, but we recommend using ``Summary``. See
-`here <_monitoring-getting_started-http_metrics_using_summary>`.
+The default type for this metric is ``histogram``. However,
+it's :ref:`recommend <monitoring-getting_started-http_metrics_using_summary>` to use the ``summary`` type instead.
 
 .. _getting_started_cartridge-advanced_settings:
 
@@ -227,7 +227,7 @@ Additional settings
         metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
 #.  You can use the configuration below to choose the default metrics to be exported.
-    If you add the include section, only the metrics from this section will be exported:
+    If you add the ``include`` section, only the metrics from this section will be exported:
 
     ..  code-block:: yaml
 
@@ -241,7 +241,7 @@ Additional settings
             - luajit
             - memory
 
-    If you add the exclude section,
+    If you add the ``exclude`` section,
     the metrics from this section will be removed from the default metrics list:
 
     ..  code-block:: yaml
@@ -264,8 +264,12 @@ Additional settings
 Creating a custom health check format
 -------------------------------------
 
-By default, the response of the health command contains a status code of 200 if everything
-is okay, and a status code of 500 if the instance is unhealthy. You can set your own response
+By default, the response of the health command contains a status code of
+
+* ``200`` -- if everything is okay,
+* ``500`` --  if the instance is unhealthy.
+
+You can set your own response
 format in the following way:
 
 .. code-block:: lua

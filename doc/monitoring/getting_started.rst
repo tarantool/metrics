@@ -3,120 +3,106 @@
 Monitoring: getting started
 ===========================
 
-.. _monitoring-getting_started-install:
-
-Install metrics rock
------------------------
-
-If you are using Tarantool version below 2.11.1 - install the latest version of Metrics. For instructions
-to install the Metrics rock :ref:`view the install documentation <_install-the_usual_way>`.
+If you use Tarantool version below `2.11.1 <https://github.com/tarantool/tarantool/releases/tag/2.11.1>`__,
+it is necessary to install the latest version of ``metrics`` first. For details,
+see :ref:`Installing the metrics module <install>`.
 
 .. _monitoring-getting_started-how_to_use:
 
-How to use
----------------
+Using the metrics module
+------------------------
 
-.. hint::
+.. note::
 
-    The use of the module in applications based on the Cartridge framework
-    is considered :ref:`here <_getting_started_cartridge>`.
+    The module is also used in applications based on the Cartridge framework. For details,
+    see the :ref:`Getting started with Cartridge <getting_started_cartridge>` section.
 
 
-1. Set the node name and enable the output of the standard set of metrics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. First, set the instance name and start to collect the standard set of metrics
 
-Calling ``metrics.cfg()`` enables collection of a standard set of metrics.
-You may also set a global label for your instance:
-
-..  code-block:: lua
-
-    metrics.cfg(labels = {alias = 'my-instance'})
-
-.. hint::
-
-    When using a metrics module version below 0.17.0, instead of using the function ``metrics.cfg(...)``
-    you should write it like this:
+    Also, you can set a global label for your instance:
 
     ..  code-block:: lua
 
-        metrics.set_global_labels({alias = 'my-instance'})
-        metrics.enable_default_metrics()
+        metrics.cfg(labels = {alias = 'my-instance'})
+
+    .. note::
+
+        When using a metrics module version below 0.17.0, use the following snippet
+        instead of `metrics.cfg(...)`:
+
+        ..  code-block:: lua
+
+            metrics.set_global_labels({alias = 'my-instance'})
+            metrics.enable_default_metrics()
 
 
-2. Adding a handler for the command to retrieve metric values
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2. Add a handler to expose metric values
 
-* If you need the JSON format:
+    For JSON format:
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    local json_exporter = require('metrics.plugins.json')
-    local function http_metrics_handler(request)
-        return request:render({ text = json_exporter.export() })
-    end
+        local json_exporter = require('metrics.plugins.json')
+        local function http_metrics_handler(request)
+            return request:render({ text = json_exporter.export() })
+        end
 
-* If you need the Prometheus format:
+    For Prometheus format:
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    local prometheus_exporter = require('metrics.plugins.prometheus').collect_http
+        local prometheus_exporter = require('metrics.plugins.prometheus').collect_http
 
-* To learn how to obtain custom metrics, check the :ref:`API reference <metrics-api_reference>`.
+    To learn how to extend metrics with custom data, check the :ref:`API reference <metrics-api_reference>`.
 
-3. Registering the command to retrieve metric values and starting the HTTP server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3. Start the HTTP server and expose metrics
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    local http_server = require('http.server')
-    local server = http_server.new('0.0.0.0', 8081)
-    server:route({path = '/metrics'}, http_metrics_handler)
-    server:start()
+        local http_server = require('http.server')
+        local server = http_server.new('0.0.0.0', 8081)
+        server:route({path = '/metrics'}, http_metrics_handler)
+        server:start()
 
-.. _monitoring-getting_started-result_example:
+4. In the end, you will be able to see the metric values by accessing the URL ``http://localhost:8081/metrics``:
 
-Result example
----------------
+    ..  code-block:: json
 
-In the end, you will be able to see the metric values by accessing the URL http://localhost:8081/metrics:
+        [
+          {
+            "label_pairs": {
+              "alias": "my-instance"
+            },
+            "timestamp": 1679663602823779,
+            "metric_name": "tnt_vinyl_disk_index_size",
+            "value": 0
+          },
+          . . .
+          {
+            "label_pairs": {
+              "alias": "my-instance"
+            },
+            "timestamp": 1679663602823779,
+            "metric_name": "tnt_info_memory_data",
+            "value": 39272
+          },
+          {
+            "label_pairs": {
+              "alias": "my-instance"
+            },
+            "timestamp": 1679663602823779,
+            "metric_name": "tnt_election_vote",
+            "value": 0
+          }
+        ]
 
-..  code-block:: json
-
-    [
-      {
-        "label_pairs": {
-          "alias": "my-instance"
-        },
-        "timestamp": 1679663602823779,
-        "metric_name": "tnt_vinyl_disk_index_size",
-        "value": 0
-      },
-      . . .
-      {
-        "label_pairs": {
-          "alias": "my-instance"
-        },
-        "timestamp": 1679663602823779,
-        "metric_name": "tnt_info_memory_data",
-        "value": 39272
-      },
-      {
-        "label_pairs": {
-          "alias": "my-instance"
-        },
-        "timestamp": 1679663602823779,
-        "metric_name": "tnt_election_vote",
-        "value": 0
-      }
-    ]
-
-The data can be visualized in
-`Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
+    The data can be visualized in
+    `Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
 
 .. _monitoring-getting_started-full_source_example:
 
-Full source example
--------------------
+Full source example:
 
 .. code-block:: lua
 
@@ -145,10 +131,10 @@ Full source example
 
 ..  _monitoring-getting_started-http_metrics:
 
-Collect HTTP metrics
---------------------
+Collecting HTTP metrics
+-----------------------
 
-To enable the collection of HTTP metrics, you need wrap handler to function
+To enable the collection of HTTP metrics, you need wrap handler with a function
 ``metrics.http_middleware.v1``:
 
 ..  code-block:: lua
@@ -167,9 +153,9 @@ To enable the collection of HTTP metrics, you need wrap handler to function
     -- Start HTTP routing
     httpd:start()
 
-.. hint::
+.. note::
     By default, the ``http_middleware`` uses the ``histogram`` collector for backward compatibility reasons.
-    For collecting HTTP metrics, it's recommended to use ``summary``.
+    To collect HTTP metrics, use the ``summary`` type instead.
 
 
 You can collect all HTTP metrics with a single collector.
@@ -182,20 +168,20 @@ Otherwise, your metrics won't appear on the charts.
 ..  _monitoring-getting_started-custom_metric:
 
 
-Custom metric
--------------
+Creating custom metric
+----------------------
 
 You can create your own metric in two ways, depending on when you need to take measurements:
 
-- At an arbitrary moment in time
-- At the time of requesting the data collected by the metrics
+- at any arbitrary moment of time
+- when the data collected by metrics is requested
 
 Let's explore both options.
 
-At a random moment
-~~~~~~~~~~~~~~~~~~
+Creating custom metrics at any arbitrary moment of time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Declare the collector:
+1. Create the collector:
 
 ..  code-block:: lua
 
@@ -297,13 +283,13 @@ Result:
 
 ..  _monitoring-getting_started-warning:
 Warning
--------
+~~~~~~~
 
 You might want to add your own metric. The module allows this, but there are nuances when working with
 specific tools.
 
 When adding your custom metric, it's important to ensure that the number of label value combinations is
-kept to a minimum. This is to prevent a "combinatorial explosion" in the database where metric data is
+kept to a minimum. Otherwise, combinatorial explosion may happen in the timeseries database with metrics values
 stored. Examples of data labels:
 
 - Labels in Prometheus.
@@ -313,7 +299,7 @@ For example, if your company uses InfluxDB for metric collection, you could pote
 monitoring setup, both for your application and for all other systems within the company. As a result,
 monitoring data is likely to be lost.
 
-Let's look at an example:
+Example:
 
 ..  code-block:: lua
 
@@ -330,12 +316,12 @@ Let's look at an example:
     end
 
 In the example, there are two versions of the function ``on_value_update``. The top version labels
-the data with the cluster node's alias. Since there's a relatively small number of nodes, using
+the data with the cluster instance's alias. Since there's a relatively small number of nodes, using
 them as labels is feasible. In the second case, an identifier of a record is used. If there are many
-records, it's advisable to avoid such situations.
+records, it's recommended to avoid such situations.
 
 The same principle applies to URLs. Using the entire URL with parameters is not recommended; using a
-URL template or just the name of the command is a better approach. And so on.
+URL template or just the name of the command is a better approach.
 
 In essence, when designing custom metrics and selecting labels or tags, it's crucial to opt for a minimal
 set of values that can uniquely identify the data without introducing unnecessary complexity or potential

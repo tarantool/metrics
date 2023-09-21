@@ -24,6 +24,15 @@ A collector represents one or more observations that change over time.
 counter
 ~~~~~~~
 
+A counter is a cumulative metrics that denotes a single monotonically increasing counter. Its value might only
+increase or be reset to zero on restart. For example, you can use a counter to represent the number of requests
+served, tasks completed, or errors.
+
+Don't use a counter to expose a value that can decrease. For example, don't use this metric to mark the number of
+currently running processes. Use a :ref:`gauge <metrics-api_reference-gauge>` type instead.
+
+The design is based on the `Prometheus counter <https://prometheus.io/docs/concepts/metric_types/#counter>`__.
+
 ..  function:: counter(name [, help, metainfo])
 
     Register a new counter.
@@ -86,6 +95,13 @@ counter
 gauge
 ~~~~~
 
+A gauge is a metric that denotes a single numerical value that can arbitrarily increase and decrease.
+
+The gauge type is typically used for measured values like temperature or current memory usage. Also,
+it might be used for the values that can go up or down, for example, the number of concurrent requests.
+
+The design is based on the `Prometheus gauge <https://prometheus.io/docs/concepts/metric_types/#gauge>`__.
+
 ..  function:: gauge(name [, help, metainfo])
 
     Register a new gauge.
@@ -128,6 +144,102 @@ gauge
 
 histogram
 ~~~~~~~~~
+
+A histogram is used for collecting and analyzing
+statistical data about the distribution of values of a specific indicator within the application.
+Unlike metrics that only allow to track the average value or quantity of events, a histogram allows
+us to see a detailed picture of the distribution of values and uncover hidden dependencies.
+
+Histograms are used in situations where we do not want or cannot store individual
+measurements (because there are too many of them), but aggregated information (in this case,
+the distribution of values across ranges) will be satisfying enough to understand the pattern.
+
+Each histogram provides several measurements:
+
+- total count (``_count``)
+- sum of measured values (``_sum``)
+- distribution across buckets (``_bucket``)
+
+Consider the following problem: we want to know how often the observed value is in the specific range (bucket).
+
+..  image:: images/histogram-buckets.png
+    :align: center
+
+For example, let observed values be 8, 7, 6, 8, 1, 7, 4, 8.
+
+Thus, in the ranges:
+
+- From 0 to 2 inclusive, 1 measurement fell.
+- From 0 to 4 inclusive, 2 measurements fell.
+- From 0 to 6 inclusive, 3 measurements fell.
+- From 0 to infinity, 8 measurements fell (equal to the histogram_demo_count value).
+
+..  code-block:: json
+
+     {
+         "label_pairs": {
+            "le": 2,
+            "alias": "my-tnt-app"
+         },
+         "timestamp": 1680174378390303,
+         "metric_name": "histogram_demo_bucket",
+         "value": 1
+      },
+      {
+        "label_pairs": {
+          "le": 4,
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680174378390303,
+        "metric_name": "histogram_demo_bucket",
+        "value": 2
+      },
+      {
+        "label_pairs": {
+          "le": 6,
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680174378390303,
+        "metric_name": "histogram_demo_bucket",
+        "value": 3
+      },
+      {
+        "label_pairs": {
+          "le": "inf",
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680174378390303,
+        "metric_name": "histogram_demo_bucket",
+        "value": 8
+      },
+
+..  image:: images/histogram.png
+    :align: center
+
+The metric also displays the count of measurements and their sum:
+
+..  code-block:: json
+
+      {
+        "label_pairs": {
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680180929162484,
+        "metric_name": "histogram_demo_count",
+        "value": 8
+      },
+      {
+        "label_pairs": {
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680180929162484,
+        "metric_name": "histogram_demo_sum",
+        "value": 49
+      },
+
+The design is based on the `Prometheus histogram <https://prometheus.io/docs/concepts/metric_types/#histogram>`__.
+
+**Usage**
 
 ..  function:: histogram(name [, help, buckets, metainfo])
 
@@ -186,6 +298,125 @@ histogram
 
 summary
 ~~~~~~~
+
+A summary metric is used for collecting statistical data
+about the distribution of values of a specific indicator within the application.
+
+Each summary provides several measurements:
+
+- total count of measurements
+- sum of measured values
+- values at specific quantiles
+
+Similar to histograms, a summary also operates with value ranges. However, unlike histograms,
+it uses quantiles (defined by a number between 0 and 1) for this purpose. In this case,
+it is not required to define fixed boundaries like in histograms. Here ranges depend
+on the measured values and the number of measurements.
+
+Let's sort the example series of measurements in ascending order:
+1, 4, 6, 7, 7, 8, 8, 8.
+
+Thus:
+
+- Quantile 0 is the value of the first, minimum element. In this example, it's 1.
+- Quantile 1 is the value of the last, maximum element. In this example, it's 8.
+- Quantile 0.5 is the value of the median element. In this example, it's 7. This means that the smaller
+  half of our measurements gives a spread of values from 1 to 7. The larger one, from 7 to 8.
+
+Note that calculating quantiles requires resources, so it makes sense to calculate no
+more than one, for example: 0.95 - the majority of measurements.
+
+With a large number of measurements per second, a significant amount of memory would be required to
+store them all. The array is compressed to reduce memory consumption. The degree of compression is determined by
+an acceptable error rate. In application error rates mostly from 1% to 10%. This means that a
+quantile of 0.50 with a 10% error from the example above will return a value in the range of 6.65...7.35
+instead of 7.
+
+Additionally, a summary metric doesn't store values for the whole application's lifetime. This metric
+uses a sliding window divided into sections (buckets) where measurements are stored.
+
+..  image:: images/summary-buckets.png
+    :align: center
+
+Note that "buckets" in histograms and "buckets" in quantiles within summaries have different meanings.
+
+In conclusion:
+
+..  code-block:: lua
+
+    local summary_demo = metrics.summary(
+        'summary_demo', -- metric name
+        'Summary demo', -- description
+        {
+           [0.5] = 0.01, -- quantile 0.50 with 1% error
+           [0.95] = 0.01, -- quantile 0.95 with 1% error
+           [0.99] = 0.01, -- quantile 0.99 with 1% error
+        },
+        {
+           max_age_time = 60, -- duration of each bucket in seconds
+           age_buckets_count = 5 -- total number of buckets in the sliding window
+                                 -- window duration = max_age_time * age_buckets_count seconds, or in
+                                 -- this case = 5 minutes
+        }
+    )
+
+A metric like the one provided in the example above returns the following measurements for
+the specified quantiles:
+
+..  code-block:: json
+
+    {
+       "label_pairs": {
+          "quantile": 0.5,
+          "alias": "my-tnt-app"
+       },
+       "timestamp": 1680180929162484,
+       "metric_name": "summary_demo",
+       "value": 7
+      },
+      {
+        "label_pairs": {
+          "quantile": 0.95,
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680180929162484,
+        "metric_name": "summary_demo",
+        "value": 8
+      },
+      {
+        "label_pairs": {
+          "quantile": 0.99,
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680180929162484,
+        "metric_name": "summary_demo",
+        "value": 8
+      },
+
+It also exposes the count of measurements and the sum of observations:
+
+..  code-block:: json
+
+      {
+        "label_pairs": {
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680180929162484,
+        "metric_name": "summary_demo_count",
+        "value": 8
+      },
+      {
+        "label_pairs": {
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1680180929162484,
+        "metric_name": "summary_demo_sum",
+        "value": 49
+      },
+
+The design is based on the `Prometheus summary <https://prometheus.io/docs/concepts/metric_types/#summary>`__.
+
+**Usage**
 
 ..  function:: summary(name [, help, objectives, params, metainfo])
 
@@ -325,7 +556,6 @@ Metrics functions
 
     Supported default metric names (for ``cfg.include`` and ``cfg.exclude`` tables):
 
-    *   ``all`` (metasection including all metrics)
     *   ``network``
     *   ``operations``
     *   ``system``

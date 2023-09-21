@@ -1,18 +1,19 @@
 .. _install:
 
-Install the latest version of Metrics
-=====================================
+Installing the metrics module
+=============================
 
 .. hint::
-    Does not require installation for Tarantula version 2.11.1 and higher
+    Since Tarantool version `2.11.1 <https://github.com/tarantool/tarantool/releases/tag/2.11.1>`__,
+    the installation is not required.
 
 .. _install-the_usual_way:
 
 The usual way
 -------------
 
-Usually, all dependencies are included in the ``*.rockspec`` file of the application
-and all dependencies are installed from it.
+Usually, all dependencies are included in the ``*.rockspec`` file of the application.
+All dependencies are installed from this file.
 
 This is done as follows:
 
@@ -26,7 +27,7 @@ This is done as follows:
             ...
         }
 
-#. Next, to install the missing dependencies, you need to execute the command:
+#. To install the missing dependencies, execute the folowing command:
 
     .. code-block:: shell
 
@@ -41,19 +42,19 @@ This is done as follows:
 Direct way
 ----------
 
-To install only the Metrics module, execute the following commands:
+To install only the ``metrics`` module, execute the following commands:
 
-#.
+#. Set current folder:
     .. code-block:: shell
 
         $ cd ${PROJECT_ROOT}
 
-#.
+#. To install the missing dependencies, execute the folowing command:
     .. code-block:: shell
 
         $ tt rocks install metrics <version>
         # OR #
         $ tarantoolctl rocks install metrics <version>
 
-    where <version> - the desired version number (you can omit it, then the version from the
-    master branch will be installed)
+    where ``version`` is the necessary version number. If omitted, then the version from the
+    ``master`` branch is installed).
