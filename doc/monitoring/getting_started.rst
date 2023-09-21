@@ -12,32 +12,28 @@ see :ref:`Installing the metrics module <install>`.
 Using the metrics module
 ------------------------
 
-.. note::
+..  note::
 
     The module is also used in applications based on the Cartridge framework. For details,
     see the :ref:`Getting started with Cartridge <getting_started_cartridge>` section.
 
 
-1. First, set the instance name and start to collect the standard set of metrics
-
-    Also, you can set a global label for your instance:
+#.  First, set the instance name and start to collect the standard set of metrics.
+    Also, you can set a global label for your instance.
 
     ..  code-block:: lua
 
         metrics.cfg(labels = {alias = 'my-instance'})
 
-    .. note::
+    When using a metrics module version below **0.17.0**, use the following snippet instead of ``metrics.cfg(...)``:
 
-        When using a metrics module version below 0.17.0, use the following snippet
-        instead of `metrics.cfg(...)`:
+    ..  code-block:: lua
 
-        ..  code-block:: lua
-
-            metrics.set_global_labels({alias = 'my-instance'})
-            metrics.enable_default_metrics()
+        metrics.set_global_labels({alias = 'my-instance'})
+        metrics.enable_default_metrics()
 
 
-2. Add a handler to expose metric values
+#.  Add a handler to expose metric values.
 
     For JSON format:
 
@@ -54,9 +50,10 @@ Using the metrics module
 
         local prometheus_exporter = require('metrics.plugins.prometheus').collect_http
 
+
     To learn how to extend metrics with custom data, check the :ref:`API reference <metrics-api_reference>`.
 
-3. Start the HTTP server and expose metrics
+#.  Start the HTTP server and expose metrics:
 
     ..  code-block:: lua
 
@@ -65,7 +62,7 @@ Using the metrics module
         server:route({path = '/metrics'}, http_metrics_handler)
         server:start()
 
-4. In the end, you will be able to see the metric values by accessing the URL ``http://localhost:8081/metrics``:
+#.  In the end, you will be able to see the metric values by accessing the URL ``http://localhost:8081/metrics``:
 
     ..  code-block:: json
 
@@ -97,8 +94,8 @@ Using the metrics module
           }
         ]
 
-    The data can be visualized in
-    `Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
+The data can be visualized in
+`Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
 
 .. _monitoring-getting_started-full_source_example:
 
@@ -134,8 +131,7 @@ Full source example:
 Collecting HTTP metrics
 -----------------------
 
-To enable the collection of HTTP metrics, you need wrap handler with a function
-``metrics.http_middleware.v1``:
+To enable the collection of HTTP metrics, wrap a handler with a ``metrics.http_middleware.v1`` function:
 
 ..  code-block:: lua
 
@@ -154,40 +150,36 @@ To enable the collection of HTTP metrics, you need wrap handler with a function
     httpd:start()
 
 .. note::
+
     By default, the ``http_middleware`` uses the ``histogram`` collector for backward compatibility reasons.
     To collect HTTP metrics, use the ``summary`` type instead.
 
 
 You can collect all HTTP metrics with a single collector.
-If you're using the default
+If you use the default
 :ref:`Grafana dashboard <monitoring-grafana_dashboard-page>`,
 don't change the default collector name.
 Otherwise, your metrics won't appear on the charts.
 
-
 ..  _monitoring-getting_started-custom_metric:
-
 
 Creating custom metric
 ----------------------
 
 You can create your own metric in two ways, depending on when you need to take measurements:
 
-- at any arbitrary moment of time
-- when the data collected by metrics is requested
+*   at any arbitrary moment of time
+*   when the data collected by metrics is requested
 
-Let's explore both options.
+To create custom metrics at any arbitrary moment of time, do the following:
 
-Creating custom metrics at any arbitrary moment of time
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Create the collector:
+#. Create the collector:
 
 ..  code-block:: lua
 
     local response_counter = metrics.counter('response_counter', 'Response counter')
 
-2. Take a measurement at the appropriate place, for example, in an API request handler:
+#. Take a measurement at the appropriate place, for example, in an API request handler:
 
 ..  code-block:: lua
 
@@ -200,17 +192,15 @@ Creating custom metrics at any arbitrary moment of time
         -- ...
     end
 
+To create custom metrics when the data collected by metrics is requested, do the following
 
-At the time of requesting the data collected by the metrics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Declare the collector:
+#. Create the collector:
 
 ..  code-block:: lua
 
     local other_custom_metric = metrics.gauge('other_custom_metric', 'Other custom metric')
 
-2. Take a measurement at the time of requesting the data collected by the metrics:
+#. Take a measurement at the time of requesting the data collected by the metrics:
 
 ..  code-block:: lua
 
@@ -222,10 +212,7 @@ At the time of requesting the data collected by the metrics
         other_custom_metric:set(current_value, label_pairs)
     end)
 
-Full example
-~~~~~~~~~~~~
-
-Code:
+The full example is listed below.
 
 ..  code-block:: lua
 
@@ -264,7 +251,7 @@ Code:
     server:route({path = '/check'}, check_handler)
     server:start()
 
-Result:
+The result looks in the following way:
 
     ..  code-block:: json
 
@@ -282,18 +269,19 @@ Result:
     ]
 
 ..  _monitoring-getting_started-warning:
+
 Warning
 ~~~~~~~
 
-You might want to add your own metric. The module allows this, but there are nuances when working with
+The module allows to add your own metrics, but there are nuances when working with
 specific tools.
 
 When adding your custom metric, it's important to ensure that the number of label value combinations is
 kept to a minimum. Otherwise, combinatorial explosion may happen in the timeseries database with metrics values
 stored. Examples of data labels:
 
-- Labels in Prometheus.
-- Tags in InfluxDB.
+*   Labels in Prometheus
+*   Tags in InfluxDB
 
 For example, if your company uses InfluxDB for metric collection, you could potentially disrupt the entire
 monitoring setup, both for your application and for all other systems within the company. As a result,
@@ -320,8 +308,8 @@ the data with the cluster instance's alias. Since there's a relatively small num
 them as labels is feasible. In the second case, an identifier of a record is used. If there are many
 records, it's recommended to avoid such situations.
 
-The same principle applies to URLs. Using the entire URL with parameters is not recommended; using a
-URL template or just the name of the command is a better approach.
+The same principle applies to URLs. Using the entire URL with parameters is not recommended.
+Use an URL template or the name of the command instead.
 
 In essence, when designing custom metrics and selecting labels or tags, it's crucial to opt for a minimal
 set of values that can uniquely identify the data without introducing unnecessary complexity or potential

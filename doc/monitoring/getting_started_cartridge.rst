@@ -3,22 +3,19 @@
 Getting started: Cartridge application
 ======================================
 
-.. _getting_started_cartridge-how_to_use:
-
-How to use
----------------
-
 The ``metrics`` module is tightly integrated with
 the `Cartridge <https://www.tarantool.io/en/doc/latest/book/cartridge/>`__ framework. To enable this
 integration, a permanent role called ``metrics`` has been introduced.
 
 To enable this role, follow the steps below.
 
-Installing metrics rock
-~~~~~~~~~~~~~~~~~~~~~~~
+.. _getting_started_cartridge-setup:
+
+Module setup
+------------
 
 First, install the latest version of ``metrics``. For details,
-:ref:`check the installation guide <_install-the_usual_way>`.
+:ref:`check the installation guide <install-the_usual_way>`.
 
 Also, you need to install the separate ``cartridge-metrics-role`` rock. To do this:
 
@@ -42,8 +39,7 @@ Also, you need to install the separate ``cartridge-metrics-role`` rock. To do th
         # OR #
         cartridge build
 
-2. Enable the ``cartridge.roles.metrics`` in the list of roles in ``cartridge.cfg``:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Then, enable the ``cartridge.roles.metrics`` in the list of roles in ``cartridge.cfg``:
 
 .. code-block:: lua
 
@@ -55,12 +51,12 @@ Also, you need to install the separate ``cartridge-metrics-role`` rock. To do th
         },
     })
 
-3. Configure the Metrics Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+After that, configure the metrics module in either of two ways:
 
-Sure, here's an example of adding the metrics configuration section to your cluster configuration.
+*   add the ``metrics` configuration section to your cluster configuration;
+*   specify the configuration in the separate ``metrics.yml`` file.
 
-Example:
+In the example below, specify the response format and the addresses at which the commands will be available:
 
 .. code-block:: yaml
 
@@ -73,33 +69,26 @@ Example:
         - path: '/health'
           format: 'health'
 
+Learn more about `Cartridge configuration <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_dev/#managing-role-specific-data>`__.
 
-..  image:: images/role-config.png
-    :align: center
+..  note::
 
-`Learn more <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_dev/#managing-role-specific-data>`_
-about Cartridge configuration.
-
-Here, we're specifying the addresses at which the commands will be available and the response format.
-
-.. hint::
-
-    Instead of configuring the cluster configuration, you can also use the ``set_export`` command.
-    See more details in the
-    `documentation <https://www.tarantool.io/en/doc/latest/book/monitoring/api_reference/#lua-function.metrics.set_export>`__.
+    Instead of configuring the cluster configuration, you can also use the
+    `set_export <https://www.tarantool.io/en/doc/latest/book/monitoring/api_reference/#lua-function.metrics.set_export>`__
+    command.
 
 Result
-~~~~~~~~~
+------
 
 Now, the commands' data is accessible at the following addresses:
 
-.. code-block:: shell
+..  code-block:: shell
 
     http://url:port/path_for_json_metrics
     http://url:port/path_for_prometheus_metrics
     http://url:port/health
 
-Here, ``url:port`` — represents the address and Cartridge HTTP port of a specific instance of the application.
+where ``url:port`` -- the address and Cartridge HTTP port of a specific instance of the application.
 
 You can visualize the data in
 `Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
@@ -124,7 +113,7 @@ Additional steps for older versions of the metrics module
 ---------------------------------------------------------
 
 Since version **0.6.0**, the ``metrics`` role is permanent and enabled on instances by default.
-If you use an old version of ``metrics``, you nees to enable the role in the interface first:
+If you use an old version of ``metrics``, you need to enable the role in the interface first:
 
 ..  image:: images/role-enable.png
     :align: center
@@ -197,7 +186,7 @@ new data on these calls is available:
     },
 
 The default type for this metric is ``histogram``. However,
-it's :ref:`recommend <monitoring-getting_started-http_metrics_using_summary>` to use the ``summary`` type instead.
+it's :ref:`recommended <monitoring-getting_started-http_metrics_using_summary>` to use the ``summary`` type instead.
 
 .. _getting_started_cartridge-advanced_settings:
 

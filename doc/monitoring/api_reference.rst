@@ -145,7 +145,7 @@ The design is based on the `Prometheus gauge <https://prometheus.io/docs/concept
 histogram
 ~~~~~~~~~
 
-A histogram is used for collecting and analyzing
+A histogram is used to collect and analyze
 statistical data about the distribution of values of a specific indicator within the application.
 Unlike metrics that only allow to track the average value or quantity of events, a histogram allows
 us to see a detailed picture of the distribution of values and uncover hidden dependencies.
@@ -338,7 +338,7 @@ uses a sliding window divided into sections (buckets) where measurements are sto
 ..  image:: images/summary-buckets.png
     :align: center
 
-Note that "buckets" in histograms and "buckets" in quantiles within summaries have different meanings.
+Note that buckets in histograms and buckets in quantiles within summaries have different meanings.
 
 In conclusion:
 
