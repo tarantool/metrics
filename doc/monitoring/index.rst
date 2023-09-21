@@ -14,6 +14,8 @@ This chapter includes the following sections:
     :numbered: 0
 
     getting_started
+    install
+    getting_started_cartridge
     metrics_reference
     api_reference
     plugins

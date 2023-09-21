@@ -3,66 +3,162 @@
 Monitoring: getting started
 ===========================
 
-.. _monitoring-getting_started-tarantool:
+.. _monitoring-getting_started-install:
 
-Tarantool
----------
+Install metrics rock
+-----------------------
 
-First, install the ``metrics`` package:
+If you are using Tarantool version below 2.11.1 - install the latest version of Metrics. For instructions
+to install the Metrics rock :ref:`view the install documentation <_install-the_usual_way>`.
 
-..  code-block:: console
+.. _monitoring-getting_started-how_to_use:
 
-    $ cd ${PROJECT_ROOT}
-    $ tarantoolctl rocks install metrics
+How to use
+---------------
 
-Next, require it in your code:
+.. hint::
+
+    The use of the module in applications based on the Cartridge framework
+    is considered :ref:`here <_getting_started_cartridge>`.
+
+
+1. Set the node name and enable the output of the standard set of metrics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Calling ``metrics.cfg()`` enables collection of a standard set of metrics.
+You may also set a global label for your instance:
 
 ..  code-block:: lua
 
-    local metrics = require('metrics')
+    metrics.cfg(labels = {alias = 'my-instance'})
 
-Enable default Tarantool metrics such as network, memory, operations, etc.
-You may also set a global label for your metrics:
+.. hint::
+
+    When using a metrics module version below 0.17.0, instead of using the function ``metrics.cfg(...)``
+    you should write it like this:
+
+    ..  code-block:: lua
+
+        metrics.set_global_labels({alias = 'my-instance'})
+        metrics.enable_default_metrics()
+
+
+2. Adding a handler for the command to retrieve metric values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* If you need the JSON format:
 
 ..  code-block:: lua
 
-    metrics.cfg{alias = 'alias'}
+    local json_exporter = require('metrics.plugins.json')
+    local function http_metrics_handler(request)
+        return request:render({ text = json_exporter.export() })
+    end
 
-Initialize the Prometheus exporter or export metrics in another format:
+* If you need the Prometheus format:
+
+..  code-block:: lua
+
+    local prometheus_exporter = require('metrics.plugins.prometheus').collect_http
+
+* To learn how to obtain custom metrics, check the :ref:`API reference <metrics-api_reference>`.
+
+3. Registering the command to retrieve metric values and starting the HTTP server
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+..  code-block:: lua
+
+    local http_server = require('http.server')
+    local server = http_server.new('0.0.0.0', 8081)
+    server:route({path = '/metrics'}, http_metrics_handler)
+    server:start()
+
+.. _monitoring-getting_started-result_example:
+
+Result example
+---------------
+
+In the end, you will be able to see the metric values by accessing the URL http://localhost:8081/metrics:
+
+..  code-block:: json
+
+    [
+      {
+        "label_pairs": {
+          "alias": "my-instance"
+        },
+        "timestamp": 1679663602823779,
+        "metric_name": "tnt_vinyl_disk_index_size",
+        "value": 0
+      },
+      . . .
+      {
+        "label_pairs": {
+          "alias": "my-instance"
+        },
+        "timestamp": 1679663602823779,
+        "metric_name": "tnt_info_memory_data",
+        "value": 39272
+      },
+      {
+        "label_pairs": {
+          "alias": "my-instance"
+        },
+        "timestamp": 1679663602823779,
+        "metric_name": "tnt_election_vote",
+        "value": 0
+      }
+    ]
+
+The data can be visualized in
+`Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
+
+.. _monitoring-getting_started-full_source_example:
+
+Full source example
+-------------------
 
 .. code-block:: lua
 
-    local httpd = require('http.server')
-    local http_handler = require('metrics.plugins.prometheus').collect_http
+    -- Import modules
+    local metrics = require('metrics')
+    local http_server = require('http.server')
+    local json_exporter = require('metrics.plugins.json')
 
+    -- Define helper functions
+    local function http_metrics_handler(request)
+        return request:render({ text = json_exporter.export() })
+    end
 
-    httpd.new('0.0.0.0', 8088)
-        :route({path = '/metrics'}, function(...)
-            return http_handler(...)
-    end)
-        :start()
-
+    -- Start the database
     box.cfg{
-        listen = 3302
+        listen = 3301,
     }
 
-Now you can use the HTTP API endpoint ``/metrics`` to collect your metrics
-in the Prometheus format. To learn how to obtain custom metrics, check the
-:ref:`API reference <metrics-api_reference>`.
+    -- Configure the metrics module
+    metrics.cfg(labels = {alias = 'my-tnt-app'})
+
+    -- Run the web server
+    local server = http_server.new('0.0.0.0', 8081)
+    server:route({path = '/metrics'}, http_metrics_handler)
+    server:start()
 
 ..  _monitoring-getting_started-http_metrics:
 
 Collect HTTP metrics
 --------------------
 
-To enable the collection of HTTP metrics, you need to create a collector first.
+To enable the collection of HTTP metrics, you need wrap handler to function
+``metrics.http_middleware.v1``:
 
 ..  code-block:: lua
 
+    local metrics = require('metrics')
     local httpd = require('http.server').new(ip, port)
 
     -- Create a summary collector for latency
-    local collector = metrics.http_middleware.build_default_collector('summary')
+    local default_collector = metrics.http_middleware.build_default_collector('summary')
+    metrics.http_middleware.set_default_collector(default_collector)
 
     -- Set a route handler for latency summary collection
     httpd:route({ path = '/path-1', method = 'POST' }, metrics.http_middleware.v1(handler_1, collector))
@@ -71,6 +167,11 @@ To enable the collection of HTTP metrics, you need to create a collector first.
     -- Start HTTP routing
     httpd:start()
 
+.. hint::
+    By default, the ``http_middleware`` uses the ``histogram`` collector for backward compatibility reasons.
+    For collecting HTTP metrics, it's recommended to use ``summary``.
+
+
 You can collect all HTTP metrics with a single collector.
 If you're using the default
 :ref:`Grafana dashboard <monitoring-grafana_dashboard-page>`,
@@ -78,205 +179,164 @@ don't change the default collector name.
 Otherwise, your metrics won't appear on the charts.
 
 
-.. _monitoring-getting_started-instance_health_check:
+..  _monitoring-getting_started-custom_metric:
 
-Instance health check
----------------------
 
-In production environments, Tarantool Cartridge usually has a large number of so-called
-routers -- Tarantool instances that handle input load.
-Various load balancers help distribute that load evenly.
-However, any load balancer has to know
-which routers are ready to accept the load at the moment.
-The Tarantool metrics library has a special plugin that creates an HTTP handler,
-which the load balancer can use to check the current state of any Tarantool instance.
-If the instance is ready to accept the load, it will return a response with a 200 status code,
-and if not, with a 500 status code.
+Custom metric
+-------------
 
-.. _monitoring-getting_started-cartridge_role:
+You can create your own metric in two ways, depending on when you need to take measurements:
 
-Cartridge role
---------------
+- At an arbitrary moment in time
+- At the time of requesting the data collected by the metrics
 
-``cartridge.roles.metrics`` is a
-`Tarantool Cartridge <https://github.com/tarantool/cartridge>`__ role.
-It allows using default metrics in a Cartridge application and managing them
-via Cartridge configuration.
+Let's explore both options.
 
-**Usage**
+At a random moment
+~~~~~~~~~~~~~~~~~~
 
-#.  Add ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file.
+1. Declare the collector:
 
-    .. code-block:: lua
+..  code-block:: lua
 
-        dependencies = {
-            ...
-            'cartridge-metrics-role >= 0.1.0-1',
-            ...
+    local response_counter = metrics.counter('response_counter', 'Response counter')
+
+2. Take a measurement at the appropriate place, for example, in an API request handler:
+
+..  code-block:: lua
+
+    local function check_handler(request)
+        local label_pairs = {
+            path = request.path,
+            method = request.method,
         }
+        response_counter:inc(1, label_pairs)
+        -- ...
+    end
 
-    If you're using older version of metrics package, you need to add ``metrics`` package
-    instead of ``cartridge-metrics-role``.
 
-    .. code-block:: lua
+At the time of requesting the data collected by the metrics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        dependencies = {
-            ...
-            'metrics == 0.17.0-1',
-            ...
+1. Declare the collector:
+
+..  code-block:: lua
+
+    local other_custom_metric = metrics.gauge('other_custom_metric', 'Other custom metric')
+
+2. Take a measurement at the time of requesting the data collected by the metrics:
+
+..  code-block:: lua
+
+    metrics.register_callback(function()
+        -- ...
+        local label_pairs = {
+            category = category,
         }
+        other_custom_metric:set(current_value, label_pairs)
+    end)
 
-    Cartridge role is present in package versions from **0.3.0** to **0.17.0**.
+Full example
+~~~~~~~~~~~~
 
-#.  Make sure that ``cartridge.roles.metrics`` is included
-    in the roles list in ``cartridge.cfg``
-    in your entry point file (for example, ``init.lua``):
+Code:
 
-    .. code-block:: lua
+..  code-block:: lua
 
-        local ok, err = cartridge.cfg({
-            ...
-            roles = {
-                ...
-                'cartridge.roles.metrics',
-                ...
-            },
-        })
+    -- Import modules
+    local metrics = require('metrics')
+    local http_server = require('http.server')
+    local json_exporter = require('metrics.plugins.json')
 
-#.  To get metrics via API endpoints, use ``set_export``.
+    local response_counter = metrics.counter('response_counter', 'Response counter')
 
-    ..  note::
+    -- Define helper functions
+    local function http_metrics_handler(request)
+        return request:render({ text = json_exporter.export() })
+    end
 
-        ``set_export`` has lower priority than clusterwide configuration
-        and may be overridden by the metrics configuration.
+    local function check_handler(request)
+        local label_pairs = {
+            path = request.path,
+            method = request.method,
+        }
+        response_counter:inc(1, label_pairs)
+        return request:render({ text = 'ok' })
+    end
 
-    ..  code-block:: lua
+    -- Start the database
+    box.cfg{
+        listen = 3301,
+    }
 
-        local metrics = require('cartridge.roles.metrics')
-        metrics.set_export({
-            {
-                path = '/path_for_json_metrics',
-                format = 'json'
-            },
-            {
-                path = '/path_for_prometheus_metrics',
-                format = 'prometheus'
-            },
-            {
-                path = '/health',
-                format = 'health'
-            }
-        })
+    -- Configure the metrics module
+    metrics.set_global_labels{alias = 'my-tnt-app'}
 
-    You can add several endpoints of the same format with different paths.
-    For example:
+    -- Run the web server
+    local server = http_server.new('0.0.0.0', 8081)
+    server:route({path = '/metrics'}, http_metrics_handler)
+    server:route({path = '/check'}, check_handler)
+    server:start()
 
-    ..  code-block:: lua
+Result:
 
-        metrics.set_export({
-            {
-                path = '/path_for_json_metrics',
-                format = 'json'
-            },
-            {
-                path = '/another_path_for_json_metrics',
-                format = 'json'
-            },
-        })
+    ..  code-block:: json
 
-    The metrics will be available on the path specified in ``path``, in the format
-    specified in ``format``.
+    [
+      {
+        "label_pairs": {
+          "path": "/check",
+          "method": "GET",
+          "alias": "my-tnt-app"
+        },
+        "timestamp": 1688385933874080,
+        "metric_name": "response_counter",
+        "value": 1
+      }
+    ]
 
-#.  Since version **0.6.0**, the metrics role is permanent and enabled on instances by default.
-    If you use old version of metrics, you should enable the role in the interface:
+..  _monitoring-getting_started-warning:
+Warning
+-------
 
-    ..  image:: images/role-enable.png
-        :align: center
+You might want to add your own metric. The module allows this, but there are nuances when working with
+specific tools.
 
-#.  After the role has been initialized, the default metrics will be enabled
-    and the global label ``alias`` will be set.
-    **Note** that the ``alias`` label value is set by the ``alias`` or ``instance_name``
-    instance :ref:`configuration option <cartridge-config>` (since **0.6.1**).
+When adding your custom metric, it's important to ensure that the number of label value combinations is
+kept to a minimum. This is to prevent a "combinatorial explosion" in the database where metric data is
+stored. Examples of data labels:
 
-    You can use the functionality of any
-    metrics package by getting it as a Cartridge service
-    and calling it with ``require`` like a regular package:
+- Labels in Prometheus.
+- Tags in InfluxDB.
 
-    ..  code-block:: lua
+For example, if your company uses InfluxDB for metric collection, you could potentially disrupt the entire
+monitoring setup, both for your application and for all other systems within the company. As a result,
+monitoring data is likely to be lost.
 
-        local cartridge = require('cartridge')
-        local metrics = cartridge.service_get('metrics')
+Let's look at an example:
 
-#.  Since Tarantool Cartridge ``2.4.0``, you can set a zone for each
-    instance in the cluster. When a zone is set, all the metrics on the instance
-    receive the ``zone`` label.
+..  code-block:: lua
 
-#.  To change the HTTP path for a metric in **runtime**,
-    you can use the configuration below.
-    `Learn more about Cartridge configuration <https://www.tarantool.io/en/doc/latest/book/cartridge/cartridge_dev/#managing-role-specific-data>`_).
-    It is not recommended to set up the metrics role in this way. Use ``set_export`` instead.
+    local some_metric = metrics.counter('some', 'Some metric')
 
-    ..  code-block:: yaml
+    -- THIS IS POSSIBLE
+    local function on_value_update(instance_alias)
+       some_metric:inc(1, { alias = instance_alias })
+    end
 
-        metrics:
-          export:
-            - path: '/path_for_json_metrics'
-              format: 'json'
-            - path: '/path_for_prometheus_metrics'
-              format: 'prometheus'
-            - path: '/health'
-              format: 'health'
+    -- THIS IS NOT ALLOWED
+    local function on_value_update(customer_id)
+       some_metric:inc(1, { customer_id = customer_id })
+    end
 
-    ..  image:: images/role-config.png
-        :align: center
+In the example, there are two versions of the function ``on_value_update``. The top version labels
+the data with the cluster node's alias. Since there's a relatively small number of nodes, using
+them as labels is feasible. In the second case, an identifier of a record is used. If there are many
+records, it's advisable to avoid such situations.
 
-#.  You can set custom global labels with the following configuration:
+The same principle applies to URLs. Using the entire URL with parameters is not recommended; using a
+URL template or just the name of the command is a better approach. And so on.
 
-    ..  code-block:: yaml
-
-        metrics:
-          export:
-            - path: '/metrics'
-              format: 'json'
-          global-labels:
-            my-custom-label: label-value
-
-    Another option is to invoke the ``set_default_labels`` function in ``init.lua``:
-
-    ..  code-block:: lua
-
-        local metrics = require('cartridge.roles.metrics')
-        metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
-
-#.  You can use the configuration below to choose the default metrics to be exported.
-    If you add the include section, only the metrics from this section will be exported:
-
-    ..  code-block:: yaml
-
-        metrics:
-          export:
-            - path: '/metrics'
-              format: 'json'
-          # export only vinyl, luajit and memory metrics:
-          include:
-            - vinyl
-            - luajit
-            - memory
-
-    If you add the exclude section,
-    the metrics from this section will be removed from the default metrics list:
-
-    ..  code-block:: yaml
-
-        metrics:
-          export:
-            - path: '/metrics'
-              format: 'json'
-          # export all metrics except vinyl, luajit and memory:
-          exclude:
-            - vinyl
-            - luajit
-            - memory
-
-    For the full list of default metrics, check the
-    :ref:`API reference <metrics-api_reference-functions>`.
+In essence, when designing custom metrics and selecting labels or tags, it's crucial to opt for a minimal
+set of values that can uniquely identify the data without introducing unnecessary complexity or potential
+conflicts with existing metrics and systems.
