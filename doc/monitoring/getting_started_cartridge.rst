@@ -1,7 +1,7 @@
 .. _getting_started_cartridge:
 
-Cartridge application: getting started
-======================================
+Getting started with Cartridge application
+==========================================
 
 The ``metrics`` module is tightly integrated with
 the `Cartridge <https://www.tarantool.io/en/doc/latest/book/cartridge/>`__ framework.

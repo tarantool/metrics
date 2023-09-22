@@ -1,7 +1,7 @@
 ..  _monitoring-getting_started:
 
-Monitoring: getting started
-===========================
+Getting started with monitoring
+===============================
 
 If you use Tarantool version below `2.11.1 <https://github.com/tarantool/tarantool/releases/tag/2.11.1>`__,
 it is necessary to install the latest version of ``metrics`` first. For details,
@@ -59,37 +59,37 @@ Using the metrics module
         server:route({path = '/metrics'}, http_metrics_handler)
         server:start()
 
-#.  The metric values are now available via the ``http://localhost:8081/metrics`` URL:
+The metric values are now available via the ``http://localhost:8081/metrics`` URL:
 
-    ..  code-block:: json
+..  code-block:: json
 
-        [
-          {
-            "label_pairs": {
-              "alias": "my-instance"
-            },
-            "timestamp": 1679663602823779,
-            "metric_name": "tnt_vinyl_disk_index_size",
-            "value": 0
-          },
-          . . .
-          {
-            "label_pairs": {
-              "alias": "my-instance"
-            },
-            "timestamp": 1679663602823779,
-            "metric_name": "tnt_info_memory_data",
-            "value": 39272
-          },
-          {
-            "label_pairs": {
-              "alias": "my-instance"
-            },
-            "timestamp": 1679663602823779,
-            "metric_name": "tnt_election_vote",
-            "value": 0
-          }
-        ]
+    [
+      {
+        "label_pairs": {
+          "alias": "my-instance"
+        },
+        "timestamp": 1679663602823779,
+        "metric_name": "tnt_vinyl_disk_index_size",
+        "value": 0
+      },
+      . . .
+      {
+        "label_pairs": {
+          "alias": "my-instance"
+        },
+        "timestamp": 1679663602823779,
+        "metric_name": "tnt_info_memory_data",
+        "value": 39272
+      },
+      {
+        "label_pairs": {
+          "alias": "my-instance"
+        },
+        "timestamp": 1679663602823779,
+        "metric_name": "tnt_election_vote",
+        "value": 0
+      }
+    ]
 
 The data can be visualized in
 `Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
@@ -146,8 +146,9 @@ To enable the collection of HTTP metrics, wrap a handler with a ``metrics.http_m
 
 .. note::
 
-    By default, the ``http_middleware`` uses the ``histogram`` collector for backward compatibility reasons.
-    To collect HTTP metrics, use the ``summary`` type instead.
+    By default, the ``http_middleware`` uses the :ref:`histogram <metrics-api_reference-histogram>` collector
+    for backward compatibility reasons.
+    To collect HTTP metrics, use the :ref:`summary <metrics-api_reference-summary>` type instead.
 
 You can collect all HTTP metrics with a single collector.
 If you use the default
@@ -167,44 +168,44 @@ You can create your own metric in two ways, depending on when you need to take m
 
 To create custom metrics at any arbitrary moment of time, do the following:
 
-#. Create the collector:
+#.  Create the collector:
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    local response_counter = metrics.counter('response_counter', 'Response counter')
+        local response_counter = metrics.counter('response_counter', 'Response counter')
 
-#. Take a measurement at the appropriate place, for example, in an API request handler:
+#.  Take a measurement at the appropriate place, for example, in an API request handler:
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    local function check_handler(request)
-        local label_pairs = {
-            path = request.path,
-            method = request.method,
-        }
-        response_counter:inc(1, label_pairs)
-        -- ...
-    end
+        local function check_handler(request)
+            local label_pairs = {
+                path = request.path,
+                method = request.method,
+            }
+            response_counter:inc(1, label_pairs)
+            -- ...
+        end
 
-To create custom metrics when the data collected by metrics is requested, do the following
+To create custom metrics when the data collected by metrics is requested, do the following:
 
-#. Create the collector:
+#.  Create the collector:
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    local other_custom_metric = metrics.gauge('other_custom_metric', 'Other custom metric')
+        local other_custom_metric = metrics.gauge('other_custom_metric', 'Other custom metric')
 
-#. Take a measurement at the time of requesting the data collected by the metrics:
+#.  Take a measurement at the time of requesting the data collected by metrics:
 
-..  code-block:: lua
+    ..  code-block:: lua
 
-    metrics.register_callback(function()
-        -- ...
-        local label_pairs = {
-            category = category,
-        }
-        other_custom_metric:set(current_value, label_pairs)
-    end)
+        metrics.register_callback(function()
+            -- ...
+            local label_pairs = {
+                category = category,
+            }
+            other_custom_metric:set(current_value, label_pairs)
+        end)
 
 The full example is listed below:
 
@@ -247,7 +248,7 @@ The full example is listed below:
 
 The result looks in the following way:
 
-    ..  code-block:: json
+..  code-block:: json
 
     [
       {
@@ -267,15 +268,14 @@ The result looks in the following way:
 Possible limitations
 ~~~~~~~~~~~~~~~~~~~~
 
-The module allows to add your own metrics, but there are some subtleties when working with
-specific tools.
+The module allows to add your own metrics, but there are some subtleties when working with specific tools.
 
 When adding your custom metric, it's important to ensure that the number of label value combinations is
 kept to a minimum. Otherwise, combinatorial explosion may happen in the timeseries database with metrics values
 stored. Examples of data labels:
 
-*   Labels in Prometheus
-*   Tags in InfluxDB
+*   `Labels <https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels>`__ in Prometheus
+*   `Tags <https://docs.influxdata.com/influxdb/v1/concepts/glossary/#tag>`__ in InfluxDB
 
 For example, if your company uses InfluxDB for metric collection, you could potentially disrupt the entire
 monitoring setup, both for your application and for all other systems within the company. As a result,
