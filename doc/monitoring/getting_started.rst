@@ -7,7 +7,7 @@ If you use Tarantool version below `2.11.1 <https://github.com/tarantool/taranto
 it is necessary to install the latest version of ``metrics`` first. For details,
 see :ref:`Installing the metrics module <install>`.
 
-.. _monitoring-getting_started-how_to_use:
+.. _monitoring-getting_started-usage:
 
 Using the metrics module
 ------------------------
@@ -16,7 +16,6 @@ Using the metrics module
 
     The module is also used in applications based on the Cartridge framework. For details,
     see the :ref:`Getting started with Cartridge <getting_started_cartridge>` section.
-
 
 #.  First, set the instance name and start to collect the standard set of metrics.
     Also, you can set a global label for your instance.
@@ -32,8 +31,7 @@ Using the metrics module
         metrics.set_global_labels({alias = 'my-instance'})
         metrics.enable_default_metrics()
 
-
-#.  Add a handler to expose metric values.
+#.  Then, add a handler to expose metric values.
 
     For JSON format:
 
@@ -50,7 +48,6 @@ Using the metrics module
 
         local prometheus_exporter = require('metrics.plugins.prometheus').collect_http
 
-
     To learn how to extend metrics with custom data, check the :ref:`API reference <metrics-api_reference>`.
 
 #.  Start the HTTP server and expose metrics:
@@ -62,7 +59,7 @@ Using the metrics module
         server:route({path = '/metrics'}, http_metrics_handler)
         server:start()
 
-#.  In the end, you will be able to see the metric values by accessing the URL ``http://localhost:8081/metrics``:
+#.  The metric values are now available via the ``http://localhost:8081/metrics`` URL:
 
     ..  code-block:: json
 
@@ -97,11 +94,9 @@ Using the metrics module
 The data can be visualized in
 `Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
 
-.. _monitoring-getting_started-full_source_example:
+The full source example is listed below:
 
-Full source example:
-
-.. code-block:: lua
+..  code-block:: lua
 
     -- Import modules
     local metrics = require('metrics')
@@ -153,7 +148,6 @@ To enable the collection of HTTP metrics, wrap a handler with a ``metrics.http_m
 
     By default, the ``http_middleware`` uses the ``histogram`` collector for backward compatibility reasons.
     To collect HTTP metrics, use the ``summary`` type instead.
-
 
 You can collect all HTTP metrics with a single collector.
 If you use the default
@@ -212,7 +206,7 @@ To create custom metrics when the data collected by metrics is requested, do the
         other_custom_metric:set(current_value, label_pairs)
     end)
 
-The full example is listed below.
+The full example is listed below:
 
 ..  code-block:: lua
 
@@ -270,10 +264,10 @@ The result looks in the following way:
 
 ..  _monitoring-getting_started-warning:
 
-Warning
-~~~~~~~
+Possible limitations
+~~~~~~~~~~~~~~~~~~~~
 
-The module allows to add your own metrics, but there are nuances when working with
+The module allows to add your own metrics, but there are some subtleties when working with
 specific tools.
 
 When adding your custom metric, it's important to ensure that the number of label value combinations is
@@ -309,7 +303,7 @@ them as labels is feasible. In the second case, an identifier of a record is use
 records, it's recommended to avoid such situations.
 
 The same principle applies to URLs. Using the entire URL with parameters is not recommended.
-Use an URL template or the name of the command instead.
+Use a URL template or the name of the command instead.
 
 In essence, when designing custom metrics and selecting labels or tags, it's crucial to opt for a minimal
 set of values that can uniquely identify the data without introducing unnecessary complexity or potential

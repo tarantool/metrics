@@ -10,8 +10,8 @@ Installing the metrics module
 
 .. _install-rockspec:
 
-Installing metrics using the ``*.rockspec`` file
-------------------------------------------------
+Installing metrics using the *.rockspec file
+--------------------------------------------
 
 Usually, all dependencies are included in the ``*.rockspec`` file of the application.
 All dependencies are installed from this file. To do this:
@@ -49,7 +49,7 @@ To install only the ``metrics`` module, execute the following commands:
 
         $ cd ${PROJECT_ROOT}
 
-#. Install the missing dependencies:
+#.  Install the missing dependencies:
 
     .. code-block:: shell
 

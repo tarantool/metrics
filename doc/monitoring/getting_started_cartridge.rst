@@ -18,7 +18,7 @@ First, install the latest version of ``metrics``. For details,
 
 Also, you need to install the separate ``cartridge-metrics-role`` rock. To do this:
 
-#. Add the ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file:
+#.  Add the ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file:
 
     .. code-block:: lua
 
