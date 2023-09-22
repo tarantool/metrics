@@ -1,6 +1,6 @@
 .. _getting_started_cartridge:
 
-Getting started: Cartridge application
+Cartridge application: getting started
 ======================================
 
 The ``metrics`` module is tightly integrated with
@@ -15,7 +15,7 @@ Module setup
 ------------
 
 First, install the latest version of ``metrics``. For details,
-:ref:`check the installation guide <install-the_usual_way>`.
+:ref:`check the installation guide <install-rockspec>`.
 
 Also, you need to install the separate ``cartridge-metrics-role`` rock. To do this:
 

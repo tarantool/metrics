@@ -8,19 +8,17 @@ Installing the metrics module
     Since Tarantool version `2.11.1 <https://github.com/tarantool/tarantool/releases/tag/2.11.1>`__,
     the installation is not required.
 
-.. _install-the_usual_way:
+.. _install-rockspec:
 
-The usual way
--------------
+Installing metrics using the ``*.rockspec`` file
+------------------------------------------------
 
 Usually, all dependencies are included in the ``*.rockspec`` file of the application.
-All dependencies are installed from this file.
+All dependencies are installed from this file. To do this:
 
-This is done as follows:
+#.  Add the ``metrics`` module to the dependencies in the ``.rockspec`` file:
 
-#.  Add the ``metrics`` package to the dependencies in the ``.rockspec`` file:
-
-    .. code-block:: lua
+    ..  code-block:: lua
 
         dependencies = {
             ...
@@ -28,9 +26,9 @@ This is done as follows:
             ...
         }
 
-#. Install the missing dependencies:
+#.  Install the missing dependencies:
 
-    .. code-block:: shell
+    ..  code-block:: shell
 
         tt rocks make
         # OR #
@@ -38,14 +36,14 @@ This is done as follows:
         # OR #
         cartridge build
 
-.. _install-the_direct_way:
+.. _install-metrics_only:
 
-Direct way
-----------
+Installing the metrics module only
+----------------------------------
 
 To install only the ``metrics`` module, execute the following commands:
 
-#. Set current folder:
+#.  Set current folder:
 
     .. code-block:: shell
 
@@ -59,5 +57,5 @@ To install only the ``metrics`` module, execute the following commands:
         # OR #
         $ tarantoolctl rocks install metrics <version>
 
-    where ``version`` is the necessary version number. If omitted, then the version from the
+    where ``version`` -- the necessary version number. If omitted, then the version from the
     ``master`` branch is installed.
