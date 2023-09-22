@@ -4,9 +4,8 @@ Cartridge application: getting started
 ======================================
 
 The ``metrics`` module is tightly integrated with
-the `Cartridge <https://www.tarantool.io/en/doc/latest/book/cartridge/>`__ framework. To enable this
-integration, a permanent role called ``metrics`` has been introduced.
-
+the `Cartridge <https://www.tarantool.io/en/doc/latest/book/cartridge/>`__ framework.
+To enable this integration, a permanent role called ``metrics`` has been introduced.
 To enable this role, follow the steps below.
 
 .. _getting_started_cartridge-setup:
@@ -39,7 +38,7 @@ Also, you need to install the separate ``cartridge-metrics-role`` rock. To do th
         # OR #
         cartridge build
 
-Then, enable the ``cartridge.roles.metrics`` in the list of roles in ``cartridge.cfg``:
+After the ``cartridge-metrics-role`` installation, enable this package in the list of roles in ``cartridge.cfg``:
 
 .. code-block:: lua
 
@@ -51,12 +50,12 @@ Then, enable the ``cartridge.roles.metrics`` in the list of roles in ``cartridge
         },
     })
 
-After that, configure the metrics module in either of two ways:
+Then, configure the ``metrics`` module in either of two ways:
 
-*   add the ``metrics` configuration section to your cluster configuration;
+*   add the ``metrics`` configuration section to your cluster configuration;
 *   specify the configuration in the separate ``metrics.yml`` file.
 
-In the example below, specify the response format and the addresses at which the commands will be available:
+In the configuration, specify the response format and the addresses at which the commands are available:
 
 .. code-block:: yaml
 
@@ -77,10 +76,7 @@ Learn more about `Cartridge configuration <https://www.tarantool.io/en/doc/lates
     `set_export <https://www.tarantool.io/en/doc/latest/book/monitoring/api_reference/#lua-function.metrics.set_export>`__
     command.
 
-Result
-------
-
-Now, the commands' data is accessible at the following addresses:
+Now the commands' data is accessible at the following addresses:
 
 ..  code-block:: shell
 
@@ -93,14 +89,16 @@ where ``url:port`` -- the address and Cartridge HTTP port of a specific instance
 You can visualize the data in
 `Grafana dashboard <https://www.tarantool.io/en/doc/latest/book/monitoring/grafana_dashboard/#monitoring-grafana-dashboard-page>`__.
 
-After the role has been initialized, the default metrics will be enabled
-and the global label ``alias`` will be set.
-**Note** that the ``alias`` label value is set by the ``alias`` or ``instance_name``
-instance :ref:`configuration option <cartridge-config>` (since **0.6.1**).
+After the role has been initialized, the default metrics are enabled
+and the global ``alias`` label is set.
 
-You can use the functionality of any
-metrics package by getting it as a Cartridge service
-and calling it with ``require`` like a regular package:
+..  note::
+
+    Since **0.6.1**, the ``alias`` label value is set by the ``alias`` or ``instance_name``
+    instance :ref:`configuration option <cartridge-config>`.
+
+You can use the functionality of any metrics package.
+To do this, get the package as a Cartridge service and call it with the ``require()`` like a regular package:
 
 ..  code-block:: lua
 
@@ -123,9 +121,9 @@ If you use an old version of ``metrics``, you need to enable the role in the int
 Adding metrics to HTTP API commands of the application
 ------------------------------------------------------
 
-You can connect the standard metric ``http_server_request_latency`` to your application's HTTP API
+You can connect the standard ``http_server_request_latency`` metric to your application's HTTP API
 commands. This metric records the number of invocations and the total execution time (latency) of
-each individual command. To do this, wrap each API handler with
+each individual command. To connect this, wrap each API handler with
 the ``metrics.http_middleware.v1(...)`` function.
 
 Example:
@@ -157,7 +155,7 @@ add a dependency of this role on the role of ``metrics``:
         }
     }
 
-Now after the HTTP API calls ``hello`` at ``http://url:port/path_for_json_metrics``
+Now after the HTTP API calls ``hello`` at ``http://url:port/path_for_json_metrics``,
 new data on these calls is available:
 
 .. code-block:: json
@@ -193,11 +191,11 @@ it's :ref:`recommended <monitoring-getting_started-http_metrics_using_summary>` 
 Additional settings
 -------------------
 
-#.  Since Tarantool Cartridge ``2.4.0``, you can set a zone for each
+*   Since Tarantool Cartridge ``2.4.0``, you can set a zone for each
     instance in the cluster. When a zone is set, all the metrics on the instance
     receive the ``zone`` label.
 
-#.  You can set custom global labels with the following configuration:
+*   You can set custom global labels with the following configuration:
 
     ..  code-block:: yaml
 
@@ -215,7 +213,7 @@ Additional settings
         local metrics = require('cartridge.roles.metrics')
         metrics.set_default_labels({ ['my-custom-label'] = 'label-value' })
 
-#.  You can use the configuration below to choose the default metrics to be exported.
+*   You can use the configuration below to choose the default metrics to be exported.
     If you add the ``include`` section, only the metrics from this section will be exported:
 
     ..  code-block:: yaml
@@ -258,8 +256,7 @@ By default, the response of the health command contains a status code of
 * ``200`` -- if everything is okay,
 * ``500`` --  if the instance is unhealthy.
 
-You can set your own response
-format in the following way:
+You can set your own response format in the following way:
 
 .. code-block:: lua
 
