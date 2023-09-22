@@ -24,7 +24,7 @@ A collector represents one or more observations that change over time.
 counter
 ~~~~~~~
 
-A counter is a cumulative metrics that denotes a single monotonically increasing counter. Its value might only
+A counter is a cumulative metric that denotes a single monotonically increasing counter. Its value might only
 increase or be reset to zero on restart. For example, you can use a counter to represent the number of requests
 served, tasks completed, or errors.
 
@@ -145,14 +145,14 @@ The design is based on the `Prometheus gauge <https://prometheus.io/docs/concept
 histogram
 ~~~~~~~~~
 
-A histogram is used to collect and analyze
-statistical data about the distribution of values of a specific indicator within the application.
+A histogram metric is used to collect and analyze
+statistical data about the distribution of values within the application.
 Unlike metrics that only allow to track the average value or quantity of events, a histogram allows
-us to see a detailed picture of the distribution of values and uncover hidden dependencies.
+to see the distribution of values in detail and uncover hidden dependencies.
 
-Histograms are used in situations where we do not want or cannot store individual
-measurements (because there are too many of them), but aggregated information (in this case,
-the distribution of values across ranges) will be satisfying enough to understand the pattern.
+Suppose there are a lot of individual measurements that you don't want or can't store, and the
+aggregated information (the distribution of values across ranges) is enough to figure out the pattern.
+In this case, a histogram is used.
 
 Each histogram provides several measurements:
 
@@ -160,19 +160,18 @@ Each histogram provides several measurements:
 - sum of measured values (``_sum``)
 - distribution across buckets (``_bucket``)
 
-Consider the following problem: we want to know how often the observed value is in the specific range (bucket).
+Consider the following problem: you want to know how often the observed value is in the specific range (bucket).
 
 ..  image:: images/histogram-buckets.png
     :align: center
 
-For example, let observed values be 8, 7, 6, 8, 1, 7, 4, 8.
+For example, the observed values are 8, 7, 6, 8, 1, 7, 4, 8.
+Then, in the ranges:
 
-Thus, in the ranges:
-
-- From 0 to 2 inclusive, 1 measurement fell.
-- From 0 to 4 inclusive, 2 measurements fell.
-- From 0 to 6 inclusive, 3 measurements fell.
-- From 0 to infinity, 8 measurements fell (equal to the histogram_demo_count value).
+*   In the interval [0, 2], there is 1 measurement.
+*   In the interval [0, 4], there are 2 measurements.
+*   In the interval [0, 6], there are 3 measurements.
+*   In the interval [0, infinity], there are 8 measurements (equal to the ``histogram_demo_count`` value).
 
 ..  code-block:: json
 
@@ -239,8 +238,6 @@ The metric also displays the count of measurements and their sum:
 
 The design is based on the `Prometheus histogram <https://prometheus.io/docs/concepts/metric_types/#histogram>`__.
 
-**Usage**
-
 ..  function:: histogram(name [, help, buckets, metainfo])
 
     Register a new histogram.
@@ -299,37 +296,37 @@ The design is based on the `Prometheus histogram <https://prometheus.io/docs/con
 summary
 ~~~~~~~
 
-A summary metric is used for collecting statistical data
-about the distribution of values of a specific indicator within the application.
+A summary metric is used to collect statistical data
+about the distribution of values within the application.
 
 Each summary provides several measurements:
 
-- total count of measurements
-- sum of measured values
-- values at specific quantiles
+*   total count of measurements
+*   sum of measured values
+*   values at specific quantiles
 
 Similar to histograms, a summary also operates with value ranges. However, unlike histograms,
 it uses quantiles (defined by a number between 0 and 1) for this purpose. In this case,
-it is not required to define fixed boundaries like in histograms. Here ranges depend
+it is not required to define fixed boundaries. For summary type, the ranges depend
 on the measured values and the number of measurements.
 
-Let's sort the example series of measurements in ascending order:
+Suppose the example series of measurements are sorted in ascending order:
 1, 4, 6, 7, 7, 8, 8, 8.
 
-Thus:
+Quantiles:
 
-- Quantile 0 is the value of the first, minimum element. In this example, it's 1.
-- Quantile 1 is the value of the last, maximum element. In this example, it's 8.
-- Quantile 0.5 is the value of the median element. In this example, it's 7. This means that the smaller
-  half of our measurements gives a spread of values from 1 to 7. The larger one, from 7 to 8.
+*   Quantile 0 is the value of the first, minimum element. In this example, it's 1.
+*   Quantile 1 is the value of the last, maximum element. In this example, it's 8.
+*   Quantile 0.5 is the value of the median element. In this example, it's 7. This means that the smaller
+    half of the measurements is a range of values from 1 to 7. The larger one is a range of values from 7 to 8.
 
 Note that calculating quantiles requires resources, so it makes sense to calculate no
-more than one, for example: 0.95 - the majority of measurements.
+more than one, for example: 0.95 -- the majority of measurements.
 
-With a large number of measurements per second, a significant amount of memory would be required to
+With a large number of measurements per second, a significant amount of memory is required to
 store them all. The array is compressed to reduce memory consumption. The degree of compression is determined by
-an acceptable error rate. In application error rates mostly from 1% to 10%. This means that a
-quantile of 0.50 with a 10% error from the example above will return a value in the range of 6.65...7.35
+an acceptable error rate. In application, error rates mostly from 1% to 10%. This means that a
+quantile of 0.50 with a 10% error from the example above returns a value in the range of ``6.65...7.35`
 instead of 7.
 
 Additionally, a summary metric doesn't store values for the whole application's lifetime. This metric
@@ -339,8 +336,6 @@ uses a sliding window divided into sections (buckets) where measurements are sto
     :align: center
 
 Note that buckets in histograms and buckets in quantiles within summaries have different meanings.
-
-In conclusion:
 
 ..  code-block:: lua
 
@@ -360,8 +355,7 @@ In conclusion:
         }
     )
 
-A metric like the one provided in the example above returns the following measurements for
-the specified quantiles:
+The metric like in the example above returns the following measurements for the specified quantiles:
 
 ..  code-block:: json
 
@@ -393,7 +387,7 @@ the specified quantiles:
         "value": 8
       },
 
-It also exposes the count of measurements and the sum of observations:
+Also, the metric exposes the count of measurements and the sum of observations:
 
 ..  code-block:: json
 
@@ -415,8 +409,6 @@ It also exposes the count of measurements and the sum of observations:
       },
 
 The design is based on the `Prometheus summary <https://prometheus.io/docs/concepts/metric_types/#summary>`__.
-
-**Usage**
 
 ..  function:: summary(name [, help, objectives, params, metainfo])
 
