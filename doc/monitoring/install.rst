@@ -8,10 +8,10 @@ Installing the metrics module
     Since Tarantool version `2.11.1 <https://github.com/tarantool/tarantool/releases/tag/2.11.1>`__,
     the installation is not required.
 
-.. _install-rockspec:
+..  _install-rockspec:
 
-Installing metrics using the *.rockspec file
---------------------------------------------
+Installing metrics using the .rockspec file
+-------------------------------------------
 
 Usually, all dependencies are included in the ``*.rockspec`` file of the application.
 All dependencies are installed from this file. To do this:

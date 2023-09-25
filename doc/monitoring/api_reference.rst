@@ -326,8 +326,7 @@ more than one, for example: 0.95 -- the majority of measurements.
 With a large number of measurements per second, a significant amount of memory is required to
 store them all. The array is compressed to reduce memory consumption. The degree of compression is determined by
 an acceptable error rate. In application, error rates mostly from 1% to 10%. This means that a
-quantile of 0.50 with a 10% error from the example above returns a value in the range of ``6.65...7.35`
-instead of 7.
+quantile of 0.50 with a 10% error from the example above returns a value in the range of ``6.65...7.35`` instead of 7.
 
 Additionally, a summary metric doesn't store values for the whole application's lifetime. This metric
 uses a sliding window divided into sections (buckets) where measurements are stored.

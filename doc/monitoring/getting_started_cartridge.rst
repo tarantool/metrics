@@ -1,4 +1,4 @@
-.. _getting_started_cartridge:
+.. _metrics-getting_started_cartridge:
 
 Getting started with Cartridge application
 ==========================================
@@ -184,7 +184,7 @@ new data on these calls is available:
     },
 
 The default type for this metric is ``histogram``. However,
-it's :ref:`recommended <monitoring-getting_started-http_metrics_using_summary>` to use the ``summary`` type instead.
+it's :ref:`recommended <monitoring-getting_started-http_metrics>` to use the ``summary`` type instead.
 
 .. _getting_started_cartridge-advanced_settings:
 

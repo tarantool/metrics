@@ -7,7 +7,7 @@ If you use Tarantool version below `2.11.1 <https://github.com/tarantool/taranto
 it is necessary to install the latest version of ``metrics`` first. For details,
 see :ref:`Installing the metrics module <install>`.
 
-.. _monitoring-getting_started-usage:
+..  _monitoring-getting_started-usage:
 
 Using the metrics module
 ------------------------
@@ -15,7 +15,7 @@ Using the metrics module
 ..  note::
 
     The module is also used in applications based on the Cartridge framework. For details,
-    see the :ref:`Getting started with Cartridge <getting_started_cartridge>` section.
+    see the :ref:`Getting started with Cartridge application <metrics-getting_started_cartridge>` section.
 
 #.  First, set the instance name and start to collect the standard set of metrics.
     Also, you can set a global label for your instance.
@@ -72,7 +72,6 @@ The metric values are now available via the ``http://localhost:8081/metrics`` UR
         "metric_name": "tnt_vinyl_disk_index_size",
         "value": 0
       },
-      . . .
       {
         "label_pairs": {
           "alias": "my-instance"
