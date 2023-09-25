@@ -29,7 +29,7 @@ Library includes:
 
 ```bash
 cd ${PROJECT_ROOT}
-tarantoolctl rocks install metrics
+tt rocks install metrics
 ```
 
 ## Plugins export
