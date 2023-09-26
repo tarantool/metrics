@@ -21,13 +21,13 @@ Using the metrics module
 
     ..  code-block:: lua
 
-        metrics.cfg(labels = {alias = 'my-instance'})
+        metrics.cfg{labels = {alias = 'my-instance'}}
 
     When using a metrics module version below **0.17.0**, use the following snippet instead of ``metrics.cfg(...)``:
 
     ..  code-block:: lua
 
-        metrics.cfg{labels = {alias = 'my-instance'}}
+        metrics.set_global_labels({alias = 'my-instance'})
         metrics.enable_default_metrics()
 
 #.  Then, add a handler to expose metric values.
