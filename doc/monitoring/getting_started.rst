@@ -132,7 +132,7 @@ To enable the collection of HTTP metrics, wrap a handler with a ``metrics.http_m
     local httpd = require('http.server').new(ip, port)
 
     -- Create a summary collector for latency
-    local default_collector = metrics.http_middleware.configure_default_collector('summary')
+    metrics.http_middleware.configure_default_collector('summary')
 
     -- Set a route handler for latency summary collection
     httpd:route({ path = '/path-1', method = 'POST' }, metrics.http_middleware.v1(handler_1))
