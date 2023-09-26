@@ -34,8 +34,6 @@ Also, you need to install the separate ``cartridge-metrics-role`` rock. To do th
 
         tt rocks make
         # OR #
-        tarantoolctl rocks make
-        # OR #
         cartridge build
 
 After the ``cartridge-metrics-role`` installation, enable this package in the list of roles in ``cartridge.cfg``:

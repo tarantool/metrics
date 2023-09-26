@@ -32,8 +32,6 @@ All dependencies are installed from this file. To do this:
 
         tt rocks make
         # OR #
-        tarantoolctl rocks make
-        # OR #
         cartridge build
 
 .. _install-metrics_only:
@@ -51,11 +49,9 @@ To install only the ``metrics`` module, execute the following commands:
 
 #.  Install the missing dependencies:
 
-    .. code-block:: shell
+    ..  code-block:: shell
 
         $ tt rocks install metrics <version>
-        # OR #
-        $ tarantoolctl rocks install metrics <version>
 
     where ``version`` -- the necessary version number. If omitted, then the version from the
     ``master`` branch is installed.

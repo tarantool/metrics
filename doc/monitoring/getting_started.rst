@@ -17,8 +17,7 @@ Using the metrics module
     The module is also used in applications based on the Cartridge framework. For details,
     see the :ref:`Getting started with Cartridge application <metrics-getting_started_cartridge>` section.
 
-#.  First, set the instance name and start to collect the standard set of metrics.
-    Also, you can set a global label for your instance.
+#.  First, set the instance name and start to collect the standard set of metrics:
 
     ..  code-block:: lua
 
@@ -28,7 +27,7 @@ Using the metrics module
 
     ..  code-block:: lua
 
-        metrics.set_global_labels({alias = 'my-instance'})
+        metrics.cfg{labels = {alias = 'my-instance'}}
         metrics.enable_default_metrics()
 
 #.  Then, add a handler to expose metric values.
@@ -113,7 +112,7 @@ The full source example is listed below:
     }
 
     -- Configure the metrics module
-    metrics.cfg(labels = {alias = 'my-tnt-app'})
+    metrics.cfg{labels = {alias = 'my-tnt-app'}}
 
     -- Run the web server
     local server = http_server.new('0.0.0.0', 8081)
@@ -133,12 +132,11 @@ To enable the collection of HTTP metrics, wrap a handler with a ``metrics.http_m
     local httpd = require('http.server').new(ip, port)
 
     -- Create a summary collector for latency
-    local default_collector = metrics.http_middleware.build_default_collector('summary')
-    metrics.http_middleware.set_default_collector(default_collector)
+    local default_collector = metrics.http_middleware.configure_default_collector('summary')
 
     -- Set a route handler for latency summary collection
-    httpd:route({ path = '/path-1', method = 'POST' }, metrics.http_middleware.v1(handler_1, collector))
-    httpd:route({ path = '/path-2', method = 'GET' }, metrics.http_middleware.v1(handler_2, collector))
+    httpd:route({ path = '/path-1', method = 'POST' }, metrics.http_middleware.v1(handler_1))
+    httpd:route({ path = '/path-2', method = 'GET' }, metrics.http_middleware.v1(handler_2))
 
     -- Start HTTP routing
     httpd:start()
