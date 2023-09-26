@@ -8,7 +8,7 @@ the `Cartridge <https://www.tarantool.io/en/doc/latest/book/cartridge/>`__ frame
 To enable this integration, a permanent role called ``metrics`` has been introduced.
 To enable this role, follow the steps below.
 
-.. _getting_started_cartridge-setup:
+..  _getting_started_cartridge-setup:
 
 Module setup
 ------------
@@ -20,7 +20,7 @@ Also, you need to install the separate ``cartridge-metrics-role`` rock. To do th
 
 #.  Add the ``cartridge-metrics-role`` package to the dependencies in the ``.rockspec`` file:
 
-    .. code-block:: lua
+    ..  code-block:: lua
 
         dependencies = {
             ...
@@ -30,17 +30,15 @@ Also, you need to install the separate ``cartridge-metrics-role`` rock. To do th
 
 #.  Next, install the missing dependencies:
 
-    .. code-block:: shell
+    ..  code-block:: shell
 
         tt rocks make
-        # OR #
-        tarantoolctl rocks make
         # OR #
         cartridge build
 
 After the ``cartridge-metrics-role`` installation, enable this package in the list of roles in ``cartridge.cfg``:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local ok, err = cartridge.cfg({
         roles = {
@@ -57,7 +55,7 @@ Then, configure the ``metrics`` module in either of two ways:
 
 In the configuration, specify the response format and the addresses at which the commands are available:
 
-.. code-block:: yaml
+..  code-block:: yaml
 
     metrics:
       export:
@@ -105,7 +103,7 @@ To do this, get the package as a Cartridge service and call it with the ``requir
     local cartridge = require('cartridge')
     local metrics = cartridge.service_get('metrics')
 
-.. _getting_started_cartridge-if_we_use_old_version:
+..  _getting_started_cartridge-if_we_use_old_version:
 
 Additional steps for older versions of the metrics module
 ---------------------------------------------------------
@@ -116,7 +114,7 @@ If you use an old version of ``metrics``, you need to enable the role in the int
 ..  image:: images/role-enable.png
     :align: center
 
-.. _getting_started_cartridge-add_metrics_to_http_api_command:
+..  _getting_started_cartridge-add_metrics_to_http_api_command:
 
 Adding metrics to HTTP API commands of the application
 ------------------------------------------------------
@@ -128,7 +126,7 @@ the ``metrics.http_middleware.v1(...)`` function.
 
 Example:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local cartridge = require('cartridge')
     local server = cartridge.service_get('httpd') -- get the HTTP server module
@@ -145,7 +143,7 @@ Example:
 When calling the ``cartridge.service_get('metrics')`` command as an application (usually in a router),
 add a dependency of this role on the role of ``metrics``:
 
-.. code-block:: lua
+..  code-block:: lua
 
     return {
         ...
@@ -158,7 +156,7 @@ add a dependency of this role on the role of ``metrics``:
 Now after the HTTP API calls ``hello`` at ``http://url:port/path_for_json_metrics``,
 new data on these calls is available:
 
-.. code-block:: json
+..  code-block:: json
 
     {
         "label_pairs": {
@@ -258,7 +256,7 @@ By default, the response of the health command contains a status code of
 
 You can set your own response format in the following way:
 
-.. code-block:: lua
+..  code-block:: lua
 
     local health = require('cartridge.health')
     local metrics = cartridge.service_get('metrics')
