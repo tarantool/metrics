@@ -296,19 +296,14 @@ g.test_labels_serializer_consistent = function()
     -- trying to set unexpected label.
     t.assert_error_msg_contains('Label "new_label" is unexpected', function() wrapped.new_label = "123456" end)
 
-    -- must result in error, as "le" label is not precached, but is added during hist:observe.
-    local hist = metrics.histogram('hist', 'test histogram', {2})
-    t.assert_error_msg_contains('Label "le" is unexpected', function() hist:observe(3, wrapped) end)
-
-    -- after we add the needed key, hist:observe should work.
-    table.insert(label_keys, "le")
+    -- check that builtin metrics work.
     local hist_serializer = metrics.labels_serializer(label_keys)
-    local hist2 = metrics.histogram('hist2', 'test histogram 2', {2})
+    local hist = metrics.histogram('hist', 'test histogram', {2})
 
-    hist2:observe(3, hist_serializer.wrap(table.copy(label_pairs)))
-    local state = table.deepcopy(hist2)
-    hist2:observe(3, label_pairs)
+    hist:observe(3, hist_serializer.wrap(table.copy(label_pairs)))
+    local state = table.deepcopy(hist)
+    hist:observe(3, label_pairs)
 
-    t.assert_equals(hist2.observations, state.observations)
-    t.assert_equals(hist2.label_pairs, state.label_pairs)
+    t.assert_equals(hist.observations, state.observations)
+    t.assert_equals(hist.label_pairs, state.label_pairs)
 end

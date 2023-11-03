@@ -134,8 +134,7 @@ end
 --- This function gives you ready-to-use serializer, so you don't have to create one yourself.
 ---
 --- BEWARE! If keys of the `label_pairs` somehow change between serialization turns, it would raise error mostlikely.
---- Therefore, it's important to understand full scope of needed fields. For instance, for histogram:observe,
---- an additional label 'le' is always needed.
+--- We cover internal cases already, for example, "le" key is always added for the histograms.
 ---
 --- @class LabelsSerializer
 --- @field wrap function(label_pairs: table): table Wraps given `label_pairs` with an efficient serialization.
@@ -145,6 +144,8 @@ end
 --- @param labels_keys string[] Label keys for the further use.
 --- @return LabelsSerializer
 local function labels_serializer(labels_keys)
+    -- we always add keys that are needed for metrics' internals.
+    table.insert(labels_keys, "le")
     table.sort(labels_keys)
 
     -- used to protect label_pairs from altering with unexpected keys.
