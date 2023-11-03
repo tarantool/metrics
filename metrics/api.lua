@@ -147,7 +147,7 @@ end
 local function labels_serializer(labels_keys)
     table.sort(labels_keys)
 
-    -- used to protect label_pairs from altering.
+    -- used to protect label_pairs from altering with unexpected keys.
     local keys_index = {}
     for _, key in ipairs(labels_keys) do
         keys_index[key] = true
@@ -155,11 +155,14 @@ local function labels_serializer(labels_keys)
 
     local function serialize(label_pairs)
         local result = ""
-        for idx, label in ipairs(labels_keys) do
-            if idx ~= 1 then
-                result = result .. '\t'
+        for _, label in ipairs(labels_keys) do
+            local value = label_pairs[label]
+            if value ~= nil then
+                if result ~= "" then
+                    result = result .. '\t'
+                end
+                result = result .. label .. '\t' .. value
             end
-            result = result .. label .. '\t' .. label_pairs[label]
         end
         return result
     end
@@ -175,7 +178,7 @@ local function labels_serializer(labels_keys)
             if not keys_index[key] then
                 error(('Label "%s" is unexpected'):format(key), 2)
             end
-            table[key] = value
+            rawset(table, key, value)
         end
     }
 

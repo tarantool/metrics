@@ -5,6 +5,7 @@ local g = t.group('collectors')
 
 local metrics = require('metrics')
 local utils = require('test.utils')
+local json = require("json")
 
 g.before_all(utils.create_server)
 g.after_all(utils.drop_server)
@@ -295,4 +296,20 @@ g.test_labels_serializer_consistent = function()
 
     -- trying to set unexpected label.
     t.assert_error_msg_contains('Label "new_label" is unexpected', function() wrapped.new_label = "123456" end)
+
+    -- must result in error, as "le" label is not precached, but is added during hist:observe.
+    local hist = metrics.histogram('hist', 'test histogram', {2})
+    t.assert_error_msg_contains('Label "le" is unexpected', function() hist:observe(3, wrapped) end)
+
+    -- after we add the needed key, hist:observe should work.
+    table.insert(label_keys, "le")
+    local serializer = metrics.labels_serializer(label_keys)
+    local hist = metrics.histogram('hist2', 'test histogram 2', {2})
+
+    hist:observe(3, serializer.wrap(table.copy(label_pairs)))
+    local state = table.deepcopy(hist)
+    hist:observe(3, label_pairs)
+
+    t.assert_equals(hist.observations, state.observations)
+    t.assert_equals(hist.label_pairs, state.label_pairs)
 end
