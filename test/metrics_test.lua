@@ -291,7 +291,7 @@ g.test_labels_serializer_consistent = function()
 
     t.assert_equals(actual, shared.make_key(label_pairs))
     t.assert_equals(actual, shared.make_key(wrapped))
-    t.assert_not_equals(wrapped.__metrics_make_key, nil)
+    t.assert_not_equals(wrapped.__metrics_serialize, nil)
 
     -- trying to set unexpected label.
     t.assert_error_msg_contains('Label "new_label" is unexpected', function() wrapped.new_label = "123456" end)

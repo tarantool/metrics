@@ -1,6 +1,7 @@
 local clock = require('clock')
 local fiber = require('fiber')
 local log = require('log')
+local serializers = require("metrics.serializers")
 
 local Shared = {}
 
@@ -48,15 +49,10 @@ function Shared.make_key(label_pairs)
         return ""
     end
     -- `label_pairs` provides its own serialization scheme, it must be used instead of default one.
-    if label_pairs.__metrics_make_key then
-        return label_pairs:__metrics_make_key()
+    if label_pairs.__metrics_serialize then
+        return label_pairs:__metrics_serialize()
     end
-    local parts = {}
-    for k, v in pairs(label_pairs) do
-        table.insert(parts, k .. '\t' .. v)
-    end
-    table.sort(parts)
-    return table.concat(parts, '\t')
+    return serializers.default_labels_serializer(label_pairs)
 end
 
 function Shared:remove(label_pairs)
