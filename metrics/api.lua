@@ -145,18 +145,22 @@ end
 --- @return LabelsSerializer
 local function labels_serializer(labels_keys)
     -- we always add keys that are needed for metrics' internals.
-    table.insert(labels_keys, "le")
-    table.sort(labels_keys)
-
+    local __labels_keys = { "le" }
     -- used to protect label_pairs from altering with unexpected keys.
-    local keys_index = {}
+    local keys_index = { le = true }
+
+    -- keep only unique labels
     for _, key in ipairs(labels_keys) do
-        keys_index[key] = true
+        if not keys_index[key] then
+            table.insert(__labels_keys, key)
+            keys_index[key] = true
+        end
     end
+    table.sort(__labels_keys)
 
     local function serialize(label_pairs)
         local result = ""
-        for _, label in ipairs(labels_keys) do
+        for _, label in ipairs(__labels_keys) do
             local value = label_pairs[label]
             if value ~= nil then
                 if result ~= "" then
