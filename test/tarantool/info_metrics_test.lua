@@ -93,3 +93,26 @@ g.test_election = function(cg)
         t.assert_type(tnt_election_term[1].value, 'number')
     end)
 end
+
+g.test_election_leader_idle = function(cg)
+    t.skip_if(utils.is_version_less(_TARANTOOL, '2.10.0'),
+        'Tarantool version is must be v2.10.0 or greater')
+
+    cg.server:exec(function()
+        box.cfg{election_mode = 'candidate'}
+        local metrics = require('metrics')
+        local info = require('metrics.tarantool.info')
+        local utils = require('test.utils') -- luacheck: ignore 431
+
+        metrics.enable_default_metrics()
+        info.update()
+        local default_metrics = metrics.collect()
+
+        local tnt_election_leader_idle = utils.find_metric(
+            'tnt_election_leader_idle', default_metrics
+        )
+        t.assert(tnt_election_leader_idle)
+        t.assert_type(tnt_election_leader_idle[1].value, 'number')
+        box.cfg{election_mode = 'off'}
+    end)
+end
