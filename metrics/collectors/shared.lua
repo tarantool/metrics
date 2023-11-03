@@ -47,6 +47,10 @@ function Shared.make_key(label_pairs)
     if type(label_pairs) ~= 'table' then
         return ""
     end
+    -- `label_pairs` provides its own serialization scheme, it must be used instead of default one.
+    if label_pairs.__metrics_make_key then
+        return label_pairs:__metrics_make_key()
+    end
     local parts = {}
     for k, v in pairs(label_pairs) do
         table.insert(parts, k .. '\t' .. v)

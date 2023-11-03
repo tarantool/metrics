@@ -269,3 +269,30 @@ g.test_deprecated_version = function(cg)
         "use require%('metrics'%)._VERSION instead."
     t.assert_not_equals(cg.server:grep_log(warn), nil)
 end
+
+g.test_labels_serializer_consistent = function()
+    local shared = require("metrics.collectors.shared")
+
+    local label_pairs = {
+        abc = 123,
+        cba = "123",
+        cda  = 0,
+        eda = -1,
+        acb = 456
+    }
+    local label_keys = {}
+    for key, _ in pairs(label_pairs) do
+        table.insert(label_keys, key)
+    end
+
+    local serializer = metrics.labels_serializer(label_keys)
+    local actual = serializer.serialize(label_pairs)
+    local wrapped = serializer.wrap(table.copy(label_pairs))
+
+    t.assert_equals(actual, shared.make_key(label_pairs))
+    t.assert_equals(actual, shared.make_key(wrapped))
+    t.assert_not_equals(wrapped.__metrics_make_key, nil)
+
+    -- trying to set unexpected label.
+    t.assert_error_msg_contains('Label "new_label" is unexpected', function() wrapped.new_label = "123456" end)
+end
