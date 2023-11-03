@@ -143,7 +143,7 @@ end
 --- Exposed so you can write your own serializers on top of it.
 ---
 --- @param labels_keys string[] Label keys for the further use.
---- @return LabelsSerializer 
+--- @return LabelsSerializer
 local function labels_serializer(labels_keys)
     table.sort(labels_keys)
 

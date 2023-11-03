@@ -5,7 +5,6 @@ local g = t.group('collectors')
 
 local metrics = require('metrics')
 local utils = require('test.utils')
-local json = require("json")
 
 g.before_all(utils.create_server)
 g.after_all(utils.drop_server)
@@ -303,13 +302,13 @@ g.test_labels_serializer_consistent = function()
 
     -- after we add the needed key, hist:observe should work.
     table.insert(label_keys, "le")
-    local serializer = metrics.labels_serializer(label_keys)
-    local hist = metrics.histogram('hist2', 'test histogram 2', {2})
+    local hist_serializer = metrics.labels_serializer(label_keys)
+    local hist2 = metrics.histogram('hist2', 'test histogram 2', {2})
 
-    hist:observe(3, serializer.wrap(table.copy(label_pairs)))
-    local state = table.deepcopy(hist)
-    hist:observe(3, label_pairs)
+    hist2:observe(3, hist_serializer.wrap(table.copy(label_pairs)))
+    local state = table.deepcopy(hist2)
+    hist2:observe(3, label_pairs)
 
-    t.assert_equals(hist.observations, state.observations)
-    t.assert_equals(hist.label_pairs, state.label_pairs)
+    t.assert_equals(hist2.observations, state.observations)
+    t.assert_equals(hist2.label_pairs, state.label_pairs)
 end
