@@ -91,6 +91,12 @@ local function update_info_metrics()
         collectors_list.election_term =
             utils.set_gauge('election_term', 'Current election term',
                 info.election.term, nil, nil, {default = true})
+
+        if info.election.leader_idle ~= nil then
+            collectors_list.election_leader_idle =
+                utils.set_gauge('election_leader_idle', 'Current idle for elected leader',
+                    info.election.leader_idle, nil, nil, {default = true})
+        end
     end
 end
 

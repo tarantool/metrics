@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`metrics.cfg{include={'all'}}` can be used instead of `metrics.cfg{include='all'}`,
   `metrics.cfg{exclude={'all'}}` can be used instead of `metrics.cfg{include='none'}`)
 
+- `tnt_election_leader_idle` metric.
+
 ## [1.0.0] - 2023-05-22
 ### Changed
 

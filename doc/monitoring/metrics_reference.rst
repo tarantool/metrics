@@ -773,6 +773,9 @@ Shows the current state of a replica set node in regards to leader election.
         *   -   ``tnt_election_term``
             -   Current election term.
 
+        *   -   ``tnt_election_leader_idle``
+            -   Time in seconds since the last interaction with the known leader.
+
 Memtx
 -----
 
