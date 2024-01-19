@@ -1,6 +1,6 @@
 TTCTL := tt
 ifeq (,$(shell which tt 2>/dev/null))
-	TTCTL := tarantoolctl
+$(error tt is not found)
 endif
 
 .PHONY: rpm

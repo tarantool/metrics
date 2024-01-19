@@ -60,6 +60,12 @@ jobs:
       - name: 'Stop Mono server'
         run: sudo kill -9 $(sudo lsof -t -i tcp:8084) || true
 
+      - name: Setup tt
+        run: |
+          curl -L https://tarantool.io/release/2/installer.sh | sudo bash
+          sudo apt install -y tt
+          tt version
+
       - name: lint
         run: make lint
         env:
@@ -89,6 +95,12 @@ jobs:
       - uses: tarantool/setup-tarantool@v2
         with:
           tarantool-version: '2.10'
+
+      - name: Setup tt
+        run: |
+          curl -L https://tarantool.io/release/2/installer.sh | sudo bash
+          sudo apt install -y tt
+          tt version
 
       - uses: actions/setup-go@v3
         with:
