@@ -69,6 +69,8 @@ function export.configure_default_collector(...)
     export.set_default_collector(export.build_default_collector(...))
 end
 
+local labels_serializer = metrics_api.labels_serializer({ "path", "method", "status" })
+
 --- Measure latency and invoke collector with labels from given route
 --
 -- @tab collector
@@ -86,11 +88,11 @@ function export.observe(collector, route, handler, ...)
             error(('incorrect http handler for %s %s: expecting return response object'):
                 format(route.method, route.path), 0)
         end
-        return {
+        return labels_serializer.wrap({
             path = route.path,
             method = route.method,
             status = (not ok and 500) or result.status or 200,
-        }
+        })
     end, handler, ...)
 end
 
