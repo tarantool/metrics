@@ -52,7 +52,7 @@ function Histogram:observe(num, label_pairs)
         error("Histogram observation should be a number")
     end
     if not cdata_warning_logged and type(num) == 'cdata' then
-        log.warn("Using cdata as observation in historgam " ..
+        log.error("Using cdata as observation in historgam " ..
             "can lead to unexpected results. " ..
             "That log message will be an error in the future.")
         cdata_warning_logged = true

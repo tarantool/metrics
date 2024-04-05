@@ -5,6 +5,9 @@ local metrics = require('metrics')
 local Histogram = require('metrics.collectors.histogram')
 local utils = require('test.utils')
 
+g.before_all(utils.create_server)
+g.after_all(utils.drop_server)
+
 g.before_each(metrics.clear)
 
 g.test_unsorted_buckets_error = function()
@@ -96,6 +99,18 @@ g.test_insert_non_number = function()
     local h = metrics.histogram('hist', 'some histogram', {2, 4})
 
     t.assert_error_msg_contains('Histogram observation should be a number', h.observe, h, true)
+end
+
+g.test_insert_cdata = function(cg)
+    cg.server:exec(function()
+        local h = require('metrics').histogram('hist', 'some histogram', {2, 4})
+        t.assert_not(h:observe(0ULL))
+    end)
+
+    local warn = "Using cdata as observation in historgam " ..
+        "can lead to unexpected results. " ..
+        "That log message will be an error in the future."
+    t.assert_not_equals(cg.server:grep_log(warn), nil)
 end
 
 g.test_metainfo = function()
