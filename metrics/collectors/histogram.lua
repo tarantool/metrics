@@ -1,3 +1,5 @@
+local log = require('log')
+
 local Shared = require('metrics.collectors.shared')
 local Counter = require('metrics.collectors.counter')
 
@@ -42,10 +44,18 @@ function Histogram:set_registry(registry)
     self.bucket_collector:set_registry(registry)
 end
 
+local cdata_warning_logged = false
+
 function Histogram:observe(num, label_pairs)
     label_pairs = label_pairs or {}
     if num ~= nil and type(tonumber(num)) ~= 'number' then
         error("Histogram observation should be a number")
+    end
+    if not cdata_warning_logged and type(num) == 'cdata' then
+        log.error("Using cdata as observation in historgam " ..
+            "can lead to unexpected results. " ..
+            "That log message will be an error in the future.")
+        cdata_warning_logged = true
     end
 
     self.count_collector:inc(1, label_pairs)

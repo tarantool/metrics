@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `tnt_election_leader_idle` metric.
 
+- Histogram now logs a warning if `observe` is called with `cdata` value.
+
+### Deprecated
+
+- Using `cdata` values with `histogram:observe`.
+
 ## [1.0.0] - 2023-05-22
 ### Changed
 
