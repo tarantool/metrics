@@ -60,6 +60,13 @@ local function update()
         utils.set_gauge('vinyl_memory_bloom_filter', 'Size of bloom filter',
             vinyl_stat.memory.bloom_filter, nil, nil, {default = true})
 
+    if vinyl_stat.memory.tuple ~= nil then
+        collectors_list.vinyl_memory_tuple =
+            utils.set_gauge('vinyl_memory_tuple',
+                'Total size of memory in bytes occupied by Vinyl tuples',
+                vinyl_stat.memory.tuple, nil, nil, {default = true})
+    end
+
     collectors_list.vinyl_scheduler_tasks =
         utils.set_gauge('vinyl_scheduler_tasks', 'Vinyl tasks count',
             vinyl_stat.scheduler.tasks_inprogress, {status = 'inprogress'}, nil, {default = true})

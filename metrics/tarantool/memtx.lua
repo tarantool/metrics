@@ -122,6 +122,36 @@ local function update()
             'Number of retained `read_view` tuples / number of stories',
             memtx_stat.mvcc.tuples.read_view.retained.total, {kind = "total"}, nil, {default = true})
 
+    -- Tarantool 3.0 memory statistics
+
+    local ok, memtx_stat = pcall(box.stat.memtx)
+    if not ok then
+        return
+    end
+
+    collectors_list.memtx_tuples_data_total =
+        utils.set_gauge('memtx_tuples_data_total',
+            'Total amount of memory allocated for data tuples',
+            memtx_stat.data.total, nil, nil, {default = true})
+    collectors_list.memtx_tuples_data_read_view =
+        utils.set_gauge('memtx_tuples_data_read_view',
+            'Memory held for read views',
+            memtx_stat.data.read_view, {kind = "read_view"}, nil, {default = true})
+    collectors_list.memtx_tuples_data_garbage =
+        utils.set_gauge('memtx_tuples_data_garbage',
+            'Memory that is unused and scheduled to be freed',
+            memtx_stat.data.garbage, nil, nil, {default = true})
+
+
+    collectors_list.memtx_index_extents_total =
+        utils.set_gauge('memtx_index_extents_total',
+            'Total amount of memory allocated for indexing data',
+            memtx_stat.data.total, nil, nil, {default = true})
+    collectors_list.memtx_index_extents_read_view =
+        utils.set_gauge('memtx_index_extents_read_view',
+            'Memory held for read views',
+            memtx_stat.data.read_view, nil, nil, {default = true})
+
 end
 
 return {
