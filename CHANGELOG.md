@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Histogram now logs a warning if `observe` is called with `cdata` value.
 
+### Changed
+
+- Inconsistent metrics descrtiptions for memtx metrics.
+
 ### Deprecated
 
 - Using `cdata` values with `histogram:observe`.
