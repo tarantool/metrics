@@ -75,7 +75,8 @@ local function update()
             'Number of `tracking` tuples / number of tracking stories.',
             memtx_stat.mvcc.tuples.tracking.stories.count, {kind = "count"}, nil, {default = true})
     collectors_list.memtx_mvcc_tuples_tracking_stories =
-        utils.set_gauge('memtx_mvcc_tuples_tracking_stories', 'Number of `tracking` tuples / number of tracking stories.',
+        utils.set_gauge('memtx_mvcc_tuples_tracking_stories',
+            'Number of `tracking` tuples / number of tracking stories.',
             memtx_stat.mvcc.tuples.tracking.stories.total, {kind = "total"}, nil, {default = true})
 
     collectors_list.memtx_mvcc_tuples_tracking_retained =
