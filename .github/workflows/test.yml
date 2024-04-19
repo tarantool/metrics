@@ -42,9 +42,9 @@ jobs:
             cartridge: ""
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: tarantool/setup-tarantool@v2
+      - uses: tarantool/setup-tarantool@v3
         if: matrix.tarantool != '2.x-latest'
         with:
           tarantool-version: ${{ matrix.tarantool }}
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: packpack
         run: |
@@ -90,9 +90,9 @@ jobs:
     runs-on: ubuntu-20.04
     needs: test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: tarantool/setup-tarantool@v2
+      - uses: tarantool/setup-tarantool@v3
         with:
           tarantool-version: '2.10'
 
@@ -102,7 +102,7 @@ jobs:
           sudo apt install -y tt
           tt version
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
           go-version: '1.15'
 
