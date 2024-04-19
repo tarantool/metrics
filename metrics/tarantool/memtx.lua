@@ -125,7 +125,7 @@ local function update()
     -- Tarantool 3.0 memory statistics
 
     local ok, memtx_stat_3 = pcall(box.stat.memtx)
-    if not ok then
+    if not ok or memtx_stat_3.data == nil or memtx_stat_3.index == nil then
         return
     end
 
@@ -146,11 +146,11 @@ local function update()
     collectors_list.memtx_index_extents_total =
         utils.set_gauge('memtx_index_extents_total',
             'Total amount of memory allocated for indexing data',
-            memtx_stat_3.data.total, nil, nil, {default = true})
+            memtx_stat_3.index.total, nil, nil, {default = true})
     collectors_list.memtx_index_extents_read_view =
         utils.set_gauge('memtx_index_extents_read_view',
             'Memory held for read views',
-            memtx_stat_3.data.read_view, nil, nil, {default = true})
+            memtx_stat_3.index.read_view, nil, nil, {default = true})
 
 end
 
