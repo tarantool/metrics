@@ -985,11 +985,11 @@ Read view statistics
             -   Memory (in bytes) that is unused and scheduled to be freed
                 (freed lazily on memory allocation).
 
-        *   -   ``tnt_memtx_index_extents_total``
+        *   -   ``tnt_memtx_index_total``
             -   Total amount of memory (in bytes) allocated for indexing data.
-                This includes ``tnt_memtx_index_extents_read_view`` metric value
+                This includes ``tnt_memtx_index_read_view`` metric value
                 plus memory used for indexing tuples
                 that are actually stored in memtx spaces.
 
-        *   -   ``tnt_memtx_index_extents_read_view``
+        *   -   ``tnt_memtx_index_read_view``
             -   Memory (in bytes) held for read views.

@@ -143,8 +143,8 @@ local function update()
             memtx_stat_3.data.garbage, nil, nil, {default = true})
 
 
-    collectors_list.memtx_index_extents_total =
-        utils.set_gauge('memtx_index_extents_total',
+    collectors_list.memtx_index_total =
+        utils.set_gauge('memtx_index_total',
             'Total amount of memory allocated for indexing data',
             memtx_stat_3.index.total, nil, nil, {default = true})
     collectors_list.memtx_index_extents_read_view =
