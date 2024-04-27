@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Inconsistent metrics descrtiptions for memtx metrics.
 
+- New memory metrics:
+  - tnt_memtx_tuples_data_total
+  - tnt_memtx_tuples_data_read_view
+  - tnt_memtx_tuples_data_garbage
+  - tnt_memtx_index_total
+  - tnt_memtx_index_read_view
+  - tnt_vinyl_memory_tuple
+
 ### Deprecated
 
 - Using `cdata` values with `histogram:observe`.

@@ -63,3 +63,34 @@ g.test_memtx = function(cg)
         end
     end)
 end
+
+g.test_memtx_read_view = function(cg)
+    t.skip_if(utils.is_version_less(_TARANTOOL, '3.1.0'),
+        'Tarantool version is must be v3.1.0 or greater')
+
+    cg.server:exec(function()
+        local metrics = require('metrics')
+        local memtx = require('metrics.tarantool.memtx')
+        local utils = require('test.utils') -- luacheck: ignore 431
+
+        metrics.enable_default_metrics()
+        memtx.update()
+        local default_metrics = metrics.collect()
+        local log = require('log')
+
+        local metrics_list = {
+            'tnt_memtx_tuples_data_total',
+            'tnt_memtx_tuples_data_read_view',
+            'tnt_memtx_tuples_data_garbage',
+            'tnt_memtx_index_total',
+            'tnt_memtx_index_read_view',
+        }
+
+        for _, item in ipairs(metrics_list) do
+            log.info('checking metric: ' .. item)
+            local metric = utils.find_metric(item, default_metrics)
+            t.assert(metric)
+            t.assert_type(metric[1].value, 'number')
+        end
+    end)
+end

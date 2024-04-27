@@ -44,6 +44,10 @@ jobs:
             cartridge: "2.9.0"
           - tarantool: "2.11"
             cartridge: "2.10.0"
+          - tarantool: "3.0"
+            cartridge: ""
+          - tarantool: "3.1"
+            cartridge: ""
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4

@@ -665,6 +665,9 @@ The following metrics show state memory areas used by vinyl for caches and write
         *   -   ``tnt_vinyl_memory_bloom_filter``
             -   Amount of memory in bytes used by
                 :ref:`bloom filters <vinyl-lsm_disadvantages_compression_bloom_filters>`.
+        *   -   ``tnt_vinyl_memory_tuple``
+            -   Total size of memory in bytes occupied by Vinyl tuples.
+                It includes cached tuples and tuples pinned by the Lua world.
 
 ..  _metrics-reference-vinyl_scheduler:
 
@@ -956,3 +959,37 @@ So ``stories`` and ``retained`` need to be measured separately.
                     Number of retained ``tracking`` tuples / number of stories.
                 *   ``total``
                     Amount of bytes used by retained ``tracking`` tuples.
+
+
+~~~~~~~~~~~~~~~~~~~~
+Read view statistics
+~~~~~~~~~~~~~~~~~~~~
+
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_memtx_tuples_data_total``
+            -   Total amount of memory (in bytes) allocated for data tuples.
+                This includes ``tnt_memtx_tuples_data_read_view`` and
+                ``tnt_memtx_tuples_data_garbage`` metric values plus tuples that
+                are actually stored in memtx spaces.
+
+        *   -   ``tnt_memtx_tuples_data_read_view``
+            -   Memory (in bytes) held for read views.
+
+        *   -   ``tnt_memtx_tuples_data_garbage``
+            -   Memory (in bytes) that is unused and scheduled to be freed
+                (freed lazily on memory allocation).
+
+        *   -   ``tnt_memtx_index_total``
+            -   Total amount of memory (in bytes) allocated for indexing data.
+                This includes ``tnt_memtx_index_read_view`` metric value
+                plus memory used for indexing tuples
+                that are actually stored in memtx spaces.
+
+        *   -   ``tnt_memtx_index_read_view``
+            -   Memory (in bytes) held for read views.
