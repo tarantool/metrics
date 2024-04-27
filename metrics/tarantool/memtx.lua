@@ -147,8 +147,8 @@ local function update()
         utils.set_gauge('memtx_index_total',
             'Total amount of memory allocated for indexing data',
             memtx_stat_3.index.total, nil, nil, {default = true})
-    collectors_list.memtx_index_extents_read_view =
-        utils.set_gauge('memtx_index_extents_read_view',
+    collectors_list.memtx_index_read_view =
+        utils.set_gauge('memtx_index_read_view',
             'Memory held for read views',
             memtx_stat_3.index.read_view, nil, nil, {default = true})
 
