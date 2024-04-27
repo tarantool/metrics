@@ -136,7 +136,7 @@ local function update()
     collectors_list.memtx_tuples_data_read_view =
         utils.set_gauge('memtx_tuples_data_read_view',
             'Memory held for read views',
-            memtx_stat_3.data.read_view, {kind = "read_view"}, nil, {default = true})
+            memtx_stat_3.data.read_view, nil, nil, {default = true})
     collectors_list.memtx_tuples_data_garbage =
         utils.set_gauge('memtx_tuples_data_garbage',
             'Memory that is unused and scheduled to be freed',
