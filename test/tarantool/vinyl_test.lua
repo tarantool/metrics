@@ -31,8 +31,10 @@ g.test_vinyl_metrics_present = function(cg)
         if utils.is_version_less(_TARANTOOL, '2.8.3')
         and utils.is_version_greater(_TARANTOOL, '2.0.0') then
             t.assert_equals(metrics_cnt, 19)
-        else
+        elseif utils.is_version_less(_TARANTOOL, '3.0.0') then
             t.assert_equals(metrics_cnt, 20)
+        else
+            t.assert_equals(metrics_cnt, 21)
         end
     end)
 end
