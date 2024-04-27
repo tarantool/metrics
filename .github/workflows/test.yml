@@ -35,25 +35,22 @@ jobs:
           - tarantool: "2.10"
             cartridge: "2.7.9"
           - tarantool: "2.10"
-            cartridge: "2.8.4"
+            cartridge: "2.8.6"
           - tarantool: "2.11"
-            cartridge: "2.8.4"
+            cartridge: "2.8.6"
           - tarantool: "2.10"
             cartridge: ""
+          - tarantool: "2.11"
+            cartridge: "2.9.0"
+          - tarantool: "2.11"
+            cartridge: "2.10.0"
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
 
       - uses: tarantool/setup-tarantool@v3
-        if: matrix.tarantool != '2.x-latest'
         with:
           tarantool-version: ${{ matrix.tarantool }}
-
-      - name: Install latest pre-release Tarantool 2.x
-        if: matrix.tarantool == '2.x-latest'
-        run: |
-          curl -L https://tarantool.io/pre-release/2/installer.sh | bash
-          sudo apt-get -y install tarantool
 
       # Stop Mono server. This server starts and listens to 8084 port that is
       # used for tests.
@@ -88,13 +85,22 @@ jobs:
 
   promtool:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        tarantool:
+          - "2.11"
+        cartridge:
+          - "2.10.0"
+        include:
+          - tarantool: "3.1"
+            cartridge: ""
     needs: test
     steps:
       - uses: actions/checkout@v4
 
       - uses: tarantool/setup-tarantool@v3
         with:
-          tarantool-version: '2.10'
+          tarantool-version: ${{ matrix.tarantool }}
 
       - name: Setup tt
         run: |
@@ -108,7 +114,7 @@ jobs:
 
       - name: promtool test
         env:
-          CARTRIDGE_VERSION: '2.7.8'
+          CARTRIDGE_VERSION: ${{ matrix.cartridge }}
         run: |
           GO111MODULE=on go get github.com/prometheus/prometheus/cmd/promtool@a6be548dbc17780d562a39c0e4bd0bd4c00ad6e2
           make test_promtool
