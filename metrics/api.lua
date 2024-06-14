@@ -9,6 +9,8 @@ local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
 local Summary = require('metrics.collectors.summary')
 
+local serializers = require("metrics.serializers")
+
 local registry = rawget(_G, '__metrics_registry')
 if not registry then
     registry = Registry.new()
@@ -140,4 +142,5 @@ return {
     unregister_callback = unregister_callback,
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
+    labels_serializer = serializers.basic_labels_serializer
 }

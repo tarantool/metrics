@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `metrics.cfg{}` `"all"` metasection for array `include` and `exclude`
   (`metrics.cfg{include={'all'}}` can be used instead of `metrics.cfg{include='all'}`,
   `metrics.cfg{exclude={'all'}}` can be used instead of `metrics.cfg{include='none'}`)
+- Allow users to decide on labels serialization scheme themselves. Add `labels_serializer`, which provides alternative efficient labels serialization scheme.
 
 - `tnt_election_leader_idle` metric.
 
