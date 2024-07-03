@@ -566,6 +566,7 @@ Metrics functions
     *   ``cartridge_failover``
     *   ``clock``
     *   ``event_loop``
+    *   ``config``
 
     See :ref:`metrics reference <metrics-reference>` for details.
     All metric collectors from the collection have ``metainfo.default = true``.

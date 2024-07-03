@@ -23,6 +23,7 @@ local default_metrics = {
     cartridge_failover  = require('metrics.cartridge.failover'),
     clock               = require('metrics.tarantool.clock'),
     event_loop          = require('metrics.tarantool.event_loop'),
+    config              = require('metrics.tarantool.config'),
 }
 
 local all_metrics_map = {}

@@ -993,3 +993,21 @@ Read view statistics
 
         *   -   ``tnt_memtx_index_read_view``
             -   Memory (in bytes) held for read views.
+
+
+Tarantool configuration
+-----------------------
+
+These metrics are available starting from Tarantool 3.0.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_config_alerts``
+            -   Count of current instance :ref:`configuration apply alerts <config_api_reference_info>`.
+                ``{level="warn"}`` label covers warnings and
+                ``{level="error"}`` covers errors.
+                
