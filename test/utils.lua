@@ -3,6 +3,8 @@ local t = require('luatest')
 local fun = require('fun')
 local metrics = require('metrics')
 
+local luatest_utils = require('luatest.utils')
+
 local utils = {}
 
 function utils.create_server(g)
@@ -106,6 +108,11 @@ function utils.clear_spaces()
             v:drop()
         end
     end
+end
+
+function utils.is_tarantool_3_config_supported()
+    local tarantool_version = luatest_utils.get_tarantool_version()
+    return luatest_utils.version_ge(tarantool_version, luatest_utils.version(3, 0, 0))
 end
 
 -- Empty by default. Empty LUA_PATH satisfies built-in package tests.

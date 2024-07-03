@@ -36,4 +36,20 @@ function utils.delete_collectors(list)
     table.clear(list)
 end
 
+local function get_tarantool_version()
+    local version_parts = rawget(_G, '_TARANTOOL'):split('-', 3)
+
+    local major_minor_patch_parts = version_parts[1]:split('.', 2)
+    local major = tonumber(major_minor_patch_parts[1])
+    local minor = tonumber(major_minor_patch_parts[2])
+    local patch = tonumber(major_minor_patch_parts[3])
+
+    return major, minor, patch
+end
+
+function utils.is_tarantool3()
+    local major = get_tarantool_version()
+    return major == 3
+end
+
 return utils
