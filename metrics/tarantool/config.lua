@@ -16,6 +16,23 @@ local function get_config_alerts(config_info)
     return config_alerts
 end
 
+local function get_config_status(config_info)
+    -- See state diagram here
+    -- https://github.com/tarantool/doc/issues/3544#issuecomment-1866033480
+    local config_status = {
+        uninitialized = 0,
+        startup_in_progress = 0,
+        reload_in_progress = 0,
+        check_warnings = 0,
+        check_errors = 0,
+        ready = 0,
+    }
+
+    config_status[config_info.status] = 1
+
+    return config_status
+end
+
 local function update()
     if not utils.is_tarantool3() then
         return
@@ -34,6 +51,19 @@ local function update()
             'Tarantool 3 configuration alerts',
             count,
             {level = level},
+            nil,
+            {default = true}
+        )
+    end
+
+    local config_status = get_config_status(config_info)
+
+    for status, value in pairs(config_status) do
+        collectors_list.config_status = utils.set_gauge(
+            'config_status',
+            'Tarantool 3 configuration status',
+            value,
+            {status = status},
             nil,
             {default = true}
         )
