@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - New Tarantool 3 metrics:
   - tnt_config_alerts
+  - tnt_config_status
 
 ## [1.1.0] - 2024-05-17
 ### Added

@@ -1010,4 +1010,23 @@ These metrics are available starting from Tarantool 3.0.
             -   Count of current instance :ref:`configuration apply alerts <config_api_reference_info>`.
                 ``{level="warn"}`` label covers warnings and
                 ``{level="error"}`` covers errors.
+
+        *   -   ``tnt_config_status``
+            -   The status of current instance :ref:`configuration apply <config_api_reference_info>`.
+                ``status`` label contains possible status name.
+                Current status has metric value ``1``, inactive statuses have metric value ``0``.
+
+                ..  code-block:: none
+
+                    # HELP tnt_config_status Tarantool 3 configuration status
+                    # TYPE tnt_config_status gauge
+                    tnt_config_status{status="reload_in_progress",alias="router-001-a"} 0
+                    tnt_config_status{status="uninitialized",alias="router-001-a"} 0
+                    tnt_config_status{status="check_warnings",alias="router-001-a"} 0
+                    tnt_config_status{status="ready",alias="router-001-a"} 1
+                    tnt_config_status{status="check_errors",alias="router-001-a"} 0
+                    tnt_config_status{status="startup_in_progress",alias="router-001-a"} 0
+
+                For example, this set of metrics means that current configuration
+                for ``router-001-a`` status is ``ready``.
                 
