@@ -9,7 +9,7 @@ local function update_replicas_metrics()
 
     local current_box_info = box.info()
 
-    if box.cfg.read_only then
+    if current_box_info.ro then
         for k, v in pairs(current_box_info.vclock) do
             local replication_info = current_box_info.replication[k]
             if replication_info then
