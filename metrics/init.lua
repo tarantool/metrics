@@ -27,6 +27,7 @@ return setmetatable({
     unregister_callback = api.unregister_callback,
     invoke_callbacks = api.invoke_callbacks,
     set_global_labels = api.set_global_labels,
+    labels_serializer = api.labels_serializer,
     enable_default_metrics = tarantool.enable,
     cfg = cfg.cfg,
     http_middleware = http_middleware,
