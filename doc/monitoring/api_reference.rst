@@ -567,6 +567,7 @@ Metrics functions
     *   ``clock``
     *   ``event_loop``
     *   ``config``
+    *   ``cpu_extended``
 
     See :ref:`metrics reference <metrics-reference>` for details.
     All metric collectors from the collection have ``metainfo.default = true``.

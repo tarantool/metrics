@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- New metrics category in config: ``cpu_extended``.
+
 ### Fixed
 - Use box.info.ro instead of box.cfg.read_only in replication metrics.
 
