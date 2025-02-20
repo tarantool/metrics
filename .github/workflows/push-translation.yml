@@ -1,9 +1,10 @@
 name: Push translation sources
 
 on:
-  pull_request:
-    paths:
-      - 'doc/**/*'
+  workflow_dispatch # Temporarily switched off
+  # pull_request:
+  #   paths:
+  #     - 'doc/**/*'
 jobs:
   push-translation-sources:
     runs-on: ubuntu-20.04
