@@ -5,6 +5,7 @@ local utils = require('metrics.utils')
 local const = require('metrics.const')
 
 local default_metrics = {
+    -- category         = {update: function, list: table},
     network             = require('metrics.tarantool.network'),
     operations          = require('metrics.tarantool.operations'),
     system              = require('metrics.tarantool.system'),
@@ -24,6 +25,7 @@ local default_metrics = {
     clock               = require('metrics.tarantool.clock'),
     event_loop          = require('metrics.tarantool.event_loop'),
     config              = require('metrics.tarantool.config'),
+    cpu_extended        = require('metrics.psutils.cpu'),
 }
 
 local all_metrics_map = {}
