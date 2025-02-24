@@ -1,11 +1,12 @@
 name: Update translations on the main branch
 
 on:
-  push:
-    paths:
-      - 'doc/**/*'
-    branches:
-      - master
+  workflow_dispatch # Temporarily switched off
+  # push:
+  #   paths:
+  #     - 'doc/**/*'
+  #   branches:
+  #     - master
 jobs:
   autocommit-pot-files:
     runs-on: ubuntu-20.04
