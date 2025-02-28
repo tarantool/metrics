@@ -16,6 +16,7 @@ return setmetatable({
     counter = api.counter,
     gauge = api.gauge,
     histogram = api.histogram,
+    histogram_vec = api.histogram_vec,
     summary = api.summary,
 
     INF = const.INF,

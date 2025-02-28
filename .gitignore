@@ -18,3 +18,4 @@ doc/locale/en/
 
 build.luarocks
 packpack
+metrics-rs/target

@@ -1,0 +1,12 @@
+[package]
+name = "metrics_rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mlua = { version = "0.10.3", features = ["luajit", "module", "serialize"] }
+prometheus = "0.13.4"
+serde = { version = "1.0.218", features = ["derive"] }
+
+[lib]
+crate-type = ["cdylib"]
