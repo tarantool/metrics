@@ -44,6 +44,11 @@ update-pot:
 update-po:
 	sphinx-intl update -p doc/locale/en/ -d doc/locale/ -l "ru"
 
+bench: .rocks
+	$(TTCTL) rocks install --server https://moonlibs.org luabench 0.3.0
+	$(TTCTL) rocks install --server https://luarocks.org argparse 0.7.1
+	.rocks/bin/luabench -d 3s
+
 .PHONY: clean
 clean:
 	rm -rf .rocks

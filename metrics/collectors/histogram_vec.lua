@@ -1,6 +1,6 @@
 local Shared = require('metrics.collectors.shared')
 local HistogramVec = Shared:new_class('histogram', {})
-local rs = require('metrics.rs')
+local rust = require('metrics.rs')
 
 ---@param label_names string[]
 function HistogramVec:new(name, help, label_names, buckets, metainfo)
@@ -8,15 +8,11 @@ function HistogramVec:new(name, help, label_names, buckets, metainfo)
     local obj = Shared.new(self, name, help, metainfo)
 
     obj._label_names = label_names or {}
-    obj.inner = rs.new_histogram_vec({
+    obj.inner = rust.new_histogram_vec({
         name = name,
         help = help,
         buckets = buckets, -- can be nil
     }, obj._label_names)
-
-    obj._observe = obj.inner.observe
-    obj._collect = obj.inner.collect
-    obj._collect_str = obj.inner.collect_str
 
     return obj
 end
@@ -42,7 +38,6 @@ function HistogramVec:observe(value, label_pairs)
     if type(label_pairs) == 'table' then
         label_values = to_values(label_pairs, self._label_names)
     end
-    -- self._observe(self.inner, value, label_values)
     self.inner:observe(value, label_values)
 end
 
@@ -52,6 +47,7 @@ function HistogramVec:remove(label_pairs)
     self.inner:remove(label_values)
 end
 
+-- Fast collect
 function HistogramVec:collect_str()
     return self.inner:collect_str()
 end
