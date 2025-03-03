@@ -28,23 +28,26 @@ impl LuaHistogramVec {
             hopts = hopts.buckets(buckets);
         }
 
-        let label_names: Vec<String> = label_names.pairs()
+        let label_names: Vec<String> = label_names
+            .pairs()
             .map(|kv| -> LuaResult<String> {
-                let (_,v):(LuaValue, LuaString) = kv?;
+                let (_, v): (LuaValue, LuaString) = kv?;
                 Ok(v.to_string_lossy())
             })
             .collect::<LuaResult<Vec<_>>>()?;
 
         let label_names = label_names.iter().map(|s| &**s).collect::<Vec<&str>>();
 
-        let hist = Box::new(prometheus::HistogramVec::new(hopts, &label_names)
-            .map_err(mlua::Error::external)?
+        let hist = Box::new(
+            prometheus::HistogramVec::new(hopts, &label_names).map_err(mlua::Error::external)?,
         );
 
-        registry::register(hist.clone())
-            .map_err(mlua::Error::external)?;
+        registry::register(hist.clone()).map_err(mlua::Error::external)?;
 
-        Ok(Self { histogram_vec: hist, name })
+        Ok(Self {
+            histogram_vec: hist,
+            name,
+        })
     }
 
     pub fn observe(&self, value: f64, label_values: Option<Vec<String>>) -> LuaResult<()> {
@@ -56,7 +59,8 @@ impl LuaHistogramVec {
                 .map_err(mlua::Error::external)?
                 .observe(value);
         } else {
-            self.histogram_vec.get_metric_with_label_values(&[])
+            self.histogram_vec
+                .get_metric_with_label_values(&[])
                 .map_err(mlua::Error::external)?
                 .observe(value);
         }
@@ -67,7 +71,8 @@ impl LuaHistogramVec {
     pub fn remove(&mut self, lv: Vec<String>) -> LuaResult<()> {
         let label_values = lv.iter().map(|s| &**s).collect::<Vec<&str>>();
 
-        self.histogram_vec.remove_label_values(&label_values)
+        self.histogram_vec
+            .remove_label_values(&label_values)
             .map_err(mlua::Error::external)
     }
 
@@ -81,13 +86,16 @@ impl LuaHistogramVec {
         lua.create_string(result)
     }
 
-    pub fn collect(&self, lua: &Lua, global_values: Option<HashMap<String,String>>) -> LuaResult<LuaTable> {
+    pub fn collect(
+        &self,
+        lua: &Lua,
+        global_values: Option<HashMap<String, String>>,
+    ) -> LuaResult<LuaTable> {
         let result = lua.create_table()?;
         let mfs = self.histogram_vec.collect();
 
-        let pairs: Option<Vec<proto::LabelPair>> = global_values.map(|ref hmap|
-            hmap
-                .iter()
+        let pairs: Option<Vec<proto::LabelPair>> = global_values.map(|ref hmap| {
+            hmap.iter()
                 .map(|(k, v)| {
                     let mut label = proto::LabelPair::default();
                     label.set_name(k.to_string());
@@ -95,7 +103,7 @@ impl LuaHistogramVec {
                     label
                 })
                 .collect()
-        );
+        });
 
         for mut mf in mfs.into_iter() {
             if mf.get_metric().is_empty() {
@@ -126,16 +134,18 @@ impl LuaHistogramVec {
                     let k = pair.get_name();
                     let v = pair.get_value();
 
-                    let k = lua.create_string(&k)?;
-                    let v = lua.create_string(&v)?;
+                    let k = lua.create_string(k)?;
+                    let v = lua.create_string(v)?;
 
-                    labels.push((k,v));
+                    labels.push((k, v));
                 }
 
                 let h = metric.get_histogram();
 
                 let blabels = lua.create_table()?;
-                for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
+                for pair in labels.iter() {
+                    blabels.set(&pair.0, &pair.1)?
+                }
 
                 // firstly collect count
                 let lmetric = lua.create_table_with_capacity(0, 4)?;
@@ -165,7 +175,9 @@ impl LuaHistogramVec {
                     let upper_bound = b.get_upper_bound();
 
                     let blabels = lua.create_table()?;
-                    for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
+                    for pair in labels.iter() {
+                        blabels.set(&pair.0, &pair.1)?
+                    }
                     blabels.set("le", upper_bound)?;
 
                     lmetric.set("label_pairs", blabels)?;
@@ -183,7 +195,9 @@ impl LuaHistogramVec {
                     lmetric.set("timestamp", time)?;
 
                     let blabels = lua.create_table()?;
-                    for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
+                    for pair in labels.iter() {
+                        blabels.set(&pair.0, &pair.1)?
+                    }
                     blabels.set("le", "+Inf")?;
 
                     lmetric.set("label_pairs", blabels)?;
@@ -201,7 +215,10 @@ impl Drop for LuaHistogramVec {
         let histogram_vec = self.histogram_vec.clone();
         let r = registry::unregister(histogram_vec);
         if let Some(err) = r.err() {
-            eprintln!("[ERR] Failed to unregister LuaHistogramVec: {}: {}", self.name, err);
+            eprintln!(
+                "[ERR] Failed to unregister LuaHistogramVec: {}: {}",
+                self.name, err
+            );
         }
     }
 }
@@ -216,23 +233,27 @@ impl LuaUserData for LuaHistogramVec {
         methods.add_meta_method("__serialize", tostring);
         methods.add_meta_method("__tostring", tostring);
 
-        methods.add_method("collect_str", |lua: &Lua, this: &Self, ():()| {
+        methods.add_method("collect_str", |lua: &Lua, this: &Self, (): ()| {
             this.collect_str(lua)
         });
 
-        methods.add_method("collect", |lua: &Lua, this: &Self, global_values: Option<HashMap<String,String>>| {
-            this.collect(lua, global_values)
-        });
+        methods.add_method(
+            "collect",
+            |lua: &Lua, this: &Self, global_values: Option<HashMap<String, String>>| {
+                this.collect(lua, global_values)
+            },
+        );
 
         methods.add_method_mut("remove", |_, this: &mut Self, label_values: _| {
             this.remove(label_values)
         });
 
-        methods.add_method("observe", |_, this: &Self, (value, label_values):(_, _)| {
-            this.observe(value, label_values)
-        });
+        methods.add_method(
+            "observe",
+            |_, this: &Self, (value, label_values): (_, _)| this.observe(value, label_values),
+        );
 
-        methods.add_method("unregister", |_, this: &Self, ():()| {
+        methods.add_method("unregister", |_, this: &Self, (): ()| {
             let r = registry::unregister(this.histogram_vec.clone());
             if let Some(err) = r.err() {
                 return Err(mlua::Error::external(err));

@@ -1,11 +1,10 @@
-use std::cell::RefCell;
-use std::collections::{BTreeMap, HashMap, HashSet};
-use std::collections::hash_map::Entry as HEntry;
-use std::collections::btree_map::Entry as BEntry;
-use prometheus::core::Collector;
 use mlua::prelude::*;
+use prometheus::core::Collector;
 use prometheus::proto;
-
+use std::cell::RefCell;
+use std::collections::btree_map::Entry as BEntry;
+use std::collections::hash_map::Entry as HEntry;
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 /// A struct for registering Prometheus collectors, collecting their metrics, and gathering
 /// them into `MetricFamilies` for exposition.
@@ -19,11 +18,11 @@ pub struct Registry {
 }
 
 impl Registry {
-	pub fn set_labels(&mut self, labels: HashMap<String, String>) {
-		self.labels = Some(labels);
-	}
-	pub fn register(&mut self, c: Box<dyn Collector>) -> LuaResult<()> {
-		let mut desc_id_set = HashSet::new();
+    pub fn set_labels(&mut self, labels: HashMap<String, String>) {
+        self.labels = Some(labels);
+    }
+    pub fn register(&mut self, c: Box<dyn Collector>) -> LuaResult<()> {
+        let mut desc_id_set = HashSet::new();
         let mut collector_id: u64 = 0;
 
         for desc in c.desc() {
@@ -72,10 +71,10 @@ impl Registry {
             }
             HEntry::Occupied(_) => Err(mlua::Error::external(prometheus::Error::AlreadyReg)),
         }
-	}
+    }
 
-	pub fn unregister(&mut self, c: Box<dyn Collector>) -> LuaResult<()> {
-		let mut id_set = Vec::new();
+    pub fn unregister(&mut self, c: Box<dyn Collector>) -> LuaResult<()> {
+        let mut id_set = Vec::new();
         let mut collector_id: u64 = 0;
         for desc in c.desc() {
             if !id_set.iter().any(|id| *id == desc.id) {
@@ -99,10 +98,10 @@ impl Registry {
         // dim_hashes_by_name is left untouched as those must be consistent
         // throughout the lifetime of a program.
         Ok(())
-	}
+    }
 
-	pub fn gather(&self) -> Vec<proto::MetricFamily> {
-		let mut mf_by_name = BTreeMap::new();
+    pub fn gather(&self) -> Vec<proto::MetricFamily> {
+        let mut mf_by_name = BTreeMap::new();
 
         for c in self.collectors_by_id.values() {
             let mfs = c.collect();
@@ -187,11 +186,11 @@ impl Registry {
                 m
             })
             .collect()
-	}
+    }
 }
 
 thread_local! {
-	static DEFAULT_REGISTRY: RefCell<Registry> = RefCell::new(Registry::default());
+    static DEFAULT_REGISTRY: RefCell<Registry> = RefCell::new(Registry::default());
 }
 
 /// Registers a new [`Collector`] to be included in metrics collection. It
@@ -216,6 +215,6 @@ pub fn gather() -> Vec<proto::MetricFamily> {
     DEFAULT_REGISTRY.with_borrow(|r| r.gather())
 }
 
-pub fn set_labels(labels: HashMap<String,String>) {
+pub fn set_labels(labels: HashMap<String, String>) {
     DEFAULT_REGISTRY.with_borrow_mut(|r| r.set_labels(labels))
 }

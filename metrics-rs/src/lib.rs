@@ -1,19 +1,18 @@
-use std::collections::HashMap;
 use mlua::prelude::*;
+use std::collections::HashMap;
 
-mod registry;
 mod histogram_vec;
-use histogram_vec::{LuaHistogramVec, LuaHistogramOpts};
+mod registry;
+use histogram_vec::{LuaHistogramOpts, LuaHistogramVec};
 
 // creates new HistogramVec with given label_names
-fn new_histogram_vec(lua: &Lua, (opts, names):(LuaValue, LuaTable)) -> LuaResult<LuaHistogramVec> {
+fn new_histogram_vec(lua: &Lua, (opts, names): (LuaValue, LuaTable)) -> LuaResult<LuaHistogramVec> {
     let opts: LuaHistogramOpts = lua.from_value(opts)?;
-    LuaHistogramVec::new(opts, names)
-        .map_err(LuaError::external)
+    LuaHistogramVec::new(opts, names).map_err(LuaError::external)
 }
 
 // gathers all metrics registered in default prometheus::Registry
-fn gather(lua: &Lua, ():()) -> LuaResult<LuaString> {
+fn gather(lua: &Lua, (): ()) -> LuaResult<LuaString> {
     let mfs = registry::gather();
 
     let result = prometheus::TextEncoder::new()
