@@ -1,7 +1,7 @@
 local metrics = require('metrics')
 require('checks')
 
-local metrics_rs = require('metrics_rs')
+local rs = require('metrics.rs')
 
 local prometheus = {}
 
@@ -67,7 +67,7 @@ local function collect_and_serialize()
             end
         end
     end
-    local text = metrics_rs.gather(metrics.get_global_labels())
+    local text = rs.gather(metrics.get_global_labels())
     if text ~=  "" then
         table.insert(parts, text)
     end

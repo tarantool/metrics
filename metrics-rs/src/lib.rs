@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use mlua::prelude::*;
 
+mod registry;
 mod histogram_vec;
 use histogram_vec::{LuaHistogramVec, LuaHistogramOpts};
 
@@ -12,29 +13,8 @@ fn new_histogram_vec(lua: &Lua, (opts, names):(LuaValue, LuaTable)) -> LuaResult
 }
 
 // gathers all metrics registered in default prometheus::Registry
-fn gather(lua: &Lua, global_labels: Option<HashMap<String, String>>) -> LuaResult<LuaString> {
-    let mfs = prometheus::gather();
-
-    // if some global_labels given, add them to all metrics
-    if let Some(ref hmap) = global_labels {
-        let pairs: Vec<prometheus::proto::LabelPair> = hmap
-        .iter()
-        .map(|(k, v)| {
-            let mut label = prometheus::proto::LabelPair::default();
-            label.set_name(k.to_string());
-            label.set_value(v.to_string());
-            label
-        })
-        .collect();
-
-        for mut m in mfs.clone().into_iter() {
-            for metric in m.mut_metric().iter_mut() {
-                let mut labels: Vec<_> = metric.take_label().into();
-                labels.append(&mut pairs.clone());
-                metric.set_label(labels.into());
-            }
-        }
-    }
+fn gather(lua: &Lua, ():()) -> LuaResult<LuaString> {
+    let mfs = registry::gather();
 
     let result = prometheus::TextEncoder::new()
         .encode_to_string(&mfs)
@@ -43,6 +23,10 @@ fn gather(lua: &Lua, global_labels: Option<HashMap<String, String>>) -> LuaResul
     lua.create_string(result)
 }
 
+fn set_labels(_: &Lua, global_labels: HashMap<String, String>) -> LuaResult<()> {
+    registry::set_labels(global_labels);
+    Ok(())
+}
 
 #[mlua::lua_module]
 pub fn metrics_rs(lua: &Lua) -> LuaResult<LuaTable> {
@@ -50,6 +34,7 @@ pub fn metrics_rs(lua: &Lua) -> LuaResult<LuaTable> {
 
     r.set("new_histogram_vec", lua.create_function(new_histogram_vec)?)?;
     r.set("gather", lua.create_function(gather)?)?;
+    r.set("set_labels", lua.create_function(set_labels)?)?;
 
     Ok(r)
 }

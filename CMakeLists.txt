@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 
 project(metrics NONE)
 
+if(NOT DEFINED TARANTOOL_INSTALL_LIBDIR)
+    set(TARANTOOL_INSTALL_LIBDIR "${PROJECT_SOURCE_DIR}/.rocks/lib/tarantool")
+endif()
+
+add_subdirectory(metrics-rs)
+
 ## Install ####################################################################
 ###############################################################################
 

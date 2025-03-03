@@ -5,6 +5,8 @@ use prometheus::core::Collector;
 use prometheus::proto;
 use serde::{Deserialize, Serialize};
 
+use crate::registry;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LuaHistogramOpts {
     pub name: String,
@@ -39,7 +41,7 @@ impl LuaHistogramVec {
             .map_err(mlua::Error::external)?
         );
 
-        prometheus::register(hist.clone())
+        registry::register(hist.clone())
             .map_err(mlua::Error::external)?;
 
         Ok(Self { histogram_vec: hist, name })
@@ -132,6 +134,27 @@ impl LuaHistogramVec {
 
                 let h = metric.get_histogram();
 
+                let blabels = lua.create_table()?;
+                for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
+
+                // firstly collect count
+                let lmetric = lua.create_table_with_capacity(0, 4)?;
+                lmetric.set("value", h.get_sample_count())?;
+                lmetric.set("metric_name", &lcount_name)?;
+                lmetric.set("timestamp", time)?;
+                lmetric.set("label_pairs", &blabels)?; // blabels are shared between _count and _sum
+                result.raw_push(lmetric)?;
+
+                // secondly collect sum
+                let lmetric = lua.create_table_with_capacity(0, 4)?;
+                lmetric.set("metric_name", &lsum_name)?;
+                lmetric.set("timestamp", time)?;
+                lmetric.set("value", h.get_sample_sum())?;
+                lmetric.set("label_pairs", &blabels)?; // blabels are shared between _count and _sum
+                result.raw_push(lmetric)?;
+
+                // lastly collect buckets
+                let mut inf_seen = false;
                 for b in h.get_bucket() {
                     let lmetric = lua.create_table_with_capacity(0, 4)?;
                     lmetric.set("metric_name", &lbucket_name)?;
@@ -145,26 +168,27 @@ impl LuaHistogramVec {
                     for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
                     blabels.set("le", upper_bound)?;
 
-                    lmetric.set("labels", blabels)?;
+                    lmetric.set("label_pairs", blabels)?;
                     result.raw_push(lmetric)?;
+
+                    if b.get_upper_bound().is_infinite() {
+                        inf_seen = true;
+                    }
                 }
 
-                let blabels = lua.create_table()?;
-                for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
+                if !inf_seen {
+                    let lmetric = lua.create_table_with_capacity(0, 4)?;
+                    lmetric.set("metric_name", &lbucket_name)?;
+                    lmetric.set("value", h.get_sample_count())?;
+                    lmetric.set("timestamp", time)?;
 
-                let lmetric = lua.create_table_with_capacity(0, 4)?;
-                lmetric.set("value", h.get_sample_count())?;
-                lmetric.set("metric_name", &lcount_name)?;
-                lmetric.set("timestamp", time)?;
-                lmetric.set("labels", &blabels)?; // blabels are shared between _count and _sum
-                result.raw_push(lmetric)?;
+                    let blabels = lua.create_table()?;
+                    for pair in labels.iter() { blabels.set(&pair.0, &pair.1)? }
+                    blabels.set("le", "+Inf")?;
 
-                let lmetric = lua.create_table_with_capacity(0, 4)?;
-                lmetric.set("metric_name", &lsum_name)?;
-                lmetric.set("timestamp", time)?;
-                lmetric.set("value", h.get_sample_sum())?;
-                lmetric.set("labels", &blabels)?; // blabels are shared between _count and _sum
-                result.raw_push(lmetric)?;
+                    lmetric.set("label_pairs", blabels)?;
+                    result.raw_push(lmetric)?;
+                }
             }
         }
 
@@ -174,9 +198,10 @@ impl LuaHistogramVec {
 
 impl Drop for LuaHistogramVec {
     fn drop(&mut self) {
-        let r = prometheus::unregister(self.histogram_vec.clone());
+        let histogram_vec = self.histogram_vec.clone();
+        let r = registry::unregister(histogram_vec);
         if let Some(err) = r.err() {
-            eprintln!("Failed to unregister LuaHistogramVec: {}: {}", self.name, err);
+            eprintln!("[ERR] Failed to unregister LuaHistogramVec: {}: {}", self.name, err);
         }
     }
 }
@@ -206,5 +231,13 @@ impl LuaUserData for LuaHistogramVec {
         methods.add_method("observe", |_, this: &Self, (value, label_values):(_, _)| {
             this.observe(value, label_values)
         });
+
+        methods.add_method("unregister", |_, this: &Self, ():()| {
+            let r = registry::unregister(this.histogram_vec.clone());
+            if let Some(err) = r.err() {
+                return Err(mlua::Error::external(err));
+            }
+            Ok(())
+        })
     }
 }

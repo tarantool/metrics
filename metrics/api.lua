@@ -10,6 +10,8 @@ local Histogram = require('metrics.collectors.histogram')
 local Summary = require('metrics.collectors.summary')
 local HistogramVec = require('metrics.collectors.histogram_vec')
 
+local rs = require('metrics.rs')
+
 local registry = rawget(_G, '__metrics_registry')
 if not registry then
     registry = Registry.new()
@@ -133,6 +135,7 @@ local function set_global_labels(label_pairs)
     end
 
     registry:set_labels(label_pairs)
+    rs.set_labels(label_pairs)
 end
 
 local function get_global_labels()

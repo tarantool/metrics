@@ -22,6 +22,7 @@ build = {
     type = 'cmake',
     variables = {
         TARANTOOL_INSTALL_LUADIR = '$(LUADIR)',
+        TARANTOOL_INSTALL_LIBDIR = '$(LIBDIR)',
     },
 }
 

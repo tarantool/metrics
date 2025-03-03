@@ -10,3 +10,10 @@ serde = { version = "1.0.218", features = ["derive"] }
 
 [lib]
 crate-type = ["cdylib"]
+
+[profile.RelWithDebInfo]
+inherits = "release"
+debug = true
+
+[profile.Release]
+inherits = "release"

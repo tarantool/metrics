@@ -1,7 +1,6 @@
 local Shared = require('metrics.collectors.shared')
-local new_histogram_vec = require('metrics_rs').new_histogram_vec
-
 local HistogramVec = Shared:new_class('histogram', {})
+local rs = require('metrics.rs')
 
 ---@param label_names string[]
 function HistogramVec:new(name, help, label_names, buckets, metainfo)
@@ -9,7 +8,7 @@ function HistogramVec:new(name, help, label_names, buckets, metainfo)
     local obj = Shared.new(self, name, help, metainfo)
 
     obj._label_names = label_names or {}
-    obj.inner = new_histogram_vec({
+    obj.inner = rs.new_histogram_vec({
         name = name,
         help = help,
         buckets = buckets, -- can be nil
@@ -32,6 +31,13 @@ local function to_values(label_pairs, keys)
 end
 
 function HistogramVec:observe(value, label_pairs)
+    if value ~= nil then
+        value = tonumber(value)
+        if type(value) ~= 'number' then
+            error("Histogram observation should be a number")
+        end
+    end
+
     local label_values
     if type(label_pairs) == 'table' then
         label_values = to_values(label_pairs, self._label_names)
@@ -47,14 +53,20 @@ function HistogramVec:remove(label_pairs)
 end
 
 function HistogramVec:collect_str()
-    local global_labels = self:append_global_labels({})
-    return self.inner:collect_str(global_labels)
+    return self.inner:collect_str()
 end
 
 -- Slow collect
 function HistogramVec:collect()
-    local global_labels = self:append_global_labels({})
-    return self.inner:collect(global_labels)
+    return self.inner:collect()
+end
+
+function HistogramVec:unregister()
+    if self.registry then
+        self.registry:unregister(self)
+    end
+    self.inner:unregister()
+    self.inner = nil
 end
 
 return HistogramVec

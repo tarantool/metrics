@@ -7,9 +7,6 @@ endif
 rpm:
 	OS=el DIST=7 packpack/packpack
 
-.rocks/lib/tarantool/metrics_rs.dylib:
-	cd metrics-rs && cargo build --release && cp target/release/libmetrics_rs.dylib ../$@
-
 .rocks: metrics-scm-1.rockspec metrics/*.lua metrics/*/*.lua
 	$(TTCTL) rocks make
 	$(TTCTL) rocks install luatest 1.0.1
