@@ -14,8 +14,8 @@ package.loaded['test.utils'].LUA_PATH = root .. '/?.lua;' ..
     root .. '/.rocks/share/tarantool/?.lua;' ..
     root .. '/.rocks/share/tarantool/?/init.lua'
 
-package.loaded['test.utils'].LUA_CPATH = root .. '/.rocks/lib/tarantool/?.so;' ..
-    root .. '/.rocks/lib/tarantool/?.dylib'
+local ext = jit.os == 'OSX' and 'dylib' or 'so'
+package.loaded['test.utils'].LUA_CPATH = root .. '/.rocks/lib/tarantool/?.'..ext
 
 local t = require('luatest')
 local ok, cartridge_helpers = pcall(require, 'cartridge.test-helpers')

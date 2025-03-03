@@ -117,7 +117,7 @@ function utils.is_tarantool_3_config_supported()
 end
 
 -- Empty by default. Empty LUA_PATH satisfies built-in package tests.
--- For tarantool/metrics, LUA_PATH, LUA_CPATH is set up through test.helper
+-- For tarantool/metrics, LUA_PATH, LUA_CPATH are set up through test.helper
 utils.LUA_PATH = nil
 utils.LUA_CPATH = nil
 
