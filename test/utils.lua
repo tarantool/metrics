@@ -11,7 +11,8 @@ function utils.create_server(g)
     g.server = t.Server:new({
         alias = 'myserver',
         env = {
-            LUA_PATH = utils.LUA_PATH
+            LUA_PATH = utils.LUA_PATH,
+            LUA_CPATH = utils.LUA_CPATH,
         }
     })
     g.server:start{wait_until_ready = true}
@@ -116,7 +117,8 @@ function utils.is_tarantool_3_config_supported()
 end
 
 -- Empty by default. Empty LUA_PATH satisfies built-in package tests.
--- For tarantool/metrics, LUA_PATH is set up through test.helper
+-- For tarantool/metrics, LUA_PATH, LUA_CPATH is set up through test.helper
 utils.LUA_PATH = nil
+utils.LUA_CPATH = nil
 
 return utils
