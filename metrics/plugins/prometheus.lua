@@ -1,6 +1,8 @@
 local metrics = require('metrics')
 require('checks')
 
+local metrics_rs = require('metrics_rs')
+
 local prometheus = {}
 
 local function escape(str)
@@ -52,16 +54,22 @@ local function collect_and_serialize()
     metrics.invoke_callbacks()
     local parts = {}
     for _, c in pairs(metrics.collectors()) do
-        table.insert(parts, string.format("# HELP %s %s", c.name, c.help))
-        table.insert(parts, string.format("# TYPE %s %s", c.name, c.kind))
-        for _, obs in ipairs(c:collect()) do
-            local s = string.format('%s%s %s',
-                serialize_name(obs.metric_name),
-                serialize_label_pairs(obs.label_pairs),
-                serialize_value(obs.value)
-            )
-            table.insert(parts, s)
+        if not c.collect_str then
+            table.insert(parts, string.format("# HELP %s %s", c.name, c.help))
+            table.insert(parts, string.format("# TYPE %s %s", c.name, c.kind))
+            for _, obs in ipairs(c:collect()) do
+                local s = string.format('%s%s %s',
+                    serialize_name(obs.metric_name),
+                    serialize_label_pairs(obs.label_pairs),
+                    serialize_value(obs.value)
+                )
+                table.insert(parts, s)
+            end
         end
+    end
+    local text = metrics_rs.gather(metrics.get_global_labels())
+    if text ~=  "" then
+        table.insert(parts, text)
     end
     return table.concat(parts, '\n') .. '\n'
 end

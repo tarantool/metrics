@@ -12,6 +12,7 @@ function Registry:clear()
     self.collectors = {}
     self.callbacks = {}
     self.label_pairs = {}
+    collectgarbage('collect')
 end
 
 function Registry:find(kind, name)
@@ -40,6 +41,7 @@ end
 
 function Registry:unregister(collector)
     self.collectors[collector.name .. collector.kind] = nil
+    collectgarbage('collect')
 end
 
 function Registry:invoke_callbacks()
@@ -68,6 +70,10 @@ end
 
 function Registry:set_labels(label_pairs)
     self.label_pairs = table.copy(label_pairs)
+end
+
+function Registry:get_labels()
+    return table.copy(self.label_pairs)
 end
 
 return Registry

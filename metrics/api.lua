@@ -135,6 +135,10 @@ local function set_global_labels(label_pairs)
     registry:set_labels(label_pairs)
 end
 
+local function get_global_labels()
+    return registry:get_labels()
+end
+
 return {
     registry = registry,
     collectors = collectors,
@@ -151,4 +155,5 @@ return {
     unregister_callback = unregister_callback,
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
+    get_global_labels = get_global_labels,
 }
