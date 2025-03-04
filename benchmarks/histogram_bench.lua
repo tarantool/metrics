@@ -1,4 +1,4 @@
-local metrics = require 'override.metrics'
+local metrics = require 'metrics'
 local luahist = assert(metrics.histogram, 'no histogram')
 local rusthist = assert(metrics.histogram_vec, 'no histogram_vec')
 
