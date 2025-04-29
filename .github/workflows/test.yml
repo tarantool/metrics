@@ -88,7 +88,7 @@ jobs:
             cartridge: ""
           - tarantool: "3.3"
             cartridge: ""
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -116,7 +116,7 @@ jobs:
         run: make test_with_coverage_report
 
   packpack:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: test
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +128,7 @@ jobs:
           ls -l build/
 
   promtool:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         tarantool:
