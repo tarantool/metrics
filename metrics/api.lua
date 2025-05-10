@@ -8,6 +8,9 @@ local Counter = require('metrics.collectors.counter')
 local Gauge = require('metrics.collectors.gauge')
 local Histogram = require('metrics.collectors.histogram')
 local Summary = require('metrics.collectors.summary')
+local HistogramVec = require('metrics.collectors.histogram_vec')
+
+local rs = require('metrics.rs')
 
 local registry = rawget(_G, '__metrics_registry')
 if not registry then
@@ -86,6 +89,15 @@ local function histogram(name, help, buckets, metainfo)
     return registry:find_or_create(Histogram, name, help, buckets, metainfo)
 end
 
+local function histogram_vec(name, help, label_names, buckets, metainfo)
+    checks('string', 'string', '?table', '?table', '?table')
+    if buckets ~= nil and not Histogram.check_buckets(buckets) then
+        error('Invalid value for buckets')
+    end
+
+    return registry:find_or_create(HistogramVec, name, help, label_names, buckets, metainfo)
+end
+
 local function summary(name, help, objectives, params, metainfo)
     checks('string', '?string', '?table', {
         age_buckets_count = '?number',
@@ -123,6 +135,11 @@ local function set_global_labels(label_pairs)
     end
 
     registry:set_labels(label_pairs)
+    rs.set_labels(label_pairs)
+end
+
+local function get_global_labels()
+    return registry:get_labels()
 end
 
 return {
@@ -132,6 +149,7 @@ return {
     counter = counter,
     gauge = gauge,
     histogram = histogram,
+    histogram_vec = histogram_vec,
     summary = summary,
 
     collect = collect,
@@ -140,4 +158,5 @@ return {
     unregister_callback = unregister_callback,
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
+    get_global_labels = get_global_labels,
 }

@@ -185,6 +185,9 @@ function Server:initialize()
     if self.env['LUA_PATH'] == nil then
         self.env['LUA_PATH'] = utils.LUA_PATH
     end
+    if self.env['LUA_CPATH'] == nil then
+        self.env['LUA_CPATH'] = utils.LUA_CPATH
+    end
 
     getmetatable(getmetatable(self)).initialize(self)
 end
