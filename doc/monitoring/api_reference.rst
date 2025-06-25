@@ -33,14 +33,18 @@ currently running processes. Use a :ref:`gauge <metrics-api_reference-gauge>` ty
 
 The design is based on the `Prometheus counter <https://prometheus.io/docs/concepts/metric_types/#counter>`__.
 
-..  function:: counter(name [, help, metainfo])
+..  function:: counter(name [, help, metainfo, label_keys])
 
     Register a new counter.
 
     :param string name: collector name. Must be unique.
     :param string help: collector description.
     :param table metainfo: collector metainfo.
+    :param table label_keys: predefined label keys to optimize performance.
+        When specified, only these keys can be used in ``label_pairs``.
+
     :return: A counter object.
+
     :rtype: counter_obj
 
 ..  class:: counter_obj
@@ -102,13 +106,15 @@ it might be used for the values that can go up or down, for example, the number 
 
 The design is based on the `Prometheus gauge <https://prometheus.io/docs/concepts/metric_types/#gauge>`__.
 
-..  function:: gauge(name [, help, metainfo])
+..  function:: gauge(name [, help, metainfo, label_keys])
 
     Register a new gauge.
 
     :param string name: collector name. Must be unique.
     :param string help: collector description.
     :param table metainfo: collector metainfo.
+    :param table label_keys: predefined label keys to optimize performance.
+        When specified, only these keys can be used in ``label_pairs``.
 
     :return: A gauge object.
 
