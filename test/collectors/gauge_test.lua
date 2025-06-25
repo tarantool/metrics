@@ -88,3 +88,65 @@ g.test_metainfo_immutable = function()
     metainfo['my_useful_info'] = 'there'
     t.assert_equals(c.metainfo, {my_useful_info = 'here'})
 end
+
+g.test_gauge_with_fixed_labels = function()
+    local fixed_labels = {'label1', 'label2'}
+    local gauge = metrics.gauge('gauge_with_labels', nil, {}, fixed_labels)
+
+    gauge:set(1, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(gauge:collect(), {
+        {'gauge_with_labels', 1, {label1 = 1, label2 = 'text'}},
+    })
+
+    gauge:set(42, {label2 = 'text', label1 = 100})
+    utils.assert_observations(gauge:collect(), {
+        {'gauge_with_labels', 1, {label1 = 1, label2 = 'text'}},
+        {'gauge_with_labels', 42, {label1 = 100, label2 = 'text'}},
+    })
+
+    gauge:inc(5, {label2 = 'text', label1 = 100})
+    utils.assert_observations(gauge:collect(), {
+        {'gauge_with_labels', 1, {label1 = 1, label2 = 'text'}},
+        {'gauge_with_labels', 47, {label1 = 100, label2 = 'text'}},
+    })
+
+    gauge:dec(11, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(gauge:collect(), {
+        {'gauge_with_labels', -10, {label1 = 1, label2 = 'text'}},
+        {'gauge_with_labels', 47, {label1 = 100, label2 = 'text'}},
+    })
+
+    gauge:remove({label2 = 'text', label1 = 100})
+    utils.assert_observations(gauge:collect(), {
+        {'gauge_with_labels', -10, {label1 = 1, label2 = 'text'}},
+    })
+end
+
+g.test_gauge_missing_label = function()
+    local fixed_labels = {'label1', 'label2'}
+    local gauge = metrics.gauge('gauge_with_labels', nil, {}, fixed_labels)
+
+    gauge:set(42, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(gauge:collect(), {
+        {'gauge_with_labels', 42, {label1 = 1, label2 = 'text'}},
+    })
+
+    t.assert_error_msg_contains(
+        "Invalid label_pairs: expected a table when label_keys is provided",
+        gauge.set, gauge, 42, 'text')
+
+    t.assert_error_msg_contains(
+        "should match the number of label pairs",
+        gauge.set, gauge, 42, {label1 = 1, label2 = 'text', label3 = 42})
+
+    local function assert_missing_label_error(fun, ...)
+        t.assert_error_msg_contains(
+            "is missing",
+            fun, gauge, ...)
+    end
+
+    assert_missing_label_error(gauge.inc, 1, {label1 = 1, label3 = 42})
+    assert_missing_label_error(gauge.dec, 2, {label1 = 1, label3 = 42})
+    assert_missing_label_error(gauge.set, 42, {label2 = 'text', label3 = 42})
+    assert_missing_label_error(gauge.remove, {label2 = 'text', label3 = 42})
+end

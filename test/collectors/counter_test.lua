@@ -101,3 +101,58 @@ g.test_metainfo_immutable = function()
     metainfo['my_useful_info'] = 'there'
     t.assert_equals(c.metainfo, {my_useful_info = 'here'})
 end
+
+g.test_counter_with_fixed_labels = function()
+    local fixed_labels = {'label1', 'label2'}
+    local counter = metrics.counter('counter_with_labels', nil, {}, fixed_labels)
+
+    counter:inc(1, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(counter:collect(), {
+        {'counter_with_labels', 1, {label1 = 1, label2 = 'text'}},
+    })
+
+    counter:inc(5, {label2 = 'text', label1 = 2})
+    utils.assert_observations(counter:collect(), {
+        {'counter_with_labels', 1, {label1 = 1, label2 = 'text'}},
+        {'counter_with_labels', 5, {label1 = 2, label2 = 'text'}},
+    })
+
+    counter:reset({label1 = 1, label2 = 'text'})
+    utils.assert_observations(counter:collect(), {
+        {'counter_with_labels', 0, {label1 = 1, label2 = 'text'}},
+        {'counter_with_labels', 5, {label1 = 2, label2 = 'text'}},
+    })
+
+    counter:remove({label1 = 2, label2 = 'text'})
+    utils.assert_observations(counter:collect(), {
+        {'counter_with_labels', 0, {label1 = 1, label2 = 'text'}},
+    })
+end
+
+g.test_counter_missing_label = function()
+    local fixed_labels = {'label1', 'label2'}
+    local counter = metrics.counter('counter_with_labels', nil, {}, fixed_labels)
+
+    counter:inc(42, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(counter:collect(), {
+        {'counter_with_labels', 42, {label1 = 1, label2 = 'text'}},
+    })
+
+    t.assert_error_msg_contains(
+        "Invalid label_pairs: expected a table when label_keys is provided",
+        counter.inc, counter, 42, 1)
+
+    t.assert_error_msg_contains(
+        "should match the number of label pairs",
+        counter.inc, counter, 42, {label1 = 1, label2 = 'text', label3 = 42})
+
+    local function assert_missing_label_error(fun, ...)
+        t.assert_error_msg_contains(
+            "is missing",
+            fun, counter, ...)
+    end
+
+    assert_missing_label_error(counter.inc, 1, {label1 = 1, label3 = 'a'})
+    assert_missing_label_error(counter.reset, {label2 = 0, label3 = 'b'})
+    assert_missing_label_error(counter.remove, {label2 = 0, label3 = 'b'})
+end

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - `tnt_cartridge_config_applied` metric.
+- New optional ``label_keys`` parameter for ``counter()`` and ``gauge()`` metrics.
 
 ## [1.3.1] - 2025-02-24
 
