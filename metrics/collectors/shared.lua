@@ -24,7 +24,7 @@ function Shared:new_class(kind, method_names)
     return setmetatable(class, {__index = methods})
 end
 
-function Shared:new(name, help, metainfo)
+function Shared:new(name, help, metainfo, label_keys)
     metainfo = table.copy(metainfo) or {}
 
     if not name then
@@ -35,6 +35,7 @@ function Shared:new(name, help, metainfo)
         help = help or "",
         observations = {},
         label_pairs = {},
+        label_keys = label_keys,
         metainfo = metainfo,
     }, self)
 end
@@ -43,21 +44,33 @@ function Shared:set_registry(registry)
     self.registry = registry
 end
 
-function Shared.make_key(label_pairs)
+function Shared.make_key(label_pairs, label_keys)
     if type(label_pairs) ~= 'table' then
         return ""
     end
+
     local parts = {}
-    for k, v in pairs(label_pairs) do
-        table.insert(parts, k .. '\t' .. v)
+    if label_keys ~= nil then
+        for _, label_key in ipairs(label_keys) do
+            local label_value = label_pairs[label_key]
+            if label_value == nil then
+                error(string.format("Label key '%s' is missing", label_key))
+            end
+            table.insert(parts, label_value)
+        end
+    else
+        for k, v in pairs(label_pairs) do
+            table.insert(parts, k .. '\t' .. v)
+        end
+        table.sort(parts)
     end
-    table.sort(parts)
+
     return table.concat(parts, '\t')
 end
 
 function Shared:remove(label_pairs)
     assert(label_pairs, 'label pairs is a required parameter')
-    local key = self.make_key(label_pairs)
+    local key = self.make_key(label_pairs, self.label_keys)
     self.observations[key] = nil
     self.label_pairs[key] = nil
 end
@@ -67,7 +80,7 @@ function Shared:set(num, label_pairs)
         error("Collector set value should be a number")
     end
     num = num or 0
-    local key = self.make_key(label_pairs)
+    local key = self.make_key(label_pairs, self.label_keys)
     self.observations[key] = num
     self.label_pairs[key] = label_pairs or {}
 end
@@ -77,7 +90,7 @@ function Shared:inc(num, label_pairs)
         error("Collector increment should be a number")
     end
     num = num or 1
-    local key = self.make_key(label_pairs)
+    local key = self.make_key(label_pairs, self.label_keys)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value + num
     self.label_pairs[key] = label_pairs or {}
@@ -88,7 +101,7 @@ function Shared:dec(num, label_pairs)
         error("Collector decrement should be a number")
     end
     num = num or 1
-    local key = self.make_key(label_pairs)
+    local key = self.make_key(label_pairs, self.label_keys)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
     self.label_pairs[key] = label_pairs or {}
