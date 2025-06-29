@@ -49,21 +49,24 @@ function Shared.make_key(label_pairs, label_keys)
         return ""
     end
 
-    local parts = {}
     if label_keys ~= nil then
-        for _, label_key in ipairs(label_keys) do
+        local parts = table.new(#label_keys, 0)
+        for i, label_key in ipairs(label_keys) do
             local label_value = label_pairs[label_key]
             if label_value == nil then
                 error(string.format("Label key '%s' is missing", label_key))
             end
-            table.insert(parts, label_value)
+            parts[i] = label_value
         end
-    else
-        for k, v in pairs(label_pairs) do
-            table.insert(parts, k .. '\t' .. v)
-        end
-        table.sort(parts)
+
+        return table.concat(parts, '\t')
     end
+
+    local parts = {}
+    for k, v in pairs(label_pairs) do
+        table.insert(parts, k .. '\t' .. v)
+    end
+    table.sort(parts)
 
     return table.concat(parts, '\t')
 end
