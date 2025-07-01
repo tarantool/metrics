@@ -144,3 +144,34 @@ g.test_failover = function()
     g.cluster.main_server:start()
     g.cluster:wait_until_healthy()
 end
+
+g.test_config_applied_metric = function()
+    local main_server = g.cluster:server('main')
+
+    t.helpers.retrying({}, function()
+        local resp = main_server:http_request('get', '/metrics')
+        local config_metric = utils.find_metric('tnt_cartridge_config_applied', resp.json)
+
+        t.assert_is_not(config_metric, nil, 'Cartridge config applied metric presents in /metrics response')
+        t.assert_equals(config_metric[1].value, 1, 'Config should be applied')
+    end)
+
+    local patch = require('cartridge').config_patch_clusterwide
+    local ok, err = patch({
+        ['conflict'] = {},
+        ['conflict.yml'] = "text",
+    })
+    t.assert_equals(ok, nil)
+    t.assert_covers(err, {
+        class_name = 'PatchConfigError',
+        err = 'Ambiguous sections "conflict" and "conflict.yml"',
+    })
+
+    t.helpers.retrying({}, function()
+        local resp = main_server:http_request('get', '/metrics')
+        local config_metric = utils.find_metric('tnt_cartridge_config_applied', resp.json)
+
+        t.assert_is_not(config_metric, nil, 'Cartridge config applied metric presents in /metrics response')
+        t.assert_equals(config_metric[1].value, 0, 'Config should not be applied')
+    end)
+end
