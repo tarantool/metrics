@@ -65,16 +65,16 @@ local function clear()
     registry:clear()
 end
 
-local function counter(name, help, metainfo)
-    checks('string', '?string', '?table')
+local function counter(name, help, metainfo, label_keys)
+    checks('string', '?string', '?table', '?table')
 
-    return registry:find_or_create(Counter, name, help, metainfo)
+    return registry:find_or_create(Counter, name, help, metainfo, label_keys)
 end
 
-local function gauge(name, help, metainfo)
-    checks('string', '?string', '?table')
+local function gauge(name, help, metainfo, label_keys)
+    checks('string', '?string', '?table', '?table')
 
-    return registry:find_or_create(Gauge, name, help, metainfo)
+    return registry:find_or_create(Gauge, name, help, metainfo, label_keys)
 end
 
 local function histogram(name, help, buckets, metainfo)
