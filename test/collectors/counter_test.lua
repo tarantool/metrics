@@ -138,6 +138,10 @@ g.test_counter_missing_label = function()
         {'counter_with_labels', 42, {label1 = 1, label2 = 'text'}},
     })
 
+    t.assert_error_msg_contains(
+        "Invalid label_pairs: expected a table when label_keys is provided",
+        counter.inc, counter, 42, 1)
+
     local function assert_missing_label_error(fun, ...)
         t.assert_error_msg_contains(
             "is missing",

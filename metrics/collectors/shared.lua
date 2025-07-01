@@ -45,11 +45,15 @@ function Shared:set_registry(registry)
 end
 
 function Shared.make_key(label_pairs, label_keys)
-    if type(label_pairs) ~= 'table' then
+    if (label_keys == nil) and (type(label_pairs) ~= 'table') then
         return ""
     end
 
     if label_keys ~= nil then
+        if type(label_pairs) ~= 'table' then
+            error("Invalid label_pairs: expected a table when label_keys is provided")
+        end
+
         local parts = table.new(#label_keys, 0)
         for i, label_key in ipairs(label_keys) do
             local label_value = label_pairs[label_key]

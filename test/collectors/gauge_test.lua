@@ -131,6 +131,10 @@ g.test_gauge_missing_label = function()
         {'gauge_with_labels', 42, {label1 = 1, label2 = 'text'}},
     })
 
+    t.assert_error_msg_contains(
+        "Invalid label_pairs: expected a table when label_keys is provided",
+        gauge.set, gauge, 42, 'text')
+
     local function assert_missing_label_error(fun, ...)
         t.assert_error_msg_contains(
             "is missing",
