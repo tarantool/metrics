@@ -142,13 +142,17 @@ g.test_counter_missing_label = function()
         "Invalid label_pairs: expected a table when label_keys is provided",
         counter.inc, counter, 42, 1)
 
+    t.assert_error_msg_contains(
+        "Label keys count should match the number of label pairs",
+        counter.inc, counter, 42, {label1 = 1, label2 = 'text', label3 = 42})
+
     local function assert_missing_label_error(fun, ...)
         t.assert_error_msg_contains(
             "is missing",
             fun, counter, ...)
     end
 
-    assert_missing_label_error(counter.inc, 1, {label1 = 1})
-    assert_missing_label_error(counter.reset, {label2 = 0})
-    assert_missing_label_error(counter.remove, {})
+    assert_missing_label_error(counter.inc, 1, {label1 = 1, label3 = 'a'})
+    assert_missing_label_error(counter.reset, {label2 = 0, label3 = 'b'})
+    assert_missing_label_error(counter.remove, {label2 = 0, label3 = 'b'})
 end

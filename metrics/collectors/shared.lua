@@ -54,6 +54,15 @@ function Shared.make_key(label_pairs, label_keys)
             error("Invalid label_pairs: expected a table when label_keys is provided")
         end
 
+        local label_count = 0
+        for _ in pairs(label_pairs) do
+            label_count = label_count + 1
+        end
+
+        if #label_keys ~= label_count then
+            error("Label keys count should match the number of label pairs")
+        end
+
         local parts = table.new(#label_keys, 0)
         for i, label_key in ipairs(label_keys) do
             local label_value = label_pairs[label_key]
