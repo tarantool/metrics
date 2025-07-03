@@ -27,6 +27,8 @@ jobs:
           - tarantool: "2.11"
             cartridge: "2.13.0"
           - tarantool: "2.11"
+            cartridge: "2.16.1"
+          - tarantool: "2.11"
             cartridge: ""
           # 3.x
           - tarantool: "3.0"
