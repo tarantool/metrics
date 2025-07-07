@@ -60,7 +60,8 @@ function Shared.make_key(label_pairs, label_keys)
         end
 
         if #label_keys ~= label_count then
-            error(("Label keys count (%d) should match the number of label pairs (%d)"):format(#label_keys, label_count))
+            error(("Label keys count (%d) should match " ..
+                "the number of label pairs (%d)"):format(#label_keys, label_count))
         end
 
         local parts = table.new(#label_keys, 0)
