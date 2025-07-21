@@ -570,7 +570,6 @@ Metrics functions
     *   ``luajit``
     *   ``cartridge_issues``
     *   ``cartridge_failover``
-    *   ``cartridge_config``
     *   ``clock``
     *   ``event_loop``
     *   ``config``

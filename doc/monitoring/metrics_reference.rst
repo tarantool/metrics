@@ -414,9 +414,6 @@ Cartridge
         *   -   ``tnt_cartridge_failover_trigger_total``
             -   Count of failover triggers in cluster.
 
-        *   -   ``tnt_cartridge_config_applied``
-            -   Whether the Cartridge configuration was successfully applied (1 if applied, 0 otherwise).
-
 ..  _metrics-reference-luajit:
 
 LuaJIT metrics
