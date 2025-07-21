@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Removed
+
+- `tnt_cartridge_config_applied` metric that only reflected local node state.
+
 ## [1.4.0] - 2025-07-07
 
 ### Added
