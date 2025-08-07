@@ -414,6 +414,10 @@ Cartridge
         *   -   ``tnt_cartridge_failover_trigger_total``
             -   Count of failover triggers in cluster.
 
+        *   -   ``tnt_cartridge_config_checksum``
+            -   Cartridge configuration checksum on the instance.
+                Can be used to detect configuration divergence across cluster nodes.
+
 ..  _metrics-reference-luajit:
 
 LuaJIT metrics
