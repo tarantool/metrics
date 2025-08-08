@@ -144,3 +144,94 @@ g.test_failover = function()
     g.cluster.main_server:start()
     g.cluster:wait_until_healthy()
 end
+
+g.test_config_checksum_match = function()
+    local main_server = g.cluster:server('main')
+    local replica_server = g.cluster:server('replica')
+
+    local resp = main_server:http_request('get', '/metrics')
+    local checksum_metric = utils.find_metric('tnt_cartridge_config_checksum', resp.json)
+
+    t.assert(checksum_metric, 'tnt_cartridge_config_checksum metric should be present')
+    t.assert_equals(#checksum_metric, 1)
+
+    local initial_checksum = checksum_metric[1].value
+    t.assert_type(initial_checksum, 'number', 'Checksum should be a number')
+
+    main_server.net_box:eval([[
+        local patch = require('cartridge').config_patch_clusterwide
+        local ok, err = patch({
+            ['text'] = 'text',
+        })
+    ]])
+
+    local updated_checksum
+    t.helpers.retrying({}, function()
+        resp = main_server:http_request('get', '/metrics')
+        checksum_metric = utils.find_metric('tnt_cartridge_config_checksum', resp.json)
+
+        t.assert(checksum_metric, 'tnt_cartridge_config_checksum metric should be present')
+
+        updated_checksum = checksum_metric[1].value
+        t.assert_type(updated_checksum, 'number', 'Checksum should be a number')
+
+        t.assert_not_equals(initial_checksum, updated_checksum, 'Config checksum should change after config update')
+    end)
+
+    t.helpers.retrying({}, function()
+        resp = replica_server:http_request('get', '/metrics')
+        checksum_metric = utils.find_metric('tnt_cartridge_config_checksum', resp.json)
+
+        t.assert(checksum_metric, 'tnt_cartridge_config_checksum metric should be present')
+
+        local replica_checksum = checksum_metric[1].value
+        t.assert_type(replica_checksum, 'number', 'Checksum should be a number')
+
+        t.assert_equals(replica_checksum, updated_checksum, 'Nodes should have the same config checksum')
+    end)
+end
+
+g.test_config_checksum_mismatch = function()
+    local main_server = g.cluster:server('main')
+    local replica_server = g.cluster:server('replica')
+
+    replica_server.net_box:eval([[
+        local vars = require('cartridge.vars').new('cartridge.confapplier')
+        __old_config = vars.clusterwide_config
+    ]])
+
+    main_server.net_box:eval([[
+        local patch = require('cartridge').config_patch_clusterwide
+        local ok, err = patch({
+            ['text'] = 'text',
+        })
+    ]])
+
+    replica_server.net_box:eval([[
+        local vars = require('cartridge.vars').new('cartridge.confapplier')
+        vars.clusterwide_config = __old_config
+    ]])
+
+    local main_checksum
+    t.helpers.retrying({}, function()
+        local resp = main_server:http_request('get', '/metrics')
+        local checksum_metric = utils.find_metric('tnt_cartridge_config_checksum', resp.json)
+
+        t.assert(checksum_metric, 'tnt_cartridge_config_checksum metric should be present')
+
+        main_checksum = checksum_metric[1].value
+        t.assert_type(main_checksum, 'number', 'Checksum should be a number')
+    end)
+
+    t.helpers.retrying({}, function()
+        local resp = replica_server:http_request('get', '/metrics')
+        local checksum_metric = utils.find_metric('tnt_cartridge_config_checksum', resp.json)
+
+        t.assert(checksum_metric, 'tnt_cartridge_config_checksum metric should be present')
+
+        local replica_checksum = checksum_metric[1].value
+        t.assert_type(replica_checksum, 'number', 'Checksum should be a number')
+
+        t.assert_not_equals(main_checksum, replica_checksum, 'Nodes should have different config checksum')
+    end)
+end
