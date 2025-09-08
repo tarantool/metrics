@@ -49,6 +49,20 @@ local function update_cpu_metrics()
         collectors_list.cpu_thread:remove(thread_info)
     end
     threads = new_threads
+
+    local instance_info = psutils.get_instance_cpu_time()
+    if instance_info ~= nil then
+        local instance_stime_labels = {kind = 'system'}
+        collectors_list.instance_cpu_usage = utils.set_gauge('cpu_instance',
+            'Tarantool instance cpu time', instance_info.stime,
+            instance_stime_labels, nil, {default = true})
+
+        local instance_utime_labels = {kind = 'user'}
+        collectors_list.instance_cpu_usage = utils.set_gauge('cpu_instance',
+            'Tarantool instance cpu time', instance_info.utime,
+            instance_utime_labels, nil, {default = true})
+
+    end
 end
 
 local function clear_cpu_metrics()

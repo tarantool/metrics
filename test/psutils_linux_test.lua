@@ -52,3 +52,11 @@ g.test_get_cpu_count = function(cg)
         t.assert_gt(psutils_linux.get_cpu_count(), 0)
     end)
 end
+
+g.test_get_instance_cpu_time = function(cg)
+    cg.server:exec(function()
+        local psutils_linux = require('metrics.psutils.psutils_linux')
+        local expected = {pid = 280908, comm = 'tarantool', utime = 222, stime = 111}
+        t.assert_items_equals(psutils_linux.get_instance_cpu_time(), expected)
+    end)
+end

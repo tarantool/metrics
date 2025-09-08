@@ -56,6 +56,21 @@ g.test_cpu_count = function(cg)
     end)
 end
 
+g.test_instance_cpu = function(cg)
+    cg.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+
+        require('metrics.psutils.cpu').update()
+
+        local observations = metrics.collect()
+        local metric = utils.find_metric('tnt_cpu_instance', observations)
+        t.assert_not_equals(metric, nil)
+        t.assert_equals(#metric, 2)
+        t.assert_gt(metric[1].value, 0)
+        t.assert_gt(metric[2].value, 0)
+    end)
+end
 
 g.test_clear = function(cg)
     cg.server:exec(function()
@@ -71,6 +86,7 @@ g.test_clear = function(cg)
                 'tnt_cpu_number',
                 'tnt_cpu_time',
                 'tnt_cpu_thread',
+                'tnt_cpu_instance',
             }
 
             for _, metric_name in ipairs(expected) do

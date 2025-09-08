@@ -527,6 +527,13 @@ They are only available on Linux.
                 *   ``kind`` can be either ``user`` or ``system``
                 *   ``thread_name`` is ``tarantool``, ``wal``, ``iproto``, or ``coio``
                 *   ``file_name`` is the entrypoint file name, for example, ``init.lua``.
+        *   -   ``tnt_cpu_instance``
+            -   Tarantool instance CPU time.
+                This metric always has the labels
+                ``{kind="user"}``,
+                where:
+
+                *   ``kind`` can be either ``user`` or ``system``.
 
 There are also two cross-platform metrics, which can be obtained with a ``getrusage()`` call.
 

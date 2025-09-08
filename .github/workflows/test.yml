@@ -39,6 +39,8 @@ jobs:
             cartridge: ""
           - tarantool: "3.3"
             cartridge: ""
+          - tarantool: "3.4"
+            cartridge: ""
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
