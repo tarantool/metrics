@@ -66,8 +66,13 @@ local function get_process_cpu_time()
     return thread_time
 end
 
+local function get_instance_cpu_time()
+    return parse_process_stat('/proc/self/stat')
+end
+
 return {
     get_cpu_time = get_cpu_time,
     get_process_cpu_time = get_process_cpu_time,
+    get_instance_cpu_time = get_instance_cpu_time,
     get_cpu_count = get_nprocs_conf,
 }
