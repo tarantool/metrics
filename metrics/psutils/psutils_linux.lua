@@ -52,6 +52,8 @@ local function parse_process_stat(path)
         comm = stats[2]:gsub('[()]', ''), -- strip spaces
         utime = tonumber(stats[14]),
         stime = tonumber(stats[15]),
+        vsize = tonumber(stats[23]),
+        rss = tonumber(stats[24]),
     }
 end
 
@@ -66,8 +68,13 @@ local function get_process_cpu_time()
     return thread_time
 end
 
+local function get_process_stats()
+    return parse_process_stat('/proc/self/stat')
+end
+
 return {
     get_cpu_time = get_cpu_time,
     get_process_cpu_time = get_process_cpu_time,
+    get_process_stats = get_process_stats,
     get_cpu_count = get_nprocs_conf,
 }

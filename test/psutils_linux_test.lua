@@ -37,10 +37,10 @@ g.test_get_process_cpu_time = function(cg)
     cg.server:exec(function()
         local psutils_linux = require('metrics.psutils.psutils_linux')
         local expected = {
-            {pid = 1, comm = 'tarantool', utime = 468, stime = 171},
-            {pid = 12, comm = 'coio', utime = 0, stime = 0},
-            {pid = 13, comm = 'iproto', utime = 118, stime = 534},
-            {pid = 14, comm = 'wal', utime = 0, stime = 0},
+            {pid = 1, comm = 'tarantool', utime = 468, stime = 171, vsize = 867078144, rss = 12731},
+            {pid = 12, comm = 'coio', utime = 0, stime = 0, vsize = 867078144, rss = 12805},
+            {pid = 13, comm = 'iproto', utime = 118, stime = 534, vsize = 867078144, rss = 12844},
+            {pid = 14, comm = 'wal', utime = 0, stime = 0, vsize = 867078144, rss = 12915},
         }
         t.assert_items_equals(psutils_linux.get_process_cpu_time(), expected)
     end)
@@ -50,5 +50,13 @@ g.test_get_cpu_count = function(cg)
     cg.server:exec(function()
         local psutils_linux = require('metrics.psutils.psutils_linux')
         t.assert_gt(psutils_linux.get_cpu_count(), 0)
+    end)
+end
+
+g.test_get_process_stats = function(cg)
+    cg.server:exec(function()
+        local psutils_linux = require('metrics.psutils.psutils_linux')
+        local expected = {pid = 280908, comm = 'tarantool', utime = 222, stime = 111, vsize = 8679424, rss = 448,}
+        t.assert_items_equals(psutils_linux.get_process_stats(), expected)
     end)
 end

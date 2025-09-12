@@ -25,6 +25,26 @@ General instance information:
 
 ..  _metrics-reference-memory_general:
 
+Instance metrics
+----------------
+
+Instance activity stats.
+These metrics can be used to monitor instance CPU and RAM usage.
+
+.. container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+        *   -   ``tnt_cpu_user_time``
+            -   Tarantool CPU user time.
+        *   -   ``tnt_cpu_system_time``
+            -   Tarantool CPU system time.
+        *   -   ``tnt_memory``
+            -   Total number of bytes used by Tarantool instance.
+
+.. _metrics-reference-instance:
+
 Memory general
 --------------
 
