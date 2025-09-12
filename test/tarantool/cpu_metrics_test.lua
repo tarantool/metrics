@@ -14,8 +14,6 @@ end)
 
 g.test_cpu = function(cg)
     cg.server:exec(function()
-        t.skip('Flaky test, see https://github.com/tarantool/metrics/issues/492')
-
         local metrics = require('metrics')
         local cpu = require('metrics.tarantool.cpu')
         local utils = require('test.utils') -- luacheck: ignore 431

@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10...3.31 FATAL_ERROR)
 
 project(metrics NONE)
+
+# Fix problem with old third_party dependencies
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
 ## Install ####################################################################
 ###############################################################################
