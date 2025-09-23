@@ -29,10 +29,14 @@ local function update_memory_metrics()
     end
 
     local memory_stat = 0
+    local memory_virt_stat = 0
 
     if jit.os == 'Linux' then
         local data = psutils.get_process_stats()
-        memory_stat = data.rss * sys_mem_page_size
+        if data then
+            memory_stat = data.rss * sys_mem_page_size
+            memory_virt_stat = data.vsize
+        end
     else
         --[[memory]]
         -- Skip `memory_box.data` cause in fact this is `memory_box.index`
@@ -70,6 +74,10 @@ local function update_memory_metrics()
     --[[metric]]
     collectors_list.memory_stat_usage = utils.set_gauge('memory',
         'Tarantool instance memory usage', memory_stat,
+        nil, nil, {default = true})
+
+    collectors_list.memory_virt_stat_usage = utils.set_gauge('memory_virt',
+        'Tarantool instance virtual memory usage', memory_virt_stat,
         nil, nil, {default = true})
 end
 
