@@ -41,7 +41,9 @@ These metrics can be used to monitor instance CPU and RAM usage.
         *   -   ``tnt_cpu_system_time``
             -   Tarantool CPU system time.
         *   -   ``tnt_memory``
-            -   Total number of bytes used by Tarantool instance.
+            -   Resident memory size in bytes used by Tarantool instance.
+        *   -   ``tnt_memory_virt``
+            -   Virtual memory size in bytes used by Tarantool instance (available on Linux).
 
 .. _metrics-reference-instance:
 

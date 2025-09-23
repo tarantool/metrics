@@ -36,5 +36,9 @@ g.test_instance_metrics = function(cg)
         local memory_metric = utils.find_metric('tnt_memory', default_metrics)
         t.assert(memory_metric)
         t.assert_gt(memory_metric[1].value, 0)
+
+        local memory_virt_metric = utils.find_metric('tnt_memory_virt', default_metrics)
+        t.assert(memory_virt_metric)
+        t.assert_gt(memory_virt_metric[1].value, 0)
     end)
 end
