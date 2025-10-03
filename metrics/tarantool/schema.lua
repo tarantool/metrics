@@ -11,6 +11,10 @@ local needs_upgrade_status = {
 }
 
 local function update_schema_metrics()
+    if not utils.box_is_configured() then
+        return
+    end
+
     local ok, needs_upgrade = pcall(box.schema_needs_upgrade)
     if not ok then
         ok, needs_upgrade = pcall(box.internal.schema_needs_upgrade)
