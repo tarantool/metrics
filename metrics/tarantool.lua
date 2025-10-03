@@ -27,6 +27,7 @@ local default_metrics = {
     event_loop          = require('metrics.tarantool.event_loop'),
     config              = require('metrics.tarantool.config'),
     cpu_extended        = require('metrics.psutils.cpu'),
+    schema              = require('metrics.tarantool.schema')
 }
 
 local all_metrics_map = {}
