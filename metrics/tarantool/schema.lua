@@ -1,4 +1,5 @@
 local utils = require('metrics.utils')
+-- luacheck: globals box
 
 local collectors_list = {}
 
@@ -16,7 +17,7 @@ local function update_schema_metrics()
     end
 
     if ok then
-        collectors_list[metric_name] = utils.set_gauge(metric_name, 'Schema needs upgrade', 
+        collectors_list[metric_name] = utils.set_gauge(metric_name, 'Schema needs upgrade',
             needs_upgrade_status[needs_upgrade], nil, nil, {default = true})
     end
 end
