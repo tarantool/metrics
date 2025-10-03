@@ -23,7 +23,23 @@ General instance information:
         *   -   ``tnt_read_only``
             -   Indicates if the instance is in read-only mode (``1`` if true, ``0`` if false)
 
-..  _metrics-reference-memory_general:
+..  _metrics-reference-schema:
+
+Schema
+------
+
+Schema state metrics.
+
+..  container:: table
+
+    ..  list-table::
+        :widths: 25 75
+        :header-rows: 0
+
+        *   -   ``tnt_schema_needs_upgrade``
+            -   Indicates if the instance schema requires an upgrade (``1`` when upgrade is needed, ``0`` when schema is up to date)
+
+..  _metrics-reference-instance:
 
 Instance metrics
 ----------------
@@ -45,7 +61,7 @@ These metrics can be used to monitor instance CPU and RAM usage.
         *   -   ``tnt_memory_virt``
             -   Virtual memory size in bytes used by Tarantool instance (available on Linux).
 
-.. _metrics-reference-instance:
+..  _metrics-reference-memory_general:
 
 Memory general
 --------------
