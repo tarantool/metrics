@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `tnt_memory` metric.
 - `tnt_memory_virt` metric.
+- `tnt_schema_needs_upgrade` metric.
 
 ### Changed
 
