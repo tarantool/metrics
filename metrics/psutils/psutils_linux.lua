@@ -1,6 +1,7 @@
 local fio = require('fio')
 local string = require('string')
 local ffi = require('ffi')
+local log = require('log')
 
 local get_nprocs_conf = function() end
 if jit.os == 'Linux' then
@@ -19,7 +20,7 @@ local function get_cpu_time()
 
     local stats_raw = cpu_stat_file:read(512)
     cpu_stat_file:close()
-    if #stats_raw == 0 then
+    if stats_raw == nil or #stats_raw == 0 then
         return nil
     end
 
@@ -37,14 +38,22 @@ local function get_cpu_time()
 end
 
 local function parse_process_stat(path)
-    local stat = fio.open(path, 'O_RDONLY')
-    if stat == nil then
-        print('stat open error')
+    local stat, err = fio.open(path, 'O_RDONLY')
+    if err ~= nil then
+        log.error('stat open error: %s', tostring(err))
         return nil
     end
 
-    local s = stat:read(512)
+    local s
+    s, err = stat:read(512)
     stat:close()
+    if err ~= nil then
+        log.error('stat read error: %s', tostring(err))
+        return nil
+    end
+    if s == nil or #s == 0 then
+        return nil
+    end
 
     local stats = string.split(s)
     return {
