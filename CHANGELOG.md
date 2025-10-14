@@ -8,15 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `tnt_memory` metric.
-- `tnt_memory_virt` metric.
-- `tnt_schema_needs_upgrade` metric.
-
 ### Changed
 
 ### Fixed
 
-- Fixed a potential `process` metrics error when `fio.read` returns an empty string or an error.
+### Removed
+
+# [1.6.0] - 2025-10-14
+
+This release adds new `memory` and `schema` metrics.
+
+### Added
+
+- `tnt_memory` metric (#519).
+- `tnt_memory_virt` metric (#521).
+- `tnt_schema_needs_upgrade` metric (#524).
+
+### Fixed
+
+- Fixed a potential `process` metrics error when `fio.read` returns an empty string or an error (#527).
 
 # [1.5.0] - 2025-08-13
 
