@@ -15,7 +15,7 @@ local function update_schema_metrics()
         return
     end
 
-    local ok, needs_upgrade = pcall(box.schema_needs_upgrade)
+    local ok, needs_upgrade = pcall(box.schema.needs_upgrade)
     if not ok then
         ok, needs_upgrade = pcall(box.internal.schema_needs_upgrade)
     end

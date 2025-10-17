@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Use `box.schema.needs_upgrade` instead of `box.schema_needs_upgrade` (#529)
+
 ### Removed
 
 # [1.6.0] - 2025-10-14
