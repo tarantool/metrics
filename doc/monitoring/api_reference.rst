@@ -244,7 +244,7 @@ The metric also displays the count of measurements and their sum:
 
 The design is based on the `Prometheus histogram <https://prometheus.io/docs/concepts/metric_types/#histogram>`__.
 
-..  function:: histogram(name [, help, buckets, metainfo])
+..  function:: histogram(name [, help, buckets, metainfo, label_keys])
 
     Register a new histogram.
 
@@ -254,6 +254,8 @@ The design is based on the `Prometheus histogram <https://prometheus.io/docs/con
                           The infinity bucket (``INF``) is appended automatically.
                           Default: ``{.005, .01, .025, .05, .075, .1, .25, .5, .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}``.
     :param table metainfo: collector metainfo.
+    :param table label_keys: predefined label keys to optimize performance.
+        When specified, only these keys can be used in ``label_pairs``.
 
     :return: A histogram object.
 

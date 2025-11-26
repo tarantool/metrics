@@ -77,13 +77,13 @@ local function gauge(name, help, metainfo, label_keys)
     return registry:find_or_create(Gauge, name, help, metainfo, label_keys)
 end
 
-local function histogram(name, help, buckets, metainfo)
-    checks('string', '?string', '?table', '?table')
+local function histogram(name, help, buckets, metainfo, label_keys)
+    checks('string', '?string', '?table', '?table', '?table')
     if buckets ~= nil and not Histogram.check_buckets(buckets) then
         error('Invalid value for buckets')
     end
 
-    return registry:find_or_create(Histogram, name, help, buckets, metainfo)
+    return registry:find_or_create(Histogram, name, help, buckets, metainfo, label_keys)
 end
 
 local function summary(name, help, objectives, params, metainfo)
