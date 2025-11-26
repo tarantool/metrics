@@ -532,6 +532,78 @@ The example above allows extracting the following time series:
 You can also set global labels by calling
 ``metrics.set_global_labels({ label = value, ...})``.
 
+..  _metrics-api_reference-prepared_statements:
+
+Prepared statements
+-------------------
+
+When working with metrics intensively, the ``make_key()`` function used internally
+to create observation keys can cause GC pressure due to string operations.
+To optimize performance, each collector provides a ``:prepare()`` method that
+creates a prepared statement object.
+
+A prepared statement caches the ``label_pairs`` and the internal key, allowing
+repeated operations with the same labels without the overhead of key generation.
+Prepared objects have the same methods as their parent collectors, but without
+the ``label_pairs`` parameter since the labels are already cached.
+
+..  method:: collector_obj:prepare(label_pairs)
+
+    Create a prepared statement for the given ``label_pairs``.
+
+    :param table label_pairs: table containing label names as keys,
+                              label values as values. Note that both
+                              label names and values in ``label_pairs``
+                              are treated as strings.
+
+    :return: A prepared object with methods specific to the collector type.
+
+    :rtype: prepared_obj
+
+..  class:: prepared_obj
+
+    Prepared objects have methods corresponding to their collector type:
+
+    * **Counter prepared object**: ``inc(num)``, ``reset()``, ``remove()``
+    * **Gauge prepared object**: ``inc(num)``, ``dec(num)``, ``set(num)``, ``reset()``, ``remove()``
+    * **Histogram prepared object**: ``observe(num)``, ``remove()``
+    * **Summary prepared object**: ``observe(num)``, ``remove()``
+
+    All methods work the same as their collector counterparts, but without
+    the ``label_pairs`` parameter since labels are already cached.
+
+    **Example usage:**
+
+    ..  code-block:: lua
+
+        local metrics = require('metrics')
+        
+        -- Create a counter
+        local requests_counter = metrics.counter('http_requests_total')
+        
+        -- Prepare a statement for specific labels
+        local post_requests = requests_counter:prepare({method = 'POST', status = '200'})
+        
+        -- Use the prepared statement (no label_pairs needed)
+        post_requests:inc(1)
+        post_requests:inc(5)
+        
+        -- Another prepared statement for different labels
+        local get_requests = requests_counter:prepare({method = 'GET', status = '200'})
+        get_requests:inc(1)
+
+    **Performance considerations:**
+
+    Prepared statements are most beneficial when:
+    
+    * The same ``label_pairs`` are used repeatedly
+    * Metrics are updated in performance-critical code paths
+    * You want to reduce GC pressure from string operations in ``make_key()``
+
+    For one-off operations or infrequently used label combinations, using
+    the regular collector methods with ``label_pairs`` is simpler and
+    doesn't require managing prepared statement objects.
+
 ..  _metrics-api_reference-functions:
 
 Metrics functions

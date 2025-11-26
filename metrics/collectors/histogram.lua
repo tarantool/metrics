@@ -7,7 +7,7 @@ local INF = math.huge
 local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
-local Histogram = Shared:new_class('histogram', {'observe_latency'})
+local Histogram = Shared:new_class('histogram', {'observe', 'observe_latency'})
 
 function Histogram.check_buckets(buckets)
     local prev = -math.huge
@@ -50,10 +50,28 @@ function Histogram:set_registry(registry)
     self.bucket_collector:set_registry(registry)
 end
 
+function Histogram:prepare(label_pairs)
+    local buckets_prepared = table.new(0, #self.buckets)
+    for _, bucket in ipairs(self.buckets) do
+        local bkt_label_pairs = table.deepcopy(label_pairs) or {}
+        if type(bkt_label_pairs) == 'table' then
+            bkt_label_pairs.le = bucket
+        end
+
+        buckets_prepared[bucket] = Counter.Prepared:new(self.bucket_collector, bkt_label_pairs)
+    end
+
+    local prepared = Histogram.Prepared:new(self, label_pairs)
+    prepared.count_prepared = Counter.Prepared:new(self.count_collector, label_pairs)
+    prepared.sum_prepared = Counter.Prepared:new(self.sum_collector, label_pairs)
+    prepared.buckets_prepared = buckets_prepared
+
+    return prepared
+end
+
 local cdata_warning_logged = false
 
-function Histogram:observe(num, label_pairs)
-    label_pairs = label_pairs or {}
+function Histogram.Prepared:observe(num)
     if num ~= nil and type(tonumber(num)) ~= 'number' then
         error("Histogram observation should be a number")
     end
@@ -64,32 +82,26 @@ function Histogram:observe(num, label_pairs)
         cdata_warning_logged = true
     end
 
-    self.count_collector:inc(1, label_pairs)
-    self.sum_collector:inc(num, label_pairs)
+    self.count_prepared:inc(1)
+    self.sum_prepared:inc(num)
 
-    for _, bucket in ipairs(self.buckets) do
-        local bkt_label_pairs = table.deepcopy(label_pairs)
-        bkt_label_pairs.le = bucket
-
+    for bucket, bucket_prepared in pairs(self.buckets_prepared) do
         if num <= bucket then
-            self.bucket_collector:inc(1, bkt_label_pairs)
+            bucket_prepared:inc(1)
         else
             -- all buckets are needed for histogram quantile approximation
             -- this creates buckets if they were not created before
-            self.bucket_collector:inc(0, bkt_label_pairs)
+            bucket_prepared:inc(0)
         end
     end
 end
 
-function Histogram:remove(label_pairs)
-    assert(label_pairs, 'label pairs is a required parameter')
-    self.count_collector:remove(label_pairs)
-    self.sum_collector:remove(label_pairs)
+function Histogram.Prepared:remove()
+    self.count_prepared:remove()
+    self.sum_prepared:remove()
 
-    for _, bucket in ipairs(self.buckets) do
-        local bkt_label_pairs = table.deepcopy(label_pairs)
-        bkt_label_pairs.le = bucket
-        self.bucket_collector:remove(bkt_label_pairs)
+    for _, bucket_prepared in pairs(self.buckets_prepared) do
+        bucket_prepared:remove()
     end
 end
 
