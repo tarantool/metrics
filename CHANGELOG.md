@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Turnend `Shared:make_key` into a Lua table method
+- Make it impossible to override the `label_keys` when calling `Shared:make_key`
+
 ### Removed
 
 # [1.6.1] - 2025-10-20

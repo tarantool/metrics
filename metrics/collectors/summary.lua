@@ -62,7 +62,7 @@ function Summary:observe(num, label_pairs)
     self.sum_collector:inc(num, label_pairs)
     if self.objectives then
         local now = os.time()
-        local key = self.make_key(label_pairs)
+        local key = self:make_key(label_pairs)
 
         if not self.observations[key] then
             local obs_object = {
@@ -95,7 +95,7 @@ function Summary:remove(label_pairs)
     self.count_collector:remove(label_pairs)
     self.sum_collector:remove(label_pairs)
     if self.objectives then
-        local key = self.make_key(label_pairs)
+        local key = self:make_key(label_pairs)
         self.observations[key] = nil
     end
 end
@@ -144,7 +144,7 @@ end
 -- returns array of quantile objects or
 -- single quantile object if summary has only one bucket
 function Summary:get_observations(label_pairs)
-    local key = self.make_key(label_pairs or {})
+    local key = self:make_key(label_pairs or {})
     local obs = self.observations[key]
     if self.age_buckets_count > 1 then
         return obs

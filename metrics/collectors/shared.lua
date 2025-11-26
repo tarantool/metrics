@@ -44,12 +44,12 @@ function Shared:set_registry(registry)
     self.registry = registry
 end
 
-function Shared.make_key(label_pairs, label_keys)
-    if (label_keys == nil) and (type(label_pairs) ~= 'table') then
+function Shared:make_key(label_pairs)
+    if (self.label_keys == nil) and (type(label_pairs) ~= 'table') then
         return ""
     end
 
-    if label_keys ~= nil then
+    if self.label_keys ~= nil then
         if type(label_pairs) ~= 'table' then
             error("Invalid label_pairs: expected a table when label_keys is provided")
         end
@@ -59,13 +59,13 @@ function Shared.make_key(label_pairs, label_keys)
             label_count = label_count + 1
         end
 
-        if #label_keys ~= label_count then
+        if #self.label_keys ~= label_count then
             error(("Label keys count (%d) should match " ..
-                "the number of label pairs (%d)"):format(#label_keys, label_count))
+                "the number of label pairs (%d)"):format(#self.label_keys, label_count))
         end
 
-        local parts = table.new(#label_keys, 0)
-        for i, label_key in ipairs(label_keys) do
+        local parts = table.new(#self.label_keys, 0)
+        for i, label_key in ipairs(self.label_keys) do
             local label_value = label_pairs[label_key]
             if label_value == nil then
                 error(string.format("Label key '%s' is missing", label_key))
@@ -87,7 +87,7 @@ end
 
 function Shared:remove(label_pairs)
     assert(label_pairs, 'label pairs is a required parameter')
-    local key = self.make_key(label_pairs, self.label_keys)
+    local key = self:make_key(label_pairs)
     self.observations[key] = nil
     self.label_pairs[key] = nil
 end
@@ -97,7 +97,7 @@ function Shared:set(num, label_pairs)
         error("Collector set value should be a number")
     end
     num = num or 0
-    local key = self.make_key(label_pairs, self.label_keys)
+    local key = self:make_key(label_pairs)
     self.observations[key] = num
     self.label_pairs[key] = label_pairs or {}
 end
@@ -107,7 +107,7 @@ function Shared:inc(num, label_pairs)
         error("Collector increment should be a number")
     end
     num = num or 1
-    local key = self.make_key(label_pairs, self.label_keys)
+    local key = self:make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value + num
     self.label_pairs[key] = label_pairs or {}
@@ -118,7 +118,7 @@ function Shared:dec(num, label_pairs)
         error("Collector decrement should be a number")
     end
     num = num or 1
-    local key = self.make_key(label_pairs, self.label_keys)
+    local key = self:make_key(label_pairs)
     local old_value = self.observations[key] or 0
     self.observations[key] = old_value - num
     self.label_pairs[key] = label_pairs or {}
