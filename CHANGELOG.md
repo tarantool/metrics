@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New optional ``label_keys`` parameter for ``histogram()`` metrics
+- New optional ``label_keys`` parameter for ``summary()`` metrics
 
 ### Changed
 

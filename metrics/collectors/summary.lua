@@ -6,13 +6,13 @@ local fiber = require('fiber')
 
 local Summary = Shared:new_class('summary', {'observe_latency'})
 
-function Summary:new(name, help, objectives, params, metainfo)
+function Summary:new(name, help, objectives, params, metainfo, label_keys)
     params = params or {}
     metainfo = table.copy(metainfo) or {}
-    local obj = Shared.new(self, name, help, metainfo)
+    local obj = Shared.new(self, name, help, metainfo, label_keys)
 
-    obj.count_collector = Counter:new(name .. '_count', help, metainfo)
-    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo)
+    obj.count_collector = Counter:new(name .. '_count', help, metainfo, label_keys)
+    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo, label_keys)
     obj.objectives = objectives
     obj.max_age_time = params.max_age_time
     obj.age_buckets_count = params.age_buckets_count or 1

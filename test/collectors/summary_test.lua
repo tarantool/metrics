@@ -252,3 +252,69 @@ g.test_metainfo_immutable = function()
     t.assert_equals(c.sum_collector.metainfo, {my_useful_info = 'here'})
     t.assert_equals(c.count_collector.metainfo, {my_useful_info = 'here'})
 end
+
+g.test_summary_with_fixed_labels = function()
+    local fixed_labels = {'label1', 'label2'}
+    local summary = metrics.summary('summary_with_labels', nil, {[0.5]=0.01, [0.9]=0.01}, {}, {}, fixed_labels)
+
+    summary:observe(42, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(summary:collect(),
+        {
+            {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels_sum', 42, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.5}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.9}},
+        }
+    )
+
+    summary:observe(1, {label1 = 2, label2 = 'text'})
+    utils.assert_observations(summary:collect(),
+        {
+            {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels_sum', 42, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.5}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.9}},
+            {'summary_with_labels_count', 1, {label1 = 2, label2 = 'text'}},
+            {'summary_with_labels_sum', 1, {label1 = 2, label2 = 'text'}},
+            {'summary_with_labels', 1, {label1 = 2, label2 = 'text', quantile = 0.5}},
+            {'summary_with_labels', 1, {label1 = 2, label2 = 'text', quantile = 0.9}},
+        }
+    )
+
+    summary:remove({label1 = 2, label2 = 'text'})
+    utils.assert_observations(summary:collect(),
+        {
+            {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels_sum', 42, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.5}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.9}},
+        }
+    )
+end
+
+g.test_summary_missing_label = function()
+    local fixed_labels = {'label1', 'label2'}
+    local summary = metrics.summary('summary_with_labels', nil, {[0.5]=0.01}, {}, {}, fixed_labels)
+
+    summary:observe(42, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(summary:collect(),
+        {
+            {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels_sum', 42, {label1 = 1, label2 = 'text'}},
+            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.5}},
+        }
+    )
+
+    t.assert_error_msg_contains(
+        "should match the number of label pairs",
+        summary.observe, summary, 42, {label1 = 1, label2 = 'text', label3 = 42})
+
+    local function assert_missing_label_error(fun, ...)
+        t.assert_error_msg_contains(
+            "is missing",
+            fun, summary, ...)
+    end
+
+    assert_missing_label_error(summary.observe, 1, {label1 = 1, label3 = 'a'})
+    assert_missing_label_error(summary.remove, {label2 = 0, label3 = 'b'})
+end

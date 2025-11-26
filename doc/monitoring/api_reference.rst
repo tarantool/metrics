@@ -417,7 +417,7 @@ Also, the metric exposes the count of measurements and the sum of observations:
 
 The design is based on the `Prometheus summary <https://prometheus.io/docs/concepts/metric_types/#summary>`__.
 
-..  function:: summary(name [, help, objectives, params, metainfo])
+..  function:: summary(name [, help, objectives, params, metainfo, label_keys])
 
     Register a new summary. Quantile computation is based on the
     `"Effective computation of biased quantiles over data streams" <https://ieeexplore.ieee.org/document/1410103>`_
@@ -451,6 +451,8 @@ The design is based on the `Prometheus summary <https://prometheus.io/docs/conce
         Default value: ``{max_age_time = math.huge, age_buckets_count = 1}``.
 
     :param table metainfo: collector metainfo.
+    :param table label_keys: predefined label keys to optimize performance.
+        When specified, only these keys can be used in ``label_pairs``.
 
     :return: A summary object.
 
