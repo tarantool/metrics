@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The `error` message level displayed when the `/proc/<pid>/stat` file is missing
+  has been changed to `verbose`. (#536).
+
 ### Removed
 
 # [1.6.1] - 2025-10-20

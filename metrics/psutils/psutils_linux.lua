@@ -40,7 +40,7 @@ end
 local function parse_process_stat(path)
     local stat, err = fio.open(path, 'O_RDONLY')
     if err ~= nil then
-        log.error('stat open error: %s', tostring(err))
+        log.verbose('stat file %s open error: %s', path, tostring(err))
         return nil
     end
 
@@ -48,7 +48,7 @@ local function parse_process_stat(path)
     s, err = stat:read(512)
     stat:close()
     if err ~= nil then
-        log.error('stat read error: %s', tostring(err))
+        log.verbose('stat file %s read error: %s', path, tostring(err))
         return nil
     end
     if s == nil or #s == 0 then
