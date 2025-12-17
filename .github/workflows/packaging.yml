@@ -38,7 +38,6 @@ jobs:
         platform:
           - { os: 'el', dist: '7' }
           - { os: 'el', dist: '8' }
-          - { os: 'el', dist: '9' }
           - { os: 'fedora', dist: '30' }
           - { os: 'fedora', dist: '31' }
           - { os: 'fedora', dist: '32' }
