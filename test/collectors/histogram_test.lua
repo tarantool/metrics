@@ -131,3 +131,79 @@ g.test_metainfo_immutable = function()
     t.assert_equals(h.count_collector.metainfo, {my_useful_info = 'here'})
     t.assert_equals(h.bucket_collector.metainfo, {my_useful_info = 'here'})
 end
+
+g.test_histogram_with_fixed_labels = function()
+    local fixed_labels = {'label1', 'label2'}
+    local histogram = metrics.histogram('histogram_with_labels', nil, {2, 4}, {}, fixed_labels)
+
+    histogram:observe(3, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(histogram:collect(),
+        {
+            {'histogram_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_sum', 3, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_bucket', 0, {label1 = 1, label2 = 'text', le = 2}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = 4}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = metrics.INF}},
+        }
+    )
+
+    histogram:observe(5, {label2 = 'text', label1 = 2})
+    utils.assert_observations(histogram:collect(),
+        {
+            {'histogram_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_sum', 3, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_bucket', 0, {label1 = 1, label2 = 'text', le = 2}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = 4}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = metrics.INF}},
+            {'histogram_with_labels_count', 1, {label1 = 2, label2 = 'text'}},
+            {'histogram_with_labels_sum', 5, {label1 = 2, label2 = 'text'}},
+            {'histogram_with_labels_bucket', 0, {label1 = 2, label2 = 'text', le = 2}},
+            {'histogram_with_labels_bucket', 0, {label1 = 2, label2 = 'text', le = 4}},
+            {'histogram_with_labels_bucket', 1, {label1 = 2, label2 = 'text', le = metrics.INF}},
+        }
+    )
+
+    histogram:remove({label1 = 2, label2 = 'text'})
+    utils.assert_observations(histogram:collect(),
+        {
+            {'histogram_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_sum', 3, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_bucket', 0, {label1 = 1, label2 = 'text', le = 2}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = 4}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = metrics.INF}},
+        }
+    )
+end
+
+g.test_histogram_missing_label = function()
+    local fixed_labels = {'label1', 'label2'}
+    local histogram = metrics.histogram('histogram_with_labels', nil, {2, 4}, {}, fixed_labels)
+
+    histogram:observe(42, {label1 = 1, label2 = 'text'})
+    utils.assert_observations(histogram:collect(),
+        {
+            {'histogram_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_sum', 42, {label1 = 1, label2 = 'text'}},
+            {'histogram_with_labels_bucket', 0, {label1 = 1, label2 = 'text', le = 2}},
+            {'histogram_with_labels_bucket', 0, {label1 = 1, label2 = 'text', le = 4}},
+            {'histogram_with_labels_bucket', 1, {label1 = 1, label2 = 'text', le = metrics.INF}},
+        }
+    )
+
+    t.assert_error_msg_contains(
+        "Invalid label_pairs: expected a table when label_keys is provided",
+        histogram.observe, histogram, 42, 1)
+
+    t.assert_error_msg_contains(
+        "should match the number of label pairs",
+        histogram.observe, histogram, 42, {label1 = 1, label2 = 'text', label3 = 42})
+
+    local function assert_missing_label_error(fun, ...)
+        t.assert_error_msg_contains(
+            "is missing",
+            fun, histogram, ...)
+    end
+
+    assert_missing_label_error(histogram.observe, 1, {label1 = 1, label3 = 'a'})
+    assert_missing_label_error(histogram.remove, {label2 = 0, label3 = 'b'})
+end
