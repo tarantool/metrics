@@ -25,6 +25,7 @@ group.before_each(function(g)
             exclude = {},
             labels = {},
         }
+        require('metrics').clear()
     end)
 end)
 

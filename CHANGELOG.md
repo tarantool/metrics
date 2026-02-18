@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Deleting a replica via `box.space._cluster:delete()` doesn't delete
+  information about this replica from the metrics (it's gone only
+  after cluster is restarted).
+
 ### Removed
 
 # [1.6.2] - 2025-12-17

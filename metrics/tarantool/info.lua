@@ -1,6 +1,7 @@
 local utils = require('metrics.utils')
 
 local collectors_list = {}
+local replicas = {}
 
 local read_only_status = {
     [true] = 1,
@@ -28,30 +29,6 @@ local function update_info_metrics()
     for k, v in pairs(info.vclock) do
         collectors_list.info_vclock = utils.set_gauge('info_vclock', 'VClock',
             v, {id = k}, nil, {default = true})
-    end
-
-    for k, v in pairs(info.replication) do
-        if k ~= info.id then
-            if v.upstream ~= nil then
-                collectors_list.replication_lag =
-                    utils.set_gauge('replication_lag', 'Replication lag',
-                        v.upstream.lag, {stream = 'upstream', id = k}, nil, {default = true})
-                collectors_list.replication_status =
-                    utils.set_gauge('replication_status', 'Replication status',
-                        v.upstream.status == 'follow' and 1 or 0, {stream = 'upstream', id = k},
-                        nil, {default = true})
-            end
-            if v.downstream ~= nil then
-                collectors_list.replication_lag =
-                    utils.set_gauge('replication_lag', 'Replication lag',
-                        v.downstream.lag, {stream = 'downstream', id = k},
-                        nil, {default = true})
-                collectors_list.replication_status =
-                    utils.set_gauge('replication_status', 'Replication status',
-                        v.downstream.status == 'follow' and 1 or 0, {stream = 'downstream', id = k},
-                        nil, {default = true})
-            end
-        end
     end
 
     collectors_list.read_only = utils.set_gauge('read_only', 'Is instance read only',
@@ -98,6 +75,50 @@ local function update_info_metrics()
                     info.election.leader_idle, nil, nil, {default = true})
         end
     end
+
+    local known_replicas = {}
+    local unknown_replicas = replicas
+
+    for k, v in pairs(info.replication) do
+        known_replicas[k] = true
+        unknown_replicas[k] = nil
+
+        if k ~= info.id then
+            if v.upstream ~= nil then
+                collectors_list.replication_lag =
+                    utils.set_gauge('replication_lag', 'Replication lag',
+                        v.upstream.lag, {stream = 'upstream', id = k}, nil, {default = true})
+                collectors_list.replication_status =
+                    utils.set_gauge('replication_status', 'Replication status',
+                        v.upstream.status == 'follow' and 1 or 0, {stream = 'upstream', id = k},
+                        nil, {default = true})
+            end
+            if v.downstream ~= nil then
+                collectors_list.replication_lag =
+                    utils.set_gauge('replication_lag', 'Replication lag',
+                        v.downstream.lag, {stream = 'downstream', id = k},
+                        nil, {default = true})
+                collectors_list.replication_status =
+                    utils.set_gauge('replication_status', 'Replication status',
+                        v.downstream.status == 'follow' and 1 or 0, {stream = 'downstream', id = k},
+                        nil, {default = true})
+            end
+        end
+    end
+
+    for k, v in pairs(unknown_replicas) do
+        if v ~= nil then
+            collectors_list.replication_lag:remove({stream = 'upstream', id = k})
+            collectors_list.replication_lag:remove({stream = 'downstream', id = k})
+
+            collectors_list.replication_status:remove({stream = 'upstream', id = k})
+            collectors_list.replication_status:remove({stream = 'downstream', id = k})
+
+            collectors_list.info_vclock:remove({id = k})
+        end
+    end
+
+    replicas = known_replicas
 end
 
 return {
