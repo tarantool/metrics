@@ -36,15 +36,10 @@ end)
 
 g.after_each(function(cg)
     cg.server:exec(function()
-        local fiber = require('fiber')
-        local fun = require('fun')
-        local metrics = require('metrics')
         -- Delete all collectors and global labels
-        metrics.clear()
-        fun.iter(fiber.info()):
-            filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
-            each(function(x) fiber.kill(x) end)
-        fiber.yield() -- let cancelled fibers disappear from fiber.info()
+        require('metrics').clear()
+        -- Stop all graphite fibers
+        require('metrics.plugins.graphite').stop()
     end)
 end)
 
@@ -152,10 +147,12 @@ g.test_graphite_sends_data_to_socket = function(cg)
 
         local cnt = metrics.counter('test_cnt', 'test-cnt')
         cnt:inc(1)
+
         graphite.init({port = port})
     end, {port})
 
-    require('fiber').sleep(0.5)
+    sock:readable(2)
+
     local graphite_obs = sock:recvfrom(50)
     local obs_table = graphite_obs:split(' ')
     t.assert_equals(obs_table[1], 'tarantool.test_cnt')
@@ -163,32 +160,92 @@ g.test_graphite_sends_data_to_socket = function(cg)
     sock:close()
 end
 
-g.test_graphite_kills_previous_fibers_on_init = function(cg)
+g.test_graphite_stop_default_fibers = function(cg)
     cg.server:exec(function()
         local fiber = require('fiber')
         local fun = require('fun')
         local graphite = require('metrics.plugins.graphite')
 
-        local function mock_graphite_worker()
-            fiber.create(function()
-                fiber.name('metrics_graphite_worker')
-                fiber.sleep(math.huge)
-            end)
-        end
-
         local function count_workers()
             return fun.iter(fiber.info()):
-                filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
+                filter(function(_, x) return string.find(x.name, 'metrics_graphite_worker') end):
                 length()
         end
 
         t.assert_equals(count_workers(), 0)
-        mock_graphite_worker()
-        mock_graphite_worker()
-        t.assert_equals(count_workers(), 2)
 
         graphite.init({})
-        fiber.yield() -- let cancelled fibers disappear from fiber.info()
         t.assert_equals(count_workers(), 1)
+
+        graphite.stop()
+        require('fiber').yield()
+        t.assert_equals(count_workers(), 0)
+    end)
+end
+
+g.test_graphite_stop_custom_fiber = function(cg)
+    cg.server:exec(function()
+        local fiber = require('fiber')
+        local fun = require('fun')
+        local graphite = require('metrics.plugins.graphite')
+
+        local function count_workers()
+            return fun.iter(fiber.info()):
+                filter(function(_, x) return string.find(x.name, 'metrics_graphite_worker') end):
+                length()
+        end
+
+        local opts = {
+            prefix = "master",
+            host = "127.0.0.1",
+            port = 3333,
+            send_interval = 1,
+        }
+
+        local opts2 = {
+            prefix = "tarantool",
+            host = "127.0.0.1",
+            port = 4444,
+            send_interval = 1,
+        }
+
+        t.assert_equals(count_workers(), 0)
+
+        graphite.init(opts)
+        graphite.init(opts2)
+
+        t.assert_equals(count_workers(), 2)
+
+        graphite.stop()
+        require('fiber').yield()
+        t.assert_equals(count_workers(), 0)
+    end)
+end
+
+g.test_graphite_double_start = function(cg)
+    cg.server:exec(function()
+        local fiber = require('fiber')
+        local fun = require('fun')
+        local graphite = require('metrics.plugins.graphite')
+
+        local function count_workers()
+            return fun.iter(fiber.info()):
+                filter(function(_, x) return string.find(x.name, 'metrics_graphite_worker') end):
+                length()
+        end
+
+        t.assert_equals(count_workers(), 0)
+
+        graphite.init({})
+
+        t.assert_equals(count_workers(), 1)
+
+        graphite.init({})
+
+        t.assert_equals(count_workers(), 1)
+
+        graphite.stop()
+        require('fiber').yield()
+        t.assert_equals(count_workers(), 0)
     end)
 end
