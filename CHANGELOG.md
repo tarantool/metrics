@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `graphite`: ability to send metrics to the multiple servers.
+  Backward compatibility with previous plugin version is preserved.
+  From now on `init` method assigns an unique name to the created fiber
+  using incoming graphite server `opts` (if passed). Added new `stop()`
+  method to stop all fibers started by the plugin.
+
 ### Changed
 
 ### Fixed
