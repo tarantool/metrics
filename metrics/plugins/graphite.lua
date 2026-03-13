@@ -37,6 +37,7 @@ function graphite.format_observation(prefix, obs)
 end
 
 local function graphite_worker(opts)
+    -- here could be a problem, cause worker only 1.
     fiber.name('metrics_graphite_worker')
 
     while true do
@@ -72,10 +73,14 @@ function graphite.init(opts)
     local port = opts.port or DEFAULT_PORT
     local send_interval = opts.send_interval or DEFAULT_SEND_INTERVAL
 
+    -- iterate over all fibers on instance
+    -- skip all except 'metrics_graphite_worker'
+    -- kill it.
     fun.iter(fiber.info()):
         filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
         each(function(x) fiber.kill(x) end)
 
+    -- start new fiber
     fiber.create(graphite_worker, {
         prefix = prefix,
         sock = sock,
@@ -83,6 +88,15 @@ function graphite.init(opts)
         port = port,
         send_interval = send_interval,
     })
+end
+
+function graphite.stop()
+    -- iterate over all fibers on instance
+    -- skip all except 'metrics_graphite_worker'
+    -- kill it.
+    fun.iter(fiber.info()):
+        filter(function(_, x) return x.name == 'metrics_graphite_worker' end):
+        each(function(x) fiber.kill(x) end)
 end
 
 return graphite
