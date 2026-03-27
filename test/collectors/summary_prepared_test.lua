@@ -9,16 +9,20 @@ local metrics = require('metrics')
 
 g.before_each(metrics.clear)
 
-g.test_collect = function()
+g.test_summary_prepared_collect = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
-    instance:observe(1)
-    instance:observe(2)
-    instance:observe(3)
-    instance:observe(3, {tag = 'a'})
-    instance:observe(4, {tag = 'a'})
-    instance:observe(5, {tag = 'a'})
-    instance:observe(6, {tag = 'a'})
-    instance:observe(6, {tag = 'b'})
+    local prepared1 = instance:prepare({})
+    local prepared2 = instance:prepare({tag = 'a'})
+    local prepared3 = instance:prepare({tag = 'b'})
+
+    prepared1:observe(1)
+    prepared1:observe(2)
+    prepared1:observe(3)
+    prepared2:observe(3)
+    prepared2:observe(4)
+    prepared2:observe(5)
+    prepared2:observe(6)
+    prepared3:observe(6)
 
     utils.assert_observations(instance:collect(), {
         {'latency_count', 3, {}},
@@ -47,11 +51,12 @@ local test_data_collect = {
 }
 
 for test_case, test_data in pairs(test_data_collect) do
-    g['test_collect_' .. test_case] = function()
+    g['test_summary_prepared_collect_' .. test_case] = function()
         local instance = Summary:new('latency', nil, unpack(test_data.input))
+        local prepared = instance:prepare({})
         local sum = 0
         for i = 1, test_data.num_observations do
-            instance:observe(i)
+            prepared:observe(i)
             sum = sum + i
         end
         local res = utils.observations_without_timestamps(instance:collect())
@@ -68,11 +73,12 @@ for test_case, test_data in pairs(test_data_collect) do
     end
 end
 
-g.test_summary_4_age_buckets_value_in_each_bucket = function()
+g.test_summary_prepared_4_age_buckets_value_in_each_bucket = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
         {max_age_time = 10, age_buckets_count = 4})
+    local prepared = instance:prepare({})
     for i = 1, 10^3 do
-        instance:observe(i)
+        prepared:observe(i)
     end
 
     local observations = instance:get_observations()
@@ -84,12 +90,13 @@ g.test_summary_4_age_buckets_value_in_each_bucket = function()
     end
 end
 
-g.test_summary_4_age_buckets_rotates = function()
+g.test_summary_prepared_4_age_buckets_rotates = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
         {max_age_time = 0, age_buckets_count = 4})
+    local prepared = instance:prepare({})
 
-    instance:observe(2) -- 0.5-quantile now is 2
-    instance:observe(1)
+    prepared:observe(2) -- 0.5-quantile now is 2
+    prepared:observe(1)
     -- summary rotates at this moment
     -- now head index is 2 and previous head bucket resets
     -- head bucket has 0.5-quantile = 2
@@ -105,12 +112,13 @@ g.test_summary_4_age_buckets_rotates = function()
     t.assert_not_equals(head_quantile, previous_quantile)
 end
 
-g.test_summary_full_circle_rotates = function()
+g.test_summary_prepared_full_circle_rotates = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
         {max_age_time = 0, age_buckets_count = 4})
+    local prepared = instance:prepare({})
 
     for i = 1, 5 do
-        instance:observe(i)
+        prepared:observe(i)
     end
 
     local observations = instance:get_observations().buckets
@@ -123,10 +131,11 @@ g.test_summary_full_circle_rotates = function()
     t.assert_not_equals(head_quantile, previous_quantile)
 end
 
-g.test_summary_counter_values_equals = function()
+g.test_summary_prepared_counter_values_equals = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+    local prepared = instance:prepare({})
     for i = 1, 10^3 do
-        instance:observe(i)
+        prepared:observe(i)
     end
 
     local observations = instance:get_observations()
@@ -135,36 +144,40 @@ g.test_summary_counter_values_equals = function()
     t.assert_equals(instance.count_collector.observations[''], count)
 end
 
-g.test_summary_with_age_buckets_refresh_values = function()
+g.test_summary_prepared_with_age_buckets_refresh_values = function()
     local s1 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
     local s2 = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
         {max_age_time = 0, age_buckets_count = 4})
 
+    local prepared1 = s1:prepare({})
+    local prepared2 = s2:prepare({})
+
     for i = 1, 10 do
-        s1:observe(i)
-        s2:observe(i)
+        prepared1:observe(i)
+        prepared2:observe(i)
     end
     for i = 0.1, 1, 0.1 do
-        s1:observe(i)
-        s2:observe(i)
+        prepared1:observe(i)
+        prepared2:observe(i)
     end
 
     t.assert_equals(s1:collect()[5].value, 10)
     t.assert_not_equals(s1:collect()[5].value, s2:collect()[5].value)
 end
 
-g.test_summary_wrong_label = function()
+g.test_summary_prepared_wrong_label = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01},
         {max_age_time = 0, age_buckets_count = 4})
 
     t.assert_error_msg_contains('Label "quantile" are not allowed in summary',
-        instance.observe, instance, 1, {quantile = 0.5})
+        instance.prepare, instance, {quantile = 0.5})
 end
 
-g.test_create_summary_without_observations = function()
+g.test_summary_prepared_create_summary_without_observations = function()
     local ok, summary = pcall(metrics.summary, 'plain_summary')
     t.assert(ok, summary)
-    summary:observe(0)
+    local prepared = summary:prepare({})
+    prepared:observe(0)
 
     local summary_metrics = utils.find_metric('plain_summary_count', metrics.collect())
     t.assert_equals(#summary_metrics, 1)
@@ -174,37 +187,15 @@ g.test_create_summary_without_observations = function()
 
     summary_metrics = utils.find_metric('plain_summary', metrics.collect())
     t.assert_not(summary_metrics)
-
 end
 
-local test_data_wrong_input = {
-    objectives = {error = 'Invalid value for objectives', input = {'summary', nil, {0.5, 0.9, 0.99}}},
-    max_age = {error = 'Max age must be positive', input = {'summary', nil, {[0.5]=0.01}, {max_age_time = -1}}},
-    age_buckets = {error = 'Age buckets count must be greater or equal than one',
-        input = {'summary', nil, {[0.5]=0.01}, {max_age_time = 1, age_buckets_count = -1}}},
-    age_buckets_without_max_age = {error = 'Age buckets count and max age must be present only together',
-        input = {'summary', nil, {[0.5]=0.01}, {age_buckets_count = 1}}},
-    max_age_without_age_buckets = {error = 'Age buckets count and max age must be present only together',
-        input = {'summary', nil, {[0.5]=0.01}, {max_age_time = 1}}},
-    bad_collector_name_type = {error = 'bad argument', input = {nil}},
-    bad_help_string_type = {error = 'bad argument', input = {'summary', {}}},
-    bad_objectives_type = {error = 'bad argument', input = {'summary', 'help', 'objectives'}},
-    bad_max_age_type = {error = 'bad argument', input = {'summary', 'help', {[0.5]=0.01},
-        {max_age_time = '1', age_buckets_count = 1}}},
-    bad_age_buckets_type = {error = 'bad argument', input = {'summary', 'help', {[0.5]=0.01},
-        {max_age_time = 1, age_buckets_count = '1'}}},
-}
-
-for case_name, test_data in pairs(test_data_wrong_input) do
-    g['test_summary_wrong_input_' .. case_name] = function()
-        t.assert_error_msg_contains(test_data.error, metrics.summary, unpack(test_data.input))
-    end
-end
-
-g.test_remove_metric_by_label = function()
+g.test_summary_prepared_remove_metric_by_label = function()
     local instance = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
-    instance:observe(3, {tag = 'a'})
-    instance:observe(6, {tag = 'b'})
+    local prepared1 = instance:prepare({tag = 'a'})
+    local prepared2 = instance:prepare({tag = 'b'})
+
+    prepared1:observe(3)
+    prepared2:observe(6)
 
     utils.assert_observations(instance:collect(), {
         {'latency_count', 1, {tag = 'a'}},
@@ -219,8 +210,7 @@ g.test_remove_metric_by_label = function()
         {'latency', 6, {quantile = 0.99, tag = 'b'}},
     })
 
-    instance:remove({tag = 'b'})
-
+    prepared2:remove()
     utils.assert_observations(instance:collect(), {
         {'latency_count', 1, {tag = 'a'}},
         {'latency_sum', 3, {tag = 'a'}},
@@ -230,34 +220,19 @@ g.test_remove_metric_by_label = function()
     })
 end
 
-g.test_insert_non_number = function()
+g.test_summary_prepared_insert_non_number = function()
     local s = Summary:new('latency', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+    local prepared = s:prepare({})
 
-    t.assert_error_msg_contains('Summary observation should be a number', s.observe, s, true)
+    t.assert_error_msg_contains('Summary observation should be a number', prepared.observe, prepared, true)
 end
 
-g.test_metainfo = function()
-    local metainfo = {my_useful_info = 'here'}
-    local c = Summary:new('collector', nil, nil, nil, metainfo)
-    t.assert_equals(c.metainfo, metainfo)
-    t.assert_equals(c.sum_collector.metainfo, metainfo)
-    t.assert_equals(c.count_collector.metainfo, metainfo)
-end
-
-g.test_metainfo_immutable = function()
-    local metainfo = {my_useful_info = 'here'}
-    local c = Summary:new('collector', nil, nil, nil, metainfo)
-    metainfo['my_useful_info'] = 'there'
-    t.assert_equals(c.metainfo, {my_useful_info = 'here'})
-    t.assert_equals(c.sum_collector.metainfo, {my_useful_info = 'here'})
-    t.assert_equals(c.count_collector.metainfo, {my_useful_info = 'here'})
-end
-
-g.test_summary_with_fixed_labels = function()
+g.test_summary_prepared_with_fixed_labels = function()
     local fixed_labels = {'label1', 'label2'}
     local summary = metrics.summary('summary_with_labels', nil, {[0.5]=0.01, [0.9]=0.01}, {}, {}, fixed_labels)
 
-    summary:observe(42, {label1 = 1, label2 = 'text'})
+    local prepared1 = summary:prepare({label1 = 1, label2 = 'text'})
+    prepared1:observe(42)
     utils.assert_observations(summary:collect(),
         {
             {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
@@ -267,7 +242,8 @@ g.test_summary_with_fixed_labels = function()
         }
     )
 
-    summary:observe(1, {label1 = 2, label2 = 'text'})
+    local prepared2 = summary:prepare({label1 = 2, label2 = 'text'})
+    prepared2:observe(1)
     utils.assert_observations(summary:collect(),
         {
             {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
@@ -281,7 +257,7 @@ g.test_summary_with_fixed_labels = function()
         }
     )
 
-    summary:remove({label1 = 2, label2 = 'text'})
+    prepared2:remove()
     utils.assert_observations(summary:collect(),
         {
             {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
@@ -292,22 +268,14 @@ g.test_summary_with_fixed_labels = function()
     )
 end
 
-g.test_summary_missing_label = function()
+g.test_summary_prepared_missing_label = function()
     local fixed_labels = {'label1', 'label2'}
     local summary = metrics.summary('summary_with_labels', nil, {[0.5]=0.01}, {}, {}, fixed_labels)
 
-    summary:observe(42, {label1 = 1, label2 = 'text'})
-    utils.assert_observations(summary:collect(),
-        {
-            {'summary_with_labels_count', 1, {label1 = 1, label2 = 'text'}},
-            {'summary_with_labels_sum', 42, {label1 = 1, label2 = 'text'}},
-            {'summary_with_labels', 42, {label1 = 1, label2 = 'text', quantile = 0.5}},
-        }
-    )
-
+    -- Test that prepare validates labels
     t.assert_error_msg_contains(
         "should match the number of label pairs",
-        summary.observe, summary, 42, {label1 = 1, label2 = 'text', label3 = 42})
+        summary.prepare, summary, {label1 = 1, label2 = 'text', label3 = 42})
 
     local function assert_missing_label_error(fun, ...)
         t.assert_error_msg_contains(
@@ -315,6 +283,76 @@ g.test_summary_missing_label = function()
             fun, summary, ...)
     end
 
-    assert_missing_label_error(summary.observe, 1, {label1 = 1, label3 = 'a'})
-    assert_missing_label_error(summary.remove, {label2 = 0, label3 = 'b'})
+    assert_missing_label_error(summary.prepare, {label1 = 1, label3 = 'a'})
+end
+
+g.test_summary_prepared_multiple_labels = function()
+    local s = metrics.summary('http_request_duration_seconds', nil, {[0.5]=0.01, [0.9]=0.01, [0.99]=0.01})
+
+    -- Test multiple prepared statements with different labels
+    local prepared1 = s:prepare({method = 'GET', endpoint = '/api/users', status = '200'})
+    local prepared2 = s:prepare({method = 'POST', endpoint = '/api/users', status = '201'})
+    local prepared3 = s:prepare({method = 'GET', endpoint = '/api/products', status = '404'})
+
+    prepared1:observe(0.15)
+    prepared2:observe(0.35)
+    prepared3:observe(1.2)
+
+    utils.assert_observations(s:collect(),
+        {
+            {'http_request_duration_seconds_count', 1, {method = 'GET', endpoint = '/api/users', status = '200'}},
+            {'http_request_duration_seconds_sum', 0.15, {method = 'GET', endpoint = '/api/users', status = '200'}},
+            {'http_request_duration_seconds', 0.15, {method = 'GET', endpoint = '/api/users', status = '200', quantile = 0.5}},
+            {'http_request_duration_seconds', 0.15, {method = 'GET', endpoint = '/api/users', status = '200', quantile = 0.9}},
+            {'http_request_duration_seconds', 0.15, {method = 'GET', endpoint = '/api/users', status = '200', quantile = 0.99}},
+            {'http_request_duration_seconds_count', 1, {method = 'POST', endpoint = '/api/users', status = '201'}},
+            {'http_request_duration_seconds_sum', 0.35, {method = 'POST', endpoint = '/api/users', status = '201'}},
+            {'http_request_duration_seconds', 0.35, {method = 'POST', endpoint = '/api/users', status = '201', quantile = 0.5}},
+            {'http_request_duration_seconds', 0.35, {method = 'POST', endpoint = '/api/users', status = '201', quantile = 0.9}},
+            {'http_request_duration_seconds', 0.35, {method = 'POST', endpoint = '/api/users', status = '201', quantile = 0.99}},
+            {'http_request_duration_seconds_count', 1, {method = 'GET', endpoint = '/api/products', status = '404'}},
+            {'http_request_duration_seconds_sum', 1.2, {method = 'GET', endpoint = '/api/products', status = '404'}},
+            {'http_request_duration_seconds', 1.2, {method = 'GET', endpoint = '/api/products', status = '404', quantile = 0.5}},
+            {'http_request_duration_seconds', 1.2, {method = 'GET', endpoint = '/api/products', status = '404', quantile = 0.9}},
+            {'http_request_duration_seconds', 1.2, {method = 'GET', endpoint = '/api/products', status = '404', quantile = 0.99}},
+        }
+    )
+
+    -- Test observe on existing prepared statement
+    prepared1:observe(0.25)
+    utils.assert_observations(s:collect(),
+        {
+            {'http_request_duration_seconds_count', 2, {method = 'GET', endpoint = '/api/users', status = '200'}},
+            {'http_request_duration_seconds_sum', 0.4, {method = 'GET', endpoint = '/api/users', status = '200'}},
+            {'http_request_duration_seconds', 0.25, {method = 'GET', endpoint = '/api/users', status = '200', quantile = 0.5}},
+            {'http_request_duration_seconds', 0.25, {method = 'GET', endpoint = '/api/users', status = '200', quantile = 0.9}},
+            {'http_request_duration_seconds', 0.25, {method = 'GET', endpoint = '/api/users', status = '200', quantile = 0.99}},
+            {'http_request_duration_seconds_count', 1, {method = 'POST', endpoint = '/api/users', status = '201'}},
+            {'http_request_duration_seconds_sum', 0.35, {method = 'POST', endpoint = '/api/users', status = '201'}},
+            {'http_request_duration_seconds', 0.35, {method = 'POST', endpoint = '/api/users', status = '201', quantile = 0.5}},
+            {'http_request_duration_seconds', 0.35, {method = 'POST', endpoint = '/api/users', status = '201', quantile = 0.9}},
+            {'http_request_duration_seconds', 0.35, {method = 'POST', endpoint = '/api/users', status = '201', quantile = 0.99}},
+            {'http_request_duration_seconds_count', 1, {method = 'GET', endpoint = '/api/products', status = '404'}},
+            {'http_request_duration_seconds_sum', 1.2, {method = 'GET', endpoint = '/api/products', status = '404'}},
+            {'http_request_duration_seconds', 1.2, {method = 'GET', endpoint = '/api/products', status = '404', quantile = 0.5}},
+            {'http_request_duration_seconds', 1.2, {method = 'GET', endpoint = '/api/products', status = '404', quantile = 0.9}},
+            {'http_request_duration_seconds', 1.2, {method = 'GET', endpoint = '/api/products', status = '404', quantile = 0.99}},
+        }
+    )
+end
+
+g.test_summary_prepared_methods = function()
+    local s = metrics.summary('summary')
+    local prepared = s:prepare({label = 'test'})
+
+    -- Test that prepared has the right methods
+    t.assert_not_equals(prepared.observe, nil, "prepared should have observe method")
+    t.assert_not_equals(prepared.remove, nil, "prepared should have remove method")
+    -- prepared statements don't have collect method (collect is on the collector)
+
+    -- Test that prepared doesn't have gauge/counter methods
+    t.assert_equals(prepared.inc, nil, "prepared shouldn't have inc method")
+    t.assert_equals(prepared.dec, nil, "prepared shouldn't have dec method")
+    t.assert_equals(prepared.set, nil, "prepared shouldn't have set method")
+    t.assert_equals(prepared.reset, nil, "prepared shouldn't have reset method")
 end

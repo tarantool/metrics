@@ -8,9 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- New optional ``label_keys`` parameter for ``histogram()`` metrics
+- New optional ``label_keys`` parameter for ``summary()`` metrics
+- Prepared statements feature for performance optimization: ``:prepare()`` method on collectors
+  to cache ``label_pairs`` and reduce GC pressure from ``make_key()`` string operations
+
 ### Changed
 
 ### Fixed
+
+- Turnend `Shared:make_key` into a Lua table method
+- Make it impossible to override the `label_keys` when calling `Shared:make_key`
 
 ### Removed
 

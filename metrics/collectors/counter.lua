@@ -1,19 +1,19 @@
 local Shared = require('metrics.collectors.shared')
 
-local Counter = Shared:new_class('counter')
+local Counter = Shared:new_class('counter', {'inc', 'reset'})
 
-function Counter:inc(num, label_pairs)
+function Counter.Prepared:inc(num)
     if num ~= nil and type(tonumber(num)) ~= 'number' then
         error("Counter increment should be a number")
     end
     if num and num < 0 then
         error("Counter increment should not be negative")
     end
-    Shared.inc(self, num, label_pairs)
+    Shared.Prepared.inc(self, num)
 end
 
-function Counter:reset(label_pairs)
-    Shared.set(self, 0, label_pairs)
+function Counter.Prepared:reset()
+    Shared.Prepared.set(self, 0)
 end
 
 return Counter

@@ -4,15 +4,15 @@ local Quantile = require('metrics.quantile')
 
 local fiber = require('fiber')
 
-local Summary = Shared:new_class('summary', {'observe_latency'})
+local Summary = Shared:new_class('summary', {'observe', 'observe_latency'})
 
-function Summary:new(name, help, objectives, params, metainfo)
+function Summary:new(name, help, objectives, params, metainfo, label_keys)
     params = params or {}
     metainfo = table.copy(metainfo) or {}
-    local obj = Shared.new(self, name, help, metainfo)
+    local obj = Shared.new(self, name, help, metainfo, label_keys)
 
-    obj.count_collector = Counter:new(name .. '_count', help, metainfo)
-    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo)
+    obj.count_collector = Counter:new(name .. '_count', help, metainfo, label_keys)
+    obj.sum_collector = Counter:new(name .. '_sum', help, metainfo, label_keys)
     obj.objectives = objectives
     obj.max_age_time = params.max_age_time
     obj.age_buckets_count = params.age_buckets_count or 1
@@ -50,38 +50,47 @@ function Summary:rotate_age_buckets(key)
     obs_object.last_rotate = os.time()
 end
 
-function Summary:observe(num, label_pairs)
+function Summary:prepare(label_pairs)
     label_pairs = label_pairs or {}
     if label_pairs.quantile then
         error('Label "quantile" are not allowed in summary')
     end
+
+    local prepared = Summary.Prepared:new(self, label_pairs)
+    prepared.count_prepared = Counter.Prepared:new(self.count_collector, label_pairs)
+    prepared.sum_prepared = Counter.Prepared:new(self.sum_collector, label_pairs)
+
+    return prepared
+end
+
+function Summary.Prepared:observe(num)
     if num ~= nil and type(tonumber(num)) ~= 'number' then
         error("Summary observation should be a number")
     end
-    self.count_collector:inc(1, label_pairs)
-    self.sum_collector:inc(num, label_pairs)
-    if self.objectives then
+    self.count_prepared:inc(1)
+    self.sum_prepared:inc(num)
+    if self.collector.objectives then
         local now = os.time()
-        local key = self.make_key(label_pairs)
+        local key = self.key
 
-        if not self.observations[key] then
+        if not self.collector.observations[key] then
             local obs_object = {
                 buckets = {},
                 head_bucket_index = 1,
                 last_rotate = now,
-                label_pairs = label_pairs,
+                label_pairs = self.label_pairs,
             }
-            self.label_pairs[key] = label_pairs
-            for i = 1, self.age_buckets_count do
-                local quantile_obj = Quantile.NewTargeted(self.objectives)
+            self.collector.label_pairs[key] = self.label_pairs
+            for i = 1, self.collector.age_buckets_count do
+                local quantile_obj = Quantile.NewTargeted(self.collector.objectives)
                 Quantile.Insert(quantile_obj, num)
                 obs_object.buckets[i] = quantile_obj
             end
-            self.observations[key] = obs_object
+            self.collector.observations[key] = obs_object
         else
-            local obs_object = self.observations[key]
-            if self.age_buckets_count > 1 and now - obs_object.last_rotate >= self.max_age_time then
-                self:rotate_age_buckets(key)
+            local obs_object = self.collector.observations[key]
+            if self.collector.age_buckets_count > 1 and now - obs_object.last_rotate >= self.collector.max_age_time then
+                self.collector:rotate_age_buckets(key)
             end
             for _, bucket in ipairs(obs_object.buckets) do
                 Quantile.Insert(bucket, num)
@@ -90,13 +99,11 @@ function Summary:observe(num, label_pairs)
     end
 end
 
-function Summary:remove(label_pairs)
-    assert(label_pairs, 'label pairs is a required parameter')
-    self.count_collector:remove(label_pairs)
-    self.sum_collector:remove(label_pairs)
-    if self.objectives then
-        local key = self.make_key(label_pairs)
-        self.observations[key] = nil
+function Summary.Prepared:remove()
+    self.count_prepared:remove()
+    self.sum_prepared:remove()
+    if self.collector.objectives then
+        self.collector.observations[self.key] = nil
     end
 end
 
@@ -144,7 +151,7 @@ end
 -- returns array of quantile objects or
 -- single quantile object if summary has only one bucket
 function Summary:get_observations(label_pairs)
-    local key = self.make_key(label_pairs or {})
+    local key = self:make_key(label_pairs or {})
     local obs = self.observations[key]
     if self.age_buckets_count > 1 then
         return obs
