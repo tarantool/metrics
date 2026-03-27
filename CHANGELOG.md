@@ -8,21 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+# [1.7.0] - 2026-03-27
+
+This release adds to the `graphite` plugin ability to send metrics
+to the multiple servers and hide replication metrics of the deleted
+replica.
+
+### Added
+
 - `graphite`: ability to send metrics to the multiple servers.
   Backward compatibility with previous plugin version is preserved.
   From now on `init` method assigns an unique name to the created fiber
   using incoming graphite server `opts` (if passed). Added new `stop()`
-  method to stop all fibers started by the plugin.
-
-### Changed
+  method to stop all fibers started by the plugin (#540).
 
 ### Fixed
 
 - Deleting a replica via `box.space._cluster:delete()` doesn't delete
   information about this replica from the metrics (it's gone only
-  after cluster is restarted).
-
-### Removed
+  after cluster is restarted) (#538).
 
 # [1.6.2] - 2025-12-17
 
