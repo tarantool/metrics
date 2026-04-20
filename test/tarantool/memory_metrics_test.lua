@@ -39,6 +39,12 @@ g.test_instance_metrics = function(cg)
 
         local memory_virt_metric = utils.find_metric('tnt_memory_virt', default_metrics)
         t.assert(memory_virt_metric)
-        t.assert_gt(memory_virt_metric[1].value, 0)
+        -- Virtual memory size is only reported on Linux, other platforms
+        -- may return 0.
+        if jit.os == 'Linux' then
+            t.assert_gt(memory_virt_metric[1].value, 0)
+        else
+            t.assert_ge(memory_virt_metric[1].value, 0)
+        end
     end)
 end
