@@ -7,6 +7,40 @@ local const = require('metrics.const')
 local stash = require('metrics.stash')
 local metrics_tarantool = require('metrics.tarantool')
 
+-- Split a metrics.cfg include/exclude side into two parts: built-in metric
+-- groups for metrics.tarantool and custom selectors for the registry filter.
+local function split_metric_groups_and_selectors(values, default_value,
+                                                 empty_default,
+                                                 empty_selectors)
+    values = values or default_value
+
+    if type(values) == 'string' then
+        return values, values
+    end
+
+    -- Built-in metric groups are handled by metrics.tarantool, while unknown
+    -- values are treated as custom selectors and passed to the registry filter.
+    local default_metrics = {}
+    local custom_selectors = {}
+    for _, value in ipairs(values) do
+        if value == const.ALL or metrics_tarantool.is_default_metric(value) then
+            table.insert(default_metrics, value)
+        else
+            table.insert(custom_selectors, {selector = value})
+        end
+    end
+
+    if next(default_metrics) == nil then
+        default_metrics = empty_default
+    end
+
+    if next(custom_selectors) == nil then
+        custom_selectors = empty_selectors
+    end
+
+    return default_metrics, custom_selectors
+end
+
 local function set_defaults_if_empty(cfg)
     if cfg.include == nil then
         cfg.include = const.ALL
@@ -37,7 +71,14 @@ local function configure(cfg, opts)
     end
 
 
-    metrics_tarantool.enable_v2(opts.include, opts.exclude)
+    local default_include, selector_include =
+        split_metric_groups_and_selectors(opts.include, const.ALL, const.NONE,
+                                          const.ALL)
+    local default_exclude, selector_exclude =
+        split_metric_groups_and_selectors(opts.exclude, {}, {}, {})
+
+    metrics_tarantool.enable_v2(default_include, default_exclude)
+    metrics_api.set_filter(selector_include, selector_exclude)
     metrics_api.set_global_labels(opts.labels)
 
     rawset(cfg, 'include', opts.include)

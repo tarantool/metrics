@@ -23,10 +23,12 @@ return setmetatable({
 
     clear = api.clear,
     collectors = api.collectors,
+    namespace = api.namespace,
     register_callback = api.register_callback,
     unregister_callback = api.unregister_callback,
     invoke_callbacks = api.invoke_callbacks,
     set_global_labels = api.set_global_labels,
+    set_filter = api.set_filter,
     enable_default_metrics = tarantool.enable,
     cfg = cfg.cfg,
     http_middleware = http_middleware,
