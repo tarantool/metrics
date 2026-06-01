@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `metrics.namespace()` and `metrics.set_filter()` to mark custom
+  collectors/callbacks with selectors and filter them at collection time.
+
 ### Changed
 
 ### Fixed

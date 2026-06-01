@@ -169,6 +169,44 @@ g.test_hotreload_remove_callbacks = function(cg)
     end)
 end
 
+g.test_hotreload_old_registry_gets_filter = function(cg)
+    cg.server:exec(function()
+        local previous_registry = rawget(_G, '__metrics_registry')
+        local previous_metrics_api = package.loaded['metrics.api']
+        local old_registry = {
+            collectors = {},
+            callbacks = {},
+            label_pairs = {},
+        }
+
+        rawset(_G, '__metrics_registry', old_registry)
+        package.loaded['metrics.api'] = nil
+
+        local metrics_api = require('metrics.api')
+        local registry = rawget(_G, '__metrics_registry')
+
+        t.assert_equals(registry, old_registry)
+        t.assert_not_equals(registry.filter, nil)
+        t.assert_equals(registry.filter, {
+            include_all = true,
+            include = {},
+            exclude_all = false,
+            exclude = {},
+        })
+
+        metrics_api.set_filter({{selector = 'roles.crud-router'}}, {})
+        t.assert_equals(registry.filter, {
+            include_all = false,
+            include = {'roles.crud-router'},
+            exclude_all = false,
+            exclude = {},
+        })
+
+        rawset(_G, '__metrics_registry', previous_registry)
+        package.loaded['metrics.api'] = previous_metrics_api
+    end)
+end
+
 local collect_invoke_callbacks_cases = {
     default = {
         args = nil,
@@ -201,6 +239,134 @@ for name, case in pairs(collect_invoke_callbacks_cases) do
         local obs = utils.find_obs('mycounter', {}, observations)
         t.assert_equals(obs.value, case.value)
     end
+end
+
+g.test_filter_custom_collectors = function()
+    local crud = metrics.namespace('roles.crud-router')
+    local queue = metrics.namespace('roles.queue')
+
+    local crud_requests = crud:gauge('crud_requests')
+    crud_requests:set(1)
+    queue:gauge('queue_requests'):set(2)
+    metrics.gauge('ungrouped_requests'):set(3)
+
+    t.assert_equals(crud_requests.metainfo, {
+        selector = 'roles.crud-router.crud_requests',
+    })
+
+    metrics.set_filter({{selector = 'roles.crud-router'}}, {})
+
+    local observations = metrics.collect()
+    t.assert_not_equals(utils.find_metric('crud_requests', observations), nil)
+    t.assert_equals(utils.find_metric('queue_requests', observations), nil)
+    t.assert_equals(utils.find_metric('ungrouped_requests', observations), nil)
+end
+
+g.test_filter_custom_collectors_exclude_has_priority = function()
+    local crud = metrics.namespace('roles.crud-router')
+
+    crud:gauge('crud_requests'):set(1)
+    crud:gauge('crud_errors'):set(2)
+
+    metrics.set_filter({{selector = 'roles.crud-router'}},
+                       {{selector = 'roles.crud-router.crud_errors'}})
+
+    local observations = metrics.collect()
+    t.assert_not_equals(utils.find_metric('crud_requests', observations), nil)
+    t.assert_equals(utils.find_metric('crud_errors', observations), nil)
+end
+
+g.test_filter_can_be_reconfigured = function()
+    local crud = metrics.namespace('roles.crud-router')
+    local queue = metrics.namespace('roles.queue')
+
+    crud:gauge('crud_requests'):set(1)
+    queue:gauge('queue_requests'):set(1)
+
+    metrics.set_filter({{selector = 'roles.crud-router'}}, {})
+    local observations = metrics.collect()
+    t.assert_not_equals(utils.find_metric('crud_requests', observations), nil)
+    t.assert_equals(utils.find_metric('queue_requests', observations), nil)
+
+    metrics.set_filter({{selector = 'roles.queue'}}, {})
+    observations = metrics.collect()
+    t.assert_equals(utils.find_metric('crud_requests', observations), nil)
+    t.assert_not_equals(utils.find_metric('queue_requests', observations), nil)
+
+    metrics.set_filter('all', {})
+    observations = metrics.collect()
+    t.assert_not_equals(utils.find_metric('crud_requests', observations), nil)
+    t.assert_not_equals(utils.find_metric('queue_requests', observations), nil)
+end
+
+g.test_set_filter_validation = function()
+    t.assert_error_msg_contains(
+        "Metric selector filter string must be 'all' or 'none'",
+        function()
+            metrics.set_filter('roles.crud-router', {})
+        end)
+
+    t.assert_error_msg_contains(
+        'Metric selector filter item must be a table with a non-empty ' ..
+        'selector field',
+        function()
+            metrics.set_filter({{name = 'roles.crud-router'}}, {})
+        end)
+
+    local Registry = require('metrics.registry')
+    local registry = Registry.new()
+
+    t.assert_error_msg_contains(
+        "Metric selector filter must be 'all', 'none', or an array of " ..
+        'selector objects',
+        function()
+            registry:set_filter(42, {})
+        end)
+end
+
+g.test_filter_custom_callbacks = function()
+    local crud = metrics.namespace('roles.crud-router')
+    local queue = metrics.namespace('roles.queue')
+    local crud_gauge = crud:gauge('crud_callback_runs')
+    local queue_gauge = queue:gauge('queue_callback_runs')
+    local crud_runs = 0
+    local queue_runs = 0
+
+    crud_gauge:set(0)
+    queue_gauge:set(0)
+    metrics.register_callback(function()
+        crud_runs = crud_runs + 1
+        crud_gauge:set(crud_runs)
+    end, {selector = 'roles.crud-router'})
+    metrics.register_callback(function()
+        queue_runs = queue_runs + 1
+        queue_gauge:set(queue_runs)
+    end, {selector = 'roles.queue'})
+
+    metrics.set_filter({{selector = 'roles.crud-router'}}, {})
+
+    local observations = metrics.collect({invoke_callbacks = true})
+    local crud_obs = utils.find_metric('crud_callback_runs', observations)
+    local queue_obs = utils.find_metric('queue_callback_runs', observations)
+
+    t.assert_equals(crud_obs[1].value, 1)
+    t.assert_equals(queue_obs, nil)
+    t.assert_equals(crud_runs, 1)
+    t.assert_equals(queue_runs, 0)
+end
+
+g.test_collectors_are_filtered = function()
+    local crud = metrics.namespace('roles.crud-router')
+    local queue = metrics.namespace('roles.queue')
+
+    crud:gauge('crud_requests'):set(1)
+    queue:gauge('queue_requests'):set(2)
+
+    metrics.set_filter('all', {{selector = 'roles.queue'}})
+
+    local collectors = metrics.collectors()
+    t.assert_not_equals(collectors.crud_requestsgauge, nil)
+    t.assert_equals(collectors.queue_requestsgauge, nil)
 end
 
 g.test_default_metrics_metainfo = function(cg)

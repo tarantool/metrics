@@ -195,6 +195,84 @@ group.test_include_with_exclude = function(g)
     end)
 end
 
+group.test_custom_selectors = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+        local crud = metrics.namespace('roles.crud-router')
+        local queue = metrics.namespace('roles.queue')
+
+        metrics.cfg{
+            include = {'info', 'roles.crud-router'},
+            exclude = {'roles.crud-router.errors'},
+        }
+
+        crud:gauge('crud_requests'):set(1)
+        crud:gauge('errors'):set(1)
+        queue:gauge('queue_requests'):set(1)
+
+        local observations = metrics.collect{invoke_callbacks = true}
+        t.assert_not_equals(utils.find_metric('tnt_info_uptime',
+                                             observations), nil)
+        t.assert_not_equals(utils.find_metric('crud_requests', observations),
+                            nil)
+        t.assert_equals(utils.find_metric('errors', observations), nil)
+        t.assert_equals(utils.find_metric('queue_requests', observations), nil)
+    end)
+end
+
+group.test_custom_selectors_reconfiguration = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+        local crud = metrics.namespace('roles.crud-router')
+        local queue = metrics.namespace('roles.queue')
+
+        crud:gauge('crud_requests'):set(1)
+        queue:gauge('queue_requests'):set(1)
+
+        metrics.cfg{
+            include = {'roles.crud-router'},
+            exclude = {},
+        }
+
+        local observations = metrics.collect{invoke_callbacks = true}
+        t.assert_not_equals(utils.find_metric('crud_requests', observations),
+                            nil)
+        t.assert_equals(utils.find_metric('queue_requests', observations), nil)
+
+        metrics.cfg{
+            include = {'roles.queue'},
+            exclude = {},
+        }
+
+        observations = metrics.collect{invoke_callbacks = true}
+        t.assert_equals(utils.find_metric('crud_requests', observations), nil)
+        t.assert_not_equals(utils.find_metric('queue_requests', observations),
+                            nil)
+    end)
+end
+
+group.test_cfg_clean_user_metrics = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+
+        local my_gauge = metrics.gauge('my_custom_metric',
+                                       'My custom metric')
+        my_gauge:set(42)
+
+        metrics.cfg{
+            include = {'info'},
+            exclude = {},
+        }
+
+        local observations = metrics.collect{invoke_callbacks = true}
+        t.assert_not_equals(utils.find_metric('my_custom_metric',
+                                             observations), nil)
+    end)
+end
+
 group.test_include_none = function(g)
     g.server:exec(function()
         local metrics = require('metrics')

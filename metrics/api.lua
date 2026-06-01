@@ -12,17 +12,24 @@ local Summary = require('metrics.collectors.summary')
 local registry = rawget(_G, '__metrics_registry')
 if not registry then
     registry = Registry.new()
+else
+    setmetatable(registry, Registry)
+    if registry.filter == nil then
+        registry:reset_filter()
+    end
 end
 registry.callbacks = {}
 
 rawset(_G, '__metrics_registry', registry)
 
 local function collectors()
-    return registry.collectors
+    return registry:filtered_collectors()
 end
 
-local function register_callback(...)
-    return registry:register_callback(...)
+local function register_callback(callback, metainfo)
+    checks('function', '?table')
+
+    return registry:register_callback(callback, metainfo)
 end
 
 local function unregister_callback(...)
@@ -48,7 +55,7 @@ local function collect(opts)
     end
 
     local result = {}
-    for _, collector in pairs(registry.collectors) do
+    for _, collector in pairs(registry:filtered_collectors()) do
         if opts.default_only then
             if collector.metainfo.default then
                 get_collector_values(collector, result)
@@ -125,6 +132,60 @@ local function set_global_labels(label_pairs)
     registry:set_labels(label_pairs)
 end
 
+local function set_filter(include, exclude)
+    checks('?string|table', '?string|table')
+
+    registry:set_filter(include, exclude)
+end
+
+local Namespace = {}
+Namespace.__index = Namespace
+
+local function namespace_metainfo(self, name, metainfo)
+    local res = table.copy(metainfo) or {}
+    res.selector = res.selector or (self.selector .. '.' .. name)
+    return res
+end
+
+function Namespace:counter(name, help, metainfo, label_keys)
+    return counter(name, help, namespace_metainfo(self, name, metainfo),
+                   label_keys)
+end
+
+function Namespace:gauge(name, help, metainfo, label_keys)
+    return gauge(name, help, namespace_metainfo(self, name, metainfo),
+                 label_keys)
+end
+
+function Namespace:histogram(name, help, buckets, metainfo)
+    return histogram(name, help, buckets,
+                     namespace_metainfo(self, name, metainfo))
+end
+
+function Namespace:summary(name, help, objectives, params, metainfo)
+    return summary(name, help, objectives, params,
+                   namespace_metainfo(self, name, metainfo))
+end
+
+function Namespace:register_callback(callback, metainfo)
+    local res = table.copy(metainfo) or {}
+    res.selector = res.selector or self.selector
+    return register_callback(callback, res)
+end
+
+function Namespace.unregister_callback(_, callback)
+    return unregister_callback(callback)
+end
+
+local function namespace(selector)
+    checks('string')
+    if selector == '' then
+        error('Metric namespace selector must not be empty')
+    end
+
+    return setmetatable({selector = selector}, Namespace)
+end
+
 return {
     registry = registry,
     collectors = collectors,
@@ -140,4 +201,6 @@ return {
     unregister_callback = unregister_callback,
     invoke_callbacks = invoke_callbacks,
     set_global_labels = set_global_labels,
+    set_filter = set_filter,
+    namespace = namespace,
 }

@@ -540,11 +540,12 @@ Metrics functions
     :param table config: module configuration options:
 
       * ``cfg.include`` (string/table, default ``'all'``): ``'all`` to enable all
-        supported default metrics, ``'none'`` to disable all default metrics,
-        table with names of the default metrics to enable a specific set of metrics.
-      * ``cfg.exclude`` (table, default ``{}``): table containing the names of
-        the default metrics that you want to disable. Has higher priority
-        than ``cfg.include``.
+        supported default metrics and custom metrics, ``'none'`` to disable
+        all metrics, or a table with default metric names and custom selectors
+        to enable.
+      * ``cfg.exclude`` (table, default ``{}``): table containing default metric
+        names and custom selectors that you want to disable. Has higher
+        priority than ``cfg.include``.
       * ``cfg.labels`` (table, default ``{}``): table containing label names as
         string keys, label values as values.
 
@@ -579,6 +580,26 @@ Metrics functions
     See :ref:`metrics reference <metrics-reference>` for details.
     All metric collectors from the collection have ``metainfo.default = true``.
 
+    Other strings in ``cfg.include`` and ``cfg.exclude`` are treated as custom
+    metric selectors. A selector matches either exactly or by dot prefix. For
+    example, ``roles.crud-router`` matches
+    ``roles.crud-router.request_count``.
+
+    **Example:**
+
+    ..  code-block:: lua
+
+        local metrics = require('metrics')
+
+        local crud = metrics.namespace('roles.crud-router')
+        crud:gauge('crud_requests'):set(1)
+        crud:gauge('crud_errors'):set(1)
+
+        metrics.cfg{
+            include = {'info', 'roles.crud-router'},
+            exclude = {'roles.crud-router.crud_errors'},
+        }
+
     ``cfg.labels`` are the global labels to be added to every observation.
 
     Global labels are applied only to metric collection. They have no effect
@@ -600,6 +621,42 @@ Metrics functions
 ..  function:: set_global_labels(label_pairs)
 
     Same as ``metrics.cfg{labels=label_pairs}``.
+
+..  function:: set_filter([include, exclude])
+
+    Set a runtime filter for collectors and callbacks by metric selectors.
+
+    :param string/table include: ``'all'`` to include everything,
+        ``'none'`` to disable everything, or a table with selector objects
+        to include. The default is ``'all'``.
+    :param string/table exclude: ``'all'`` to exclude everything or a table
+        with selector objects to exclude. Has higher priority than ``include``.
+
+    A selector matches either exactly or by dot prefix. For example,
+    ``roles.crud-router`` matches ``roles.crud-router.request_count``.
+
+..  function:: namespace(selector)
+
+    Create a namespace object that marks collectors and callbacks with
+    selectors derived from ``selector``.
+
+    **Example:**
+
+    ..  code-block:: lua
+
+        local metrics = require('metrics')
+        local ns = metrics.namespace('roles.crud-router')
+
+        local requests = ns:counter('crud_router_requests_total')
+        local in_flight = ns:gauge('crud_router_requests_in_flight')
+
+        metrics.register_callback(function()
+            in_flight:set(get_in_flight_requests())
+        end, {selector = 'roles.crud-router'})
+
+        metrics.set_filter('all', {
+            {selector = 'roles.crud-router'},
+        })
 
 ..  function:: collect([opts])
 

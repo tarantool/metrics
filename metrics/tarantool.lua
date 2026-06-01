@@ -35,6 +35,10 @@ for name, _ in pairs(default_metrics) do
     all_metrics_map[name] = true
 end
 
+local function is_default_metric(name)
+    return default_metrics[name] ~= nil
+end
+
 local function check_metrics_name(name, raise_if_unknown)
     if default_metrics[name] == nil then
         if raise_if_unknown then
@@ -79,7 +83,7 @@ local function enable_impl(include, exclude, raise_if_unknown)
 
     for name, value in pairs(default_metrics) do
         if include_map[name] then
-            metrics_api.register_callback(value.update)
+            metrics_api.register_callback(value.update, {default = true})
         else
             metrics_api.unregister_callback(value.update)
             utils.delete_collectors(value.list)
@@ -110,4 +114,5 @@ end
 return {
     enable = enable,
     enable_v2 = enable_v2,
+    is_default_metric = is_default_metric,
 }
