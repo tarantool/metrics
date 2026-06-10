@@ -8,14 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `metrics.namespace()` and `metrics.set_filter()` to mark custom
-  collectors/callbacks with selectors and filter them at collection time.
-
 ### Changed
 
 ### Fixed
 
 ### Removed
+
+# [1.8.0] - 2026-06-10
+
+This release adds selector-based filtering for custom metrics. Custom
+metrics can now be associated with hierarchical selectors and controlled
+via `metrics.set_filter()` or `metrics.cfg()` include/exclude options.
+Unknown include/exclude entries are treated as custom selectors, while
+built-in metric group names keep the existing behavior.
+
+### Added
+
+- Added `metrics.namespace()` and `metrics.set_filter()` to mark custom
+  collectors/callbacks with selectors and filter them at collection time
+  (#543).
 
 # [1.7.0] - 2026-03-27
 
