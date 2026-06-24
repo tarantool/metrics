@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed `metrics.cfg{exclude = {'all'}}` so it excludes custom metric
+  selectors in addition to built-in metric groups (#548).
+
 ### Removed
 
 # [1.8.0] - 2026-06-10
