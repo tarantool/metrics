@@ -253,6 +253,43 @@ group.test_custom_selectors_reconfiguration = function(g)
     end)
 end
 
+group.test_custom_selectors_exclude_all = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+        local crud = metrics.namespace('roles.crud-router')
+
+        metrics.cfg{
+            include = {'roles.crud-router'},
+            exclude = {'all'},
+        }
+
+        crud:gauge('crud_requests'):set(1)
+
+        local observations = metrics.collect{invoke_callbacks = true}
+        t.assert_equals(utils.find_metric('crud_requests', observations), nil)
+    end)
+end
+
+group.test_custom_selectors_include_all_exclude_all = function(g)
+    g.server:exec(function()
+        local metrics = require('metrics')
+        local utils = require('test.utils') -- luacheck: ignore 431
+        local crud = metrics.namespace('roles.crud-router')
+
+        metrics.cfg{
+            include = {'all'},
+            exclude = {'all'},
+        }
+
+        crud:gauge('crud_requests'):set(1)
+
+        local observations = metrics.collect{invoke_callbacks = true}
+        t.assert_equals(utils.find_metric('tnt_info_uptime', observations), nil)
+        t.assert_equals(utils.find_metric('crud_requests', observations), nil)
+    end)
+end
+
 group.test_cfg_clean_user_metrics = function(g)
     g.server:exec(function()
         local metrics = require('metrics')

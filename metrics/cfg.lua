@@ -23,7 +23,10 @@ local function split_metric_groups_and_selectors(values, default_value,
     local default_metrics = {}
     local custom_selectors = {}
     for _, value in ipairs(values) do
-        if value == const.ALL or metrics_tarantool.is_default_metric(value) then
+        if value == const.ALL then
+            table.insert(default_metrics, value)
+            return default_metrics, const.ALL
+        elseif metrics_tarantool.is_default_metric(value) then
             table.insert(default_metrics, value)
         else
             table.insert(custom_selectors, {selector = value})
