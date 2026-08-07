@@ -19,6 +19,7 @@ end)
 
 g.test_global_labels = function()
     t.assert_error_msg_contains("bad label key (string expected, got number)", function()
+        ---@diagnostic disable-next-line: param-type-mismatch
         metrics.set_global_labels({ [2] = 'value' })
     end)
 

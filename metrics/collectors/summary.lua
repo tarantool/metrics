@@ -4,8 +4,22 @@ local Quantile = require('metrics.quantile')
 
 local fiber = require('fiber')
 
+---@class metrics.collector.summary : metrics.collector
+---@field count_collector metrics.collector.counter
+---@field sum_collector metrics.collector.counter
+---@field objectives table<number, number>|nil
+---@field quantiles number[]|nil
+---@field max_age_time number|nil
+---@field age_buckets_count number
+---@field observations table<string, table>
 local Summary = Shared:new_class('summary', {'observe_latency'})
 
+---@param name string
+---@param help string?
+---@param objectives table<number, number>?
+---@param params {age_buckets_count?: number, max_age_time?: number}?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.summary
 function Summary:new(name, help, objectives, params, metainfo)
     params = params or {}
     metainfo = table.copy(metainfo) or {}
@@ -20,13 +34,15 @@ function Summary:new(name, help, objectives, params, metainfo)
 
     if obj.objectives then
         obj.quantiles = {}
-        for q, _ in pairs(objectives) do
+        for q, _ in pairs(obj.objectives) do
             table.insert(obj.quantiles, q)
         end
     end
     return obj
 end
 
+---@param objectives table<number, number>
+---@return boolean
 function Summary.check_quantiles(objectives)
     for k, v in pairs(objectives) do
         if type(k) ~= 'number' then return false end
@@ -36,12 +52,14 @@ function Summary.check_quantiles(objectives)
     return true
 end
 
+---@param registry metrics.registry
 function Summary:set_registry(registry)
     Shared.set_registry(self, registry)
     self.count_collector:set_registry(registry)
     self.sum_collector:set_registry(registry)
 end
 
+---@param key string
 function Summary:rotate_age_buckets(key)
     --- @type any
     local obs_object = self.observations[key]
@@ -51,8 +69,12 @@ function Summary:rotate_age_buckets(key)
     obs_object.last_rotate = os.time()
 end
 
+--- Record a new value in a summary.
+---@param num number
+---@param label_pairs metrics.label_pairs?
 function Summary:observe(num, label_pairs)
     label_pairs = label_pairs or {}
+    ---@diagnostic disable-next-line: unnecessary-if
     if label_pairs.quantile then
         error('Label "quantile" are not allowed in summary')
     end
@@ -91,6 +113,8 @@ function Summary:observe(num, label_pairs)
     end
 end
 
+--- Remove the observation for `label_pairs`.
+---@param label_pairs metrics.label_pairs?
 function Summary:remove(label_pairs)
     assert(label_pairs, 'label pairs is a required parameter')
     self.count_collector:remove(label_pairs)
@@ -101,8 +125,10 @@ function Summary:remove(label_pairs)
     end
 end
 
+---@return metrics.observation[]
 function Summary:collect_quantiles()
-    if not self.objectives or next(self.observations) == nil then
+    local quantiles = self.quantiles
+    if not self.objectives or not quantiles or next(self.observations) == nil then
         return {}
     end
 
@@ -112,7 +138,7 @@ function Summary:collect_quantiles()
         if self.age_buckets_count > 1 and now - observation.last_rotate >= self.max_age_time then
             self:rotate_age_buckets(key)
         end
-        for _, objective in ipairs(self.quantiles) do
+        for _, objective in ipairs(quantiles) do
             local label_pairs = table.deepcopy(self:append_global_labels(observation.label_pairs))
             label_pairs.quantile = objective
             local obs = {
@@ -127,6 +153,8 @@ function Summary:collect_quantiles()
     return result
 end
 
+--- Return observations from all internal counters.
+---@return metrics.observation[]
 function Summary:collect()
     local result = {}
     for _, obs in ipairs(self.count_collector:collect()) do
@@ -144,6 +172,8 @@ end
 -- debug function to get observation quantiles from summary
 -- returns array of quantile objects or
 -- single quantile object if summary has only one bucket
+---@param label_pairs metrics.label_pairs?
+---@return table|any
 function Summary:get_observations(label_pairs)
     local key = self.make_key(label_pairs or {})
     local obs = self.observations[key]

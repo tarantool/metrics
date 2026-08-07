@@ -11,10 +11,12 @@ end)
 
 g.test_counter = function()
     t.assert_error_msg_contains("bad argument #1 to counter (string expected, got nil)", function()
+        ---@diagnostic disable-next-line: missing-parameter
         metrics.counter()
     end)
 
     t.assert_error_msg_contains("bad argument #1 to counter (string expected, got number)", function()
+        ---@diagnostic disable-next-line: param-type-mismatch
         metrics.counter(2)
     end)
 

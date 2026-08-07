@@ -22,30 +22,46 @@ registry.callbacks = {}
 
 rawset(_G, '__metrics_registry', registry)
 
+--- Return a table of all registered collectors.
+---@return table<string, metrics.collector>
 local function collectors()
     return registry:filtered_collectors()
 end
 
+--- Register a callback that is called right before metric collection.
+---@param callback function
+---@param metainfo metrics.metainfo?
+---@return any
 local function register_callback(callback, metainfo)
     checks('function', '?table')
 
     return registry:register_callback(callback, metainfo)
 end
 
+--- Unregister a callback.
+---@vararg any
+---@return any
 local function unregister_callback(...)
     return registry:unregister_callback(...)
 end
 
+--- Invoke all registered callbacks.
+---@return any
 local function invoke_callbacks()
     return registry:invoke_callbacks()
 end
 
+---@param collector metrics.collector
+---@param result metrics.observation[]
 local function get_collector_values(collector, result)
     for _, obs in ipairs(collector:collect()) do
         table.insert(result, obs)
     end
 end
 
+--- Collect observations from each collector.
+---@param opts {invoke_callbacks?: boolean, default_only?: boolean}?
+---@return metrics.observation[]
 local function collect(opts)
     checks({invoke_callbacks = '?boolean', default_only = '?boolean'})
     opts = opts or {}
@@ -68,22 +84,42 @@ local function collect(opts)
     return result
 end
 
+--- Clear all collectors and callbacks from the registry.
+---@return any
 local function clear()
     registry:clear()
 end
 
+--- Register a new counter.
+---@param name string
+---@param help string?
+---@param metainfo metrics.metainfo?
+---@param label_keys string[]?
+---@return metrics.collector.counter
 local function counter(name, help, metainfo, label_keys)
     checks('string', '?string', '?table', '?table')
 
     return registry:find_or_create(Counter, name, help, metainfo, label_keys)
 end
 
+--- Register a new gauge.
+---@param name string
+---@param help string?
+---@param metainfo metrics.metainfo?
+---@param label_keys string[]?
+---@return metrics.collector.gauge
 local function gauge(name, help, metainfo, label_keys)
     checks('string', '?string', '?table', '?table')
 
     return registry:find_or_create(Gauge, name, help, metainfo, label_keys)
 end
 
+--- Register a new histogram.
+---@param name string
+---@param help string?
+---@param buckets number[]?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.histogram
 local function histogram(name, help, buckets, metainfo)
     checks('string', '?string', '?table', '?table')
     if buckets ~= nil and not Histogram.check_buckets(buckets) then
@@ -93,6 +129,13 @@ local function histogram(name, help, buckets, metainfo)
     return registry:find_or_create(Histogram, name, help, buckets, metainfo)
 end
 
+--- Register a new summary.
+---@param name string
+---@param help string?
+---@param objectives table<number, number>?
+---@param params {age_buckets_count?: number, max_age_time?: number}?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.summary
 local function summary(name, help, objectives, params, metainfo)
     checks('string', '?string', '?table', {
         age_buckets_count = '?number',
@@ -117,6 +160,9 @@ local function summary(name, help, objectives, params, metainfo)
     return registry:find_or_create(Summary, name, help, objectives, params, metainfo)
 end
 
+--- Set global labels applied to every observation.
+---@param label_pairs metrics.label_pairs?
+---@return any
 local function set_global_labels(label_pairs)
     checks('?table')
 
@@ -132,51 +178,99 @@ local function set_global_labels(label_pairs)
     registry:set_labels(label_pairs)
 end
 
+--- Set a runtime filter for collectors and callbacks by metric selectors.
+---@param include string|table?
+---@param exclude string|table?
+---@return any
 local function set_filter(include, exclude)
     checks('?string|table', '?string|table')
 
     registry:set_filter(include, exclude)
 end
 
+---@class metrics.namespace
+---@field selector string
+
 local Namespace = {}
 Namespace.__index = Namespace
 
+---@param self table
+---@param name string
+---@param metainfo metrics.metainfo?
+---@return metrics.metainfo
 local function namespace_metainfo(self, name, metainfo)
+    --- @type metrics.metainfo
     local res = table.copy(metainfo) or {}
     res.selector = res.selector or (self.selector .. '.' .. name)
     return res
 end
 
+--- Register a new counter in the namespace.
+---@param name string
+---@param help string?
+---@param metainfo metrics.metainfo?
+---@param label_keys string[]?
+---@return metrics.collector.counter
 function Namespace:counter(name, help, metainfo, label_keys)
     return counter(name, help, namespace_metainfo(self, name, metainfo),
                    label_keys)
 end
 
+--- Register a new gauge in the namespace.
+---@param name string
+---@param help string?
+---@param metainfo metrics.metainfo?
+---@param label_keys string[]?
+---@return metrics.collector.gauge
 function Namespace:gauge(name, help, metainfo, label_keys)
     return gauge(name, help, namespace_metainfo(self, name, metainfo),
                  label_keys)
 end
 
+--- Register a new histogram in the namespace.
+---@param name string
+---@param help string?
+---@param buckets number[]?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.histogram
 function Namespace:histogram(name, help, buckets, metainfo)
     return histogram(name, help, buckets,
                      namespace_metainfo(self, name, metainfo))
 end
 
+--- Register a new summary in the namespace.
+---@param name string
+---@param help string?
+---@param objectives table<number, number>?
+---@param params {age_buckets_count?: number, max_age_time?: number}?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.summary
 function Namespace:summary(name, help, objectives, params, metainfo)
     return summary(name, help, objectives, params,
                    namespace_metainfo(self, name, metainfo))
 end
 
+--- Register a callback in the namespace.
+---@param callback function
+---@param metainfo metrics.metainfo?
+---@return any
 function Namespace:register_callback(callback, metainfo)
     local res = table.copy(metainfo) or {}
     res.selector = res.selector or self.selector
     return register_callback(callback, res)
 end
 
+--- Unregister a callback from the namespace.
+---@param callback function
+---@return any
 function Namespace.unregister_callback(_, callback)
     return unregister_callback(callback)
 end
 
+--- Create a namespace object that marks collectors and callbacks with
+--- selectors derived from `selector`.
+---@param selector string
+---@return metrics.namespace
 local function namespace(selector)
     checks('string')
     if selector == '' then

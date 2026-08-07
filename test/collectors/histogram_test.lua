@@ -49,10 +49,12 @@ end
 
 g.test_histogram = function()
     t.assert_error_msg_contains("bad argument #1 to histogram (string expected, got nil)", function()
+        ---@diagnostic disable-next-line: missing-parameter
         metrics.histogram()
     end)
 
     t.assert_error_msg_contains("bad argument #1 to histogram (string expected, got number)", function()
+        ---@diagnostic disable-next-line: param-type-mismatch
         metrics.histogram(2)
     end)
 

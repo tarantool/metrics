@@ -27,12 +27,11 @@ export.DEFAULT_SUMMARY_PARAMS = {
     age_buckets_count = 5,
 }
 
---- Build default histogram collector
---
--- @string[opt='histogram'] type_name `histogram` or `summary`
--- @string[opt='http_server_requests'] name
--- @string[opt='HTTP Server Requests'] help
--- @return collector
+--- Register and return a collector for the middleware.
+---@param type_name string? `histogram` or `summary`
+---@param name string?
+---@param help string?
+---@return metrics.collector
 function export.build_default_collector(type_name, name, help)
     type_name = type_name or 'histogram'
     name = name or 'http_server_request_latency'
@@ -48,6 +47,8 @@ function export.build_default_collector(type_name, name, help)
     return metrics_api.registry:register(collector_type[type_name]:new(name, help, unpack(extra)))
 end
 
+--- Return the default collector.
+---@return metrics.collector
 function export.get_default_collector()
     if not export.default_collector then
         export.default_collector = export.build_default_collector()
@@ -55,28 +56,24 @@ function export.get_default_collector()
     return export.default_collector
 end
 
---- Set default collector for all middlewares
---
--- @tab collector object with `:collect` method.
+--- Set the default collector.
+---@param collector metrics.collector?
 function export.set_default_collector(collector)
     export.default_collector = collector
 end
 
---- Build collector and set it as default
---
--- @see build_default_collector
+--- Register a collector for the middleware and set it as default.
+---@vararg any
 function export.configure_default_collector(...)
     export.set_default_collector(export.build_default_collector(...))
 end
 
---- Measure latency and invoke collector with labels from given route
---
--- @tab collector
--- @tab route
--- @string route.path
--- @string route.method
--- ... arguments for pcall to instrument
--- @return value from observable function
+--- Measure latency and invoke collector with labels from given route.
+---@param collector metrics.collector
+---@param route {path: string, method: string}
+---@param handler function
+---@vararg any
+---@return any
 function export.observe(collector, route, handler, ...)
     return collector:observe_latency(function(ok, result)
         if ok ~= true then
@@ -94,12 +91,11 @@ function export.observe(collector, route, handler, ...)
     end, handler, ...)
 end
 
---- Apply instrumentation middleware for http request handler
---
--- @func handler original
--- @func[opt] collector custom histogram-like collector
--- @return new handler
--- @usage httpd:route({method = 'GET', path = '/...'}, http_middleware.v1(request_handler))
+--- Latency measuring wrap-up for the HTTP ver. ``1.x.x`` handler.
+--- Returns a wrapped handler.
+---@param handler function
+---@param collector metrics.collector?
+---@return function
 function export.v1(handler, collector)
     collector = collector or export.get_default_collector()
     return function(req)

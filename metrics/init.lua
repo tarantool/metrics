@@ -10,6 +10,29 @@ local tarantool = require('metrics.tarantool')
 
 local VERSION = require('metrics.version')
 
+---@class metrics
+---@field registry metrics.registry
+---@field counter fun(name: string, help?: string, metainfo?: metrics.metainfo, label_keys?: string[]): metrics.collector.counter
+---@field gauge fun(name: string, help?: string, metainfo?: metrics.metainfo, label_keys?: string[]): metrics.collector.gauge
+---@field histogram fun(name: string, help?: string, buckets?: number[], metainfo?: metrics.metainfo): metrics.collector.histogram
+---@field summary fun(name: string, help?: string, objectives?: table<number, number>,
+---    params?: {age_buckets_count?: number, max_age_time?: number}, metainfo?: metrics.metainfo): metrics.collector.summary
+---@field INF number
+---@field NAN number
+---@field clear fun(): any
+---@field collectors fun(): table<string, metrics.collector>
+---@field namespace fun(selector: string): metrics.namespace
+---@field register_callback fun(callback: function, metainfo?: metrics.metainfo): any
+---@field unregister_callback fun(...: any): any
+---@field invoke_callbacks fun(): any
+---@field set_global_labels fun(label_pairs?: metrics.label_pairs): any
+---@field set_filter fun(include?: string|table, exclude?: string|table): any
+---@field enable_default_metrics fun(include?: string|table, exclude?: table): any
+---@field cfg fun(opts?: {include?: string|table, exclude?: table, labels?: metrics.label_pairs}): table
+---@field http_middleware table
+---@field collect fun(opts?: {invoke_callbacks?: boolean, default_only?: boolean}): metrics.observation[]
+---@field _VERSION string
+
 return setmetatable({
     registry = api.registry,
 
