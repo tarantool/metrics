@@ -7,8 +7,15 @@ local INF = math.huge
 local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
+---@class metrics.collector.histogram : metrics.collector
+---@field buckets number[]
+---@field count_collector metrics.collector.counter
+---@field sum_collector metrics.collector.counter
+---@field bucket_collector metrics.collector.counter
 local Histogram = Shared:new_class('histogram', {'observe_latency'})
 
+---@param buckets number[]
+---@return boolean
 function Histogram.check_buckets(buckets)
     local prev = -math.huge
     for _, v in ipairs(buckets) do
@@ -20,6 +27,11 @@ function Histogram.check_buckets(buckets)
     return true
 end
 
+---@param name string
+---@param help string?
+---@param buckets number[]?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.histogram
 function Histogram:new(name, help, buckets, metainfo)
     metainfo = table.copy(metainfo) or {}
     local obj = Shared.new(self, name, help, metainfo)
@@ -37,6 +49,7 @@ function Histogram:new(name, help, buckets, metainfo)
     return obj
 end
 
+---@param registry metrics.registry
 function Histogram:set_registry(registry)
     Shared.set_registry(self, registry)
     self.count_collector:set_registry(registry)
@@ -46,6 +59,9 @@ end
 
 local cdata_warning_logged = false
 
+--- Record a new value in a histogram.
+---@param num number
+---@param label_pairs metrics.label_pairs?
 function Histogram:observe(num, label_pairs)
     label_pairs = label_pairs or {}
     if num ~= nil and type(tonumber(num)) ~= 'number' then
@@ -75,6 +91,8 @@ function Histogram:observe(num, label_pairs)
     end
 end
 
+--- Remove the observation for `label_pairs`.
+---@param label_pairs metrics.label_pairs?
 function Histogram:remove(label_pairs)
     assert(label_pairs, 'label pairs is a required parameter')
     self.count_collector:remove(label_pairs)
@@ -87,6 +105,8 @@ function Histogram:remove(label_pairs)
     end
 end
 
+--- Return observations from all internal counters.
+---@return metrics.observation[]
 function Histogram:collect()
     local result = {}
     for _, obs in ipairs(self.count_collector:collect()) do

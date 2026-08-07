@@ -9,6 +9,12 @@ local metrics_tarantool = require('metrics.tarantool')
 
 -- Split a metrics.cfg include/exclude side into two parts: built-in metric
 -- groups for metrics.tarantool and custom selectors for the registry filter.
+---@param values string|table|nil
+---@param default_value string|table
+---@param empty_default string|table
+---@param empty_selectors string|table
+---@return string|table
+---@return string|table
 local function split_metric_groups_and_selectors(values, default_value,
                                                  empty_default,
                                                  empty_selectors)
@@ -33,17 +39,23 @@ local function split_metric_groups_and_selectors(values, default_value,
         end
     end
 
+    if next(default_metrics) == nil and next(custom_selectors) == nil then
+        return empty_default, empty_selectors
+    end
+
     if next(default_metrics) == nil then
-        default_metrics = empty_default
+        return empty_default, custom_selectors
     end
 
     if next(custom_selectors) == nil then
-        custom_selectors = empty_selectors
+        return default_metrics, empty_selectors
     end
 
     return default_metrics, custom_selectors
 end
 
+---@param cfg table
+---@return table
 local function set_defaults_if_empty(cfg)
     if cfg.include == nil then
         cfg.include = const.ALL
@@ -60,6 +72,9 @@ local function set_defaults_if_empty(cfg)
     return cfg
 end
 
+---@param cfg table
+---@param opts {include?: string|table, exclude?: table, labels?: table}
+---@return any
 local function configure(cfg, opts)
     if opts.include == nil then
         opts.include = cfg.include
@@ -96,6 +111,10 @@ if _cfg_internal.initialized then
     configure(_cfg, {})
 end
 
+--- Entrypoint to setup the module.
+---@param self table
+---@param opts {include?: string|table, exclude?: table, labels?: metrics.label_pairs}
+---@return table
 local function __call(self, opts)
     checks('table', {
         include = '?string|table',
@@ -112,6 +131,8 @@ local function __call(self, opts)
     return self
 end
 
+---@param key string
+---@return any
 local function __index(_, key)
     if _cfg_internal.initialized then
         return _cfg[key]

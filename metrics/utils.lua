@@ -3,6 +3,13 @@ local metrics_api = require('metrics.api')
 local TNT_PREFIX = 'tnt_'
 local utils = {}
 
+---@param name string
+---@param description string
+---@param value number?
+---@param labels metrics.label_pairs?
+---@param prefix string?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.gauge
 function utils.set_gauge(name, description, value, labels, prefix, metainfo)
     prefix = prefix or TNT_PREFIX
     local gauge = metrics_api.gauge(prefix .. name, description, metainfo)
@@ -10,6 +17,13 @@ function utils.set_gauge(name, description, value, labels, prefix, metainfo)
     return gauge
 end
 
+---@param name string
+---@param description string
+---@param value number?
+---@param labels metrics.label_pairs?
+---@param prefix string?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.counter
 function utils.set_counter(name, description, value, labels, prefix, metainfo)
     prefix = prefix or TNT_PREFIX
     local counter = metrics_api.counter(prefix .. name, description, metainfo)
@@ -18,6 +32,7 @@ function utils.set_counter(name, description, value, labels, prefix, metainfo)
     return counter
 end
 
+---@return boolean
 function utils.box_is_configured()
     local is_configured = type(box.cfg) ~= 'function'
     if is_configured then
@@ -26,6 +41,8 @@ function utils.box_is_configured()
     return is_configured
 end
 
+---@param list table<string, metrics.collector>?
+---@return any
 function utils.delete_collectors(list)
     if list == nil then
         return
@@ -47,6 +64,7 @@ local function get_tarantool_version()
     return major, minor, patch
 end
 
+---@return boolean
 function utils.is_tarantool3()
     local major = get_tarantool_version()
     return major == 3

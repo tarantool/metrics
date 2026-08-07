@@ -11,10 +11,12 @@ end)
 
 g.test_gauge = function()
     t.assert_error_msg_contains("bad argument #1 to gauge (string expected, got nil)", function()
+        ---@diagnostic disable-next-line: missing-parameter
         metrics.gauge()
     end)
 
     t.assert_error_msg_contains("bad argument #1 to gauge (string expected, got number)", function()
+        ---@diagnostic disable-next-line: param-type-mismatch
         metrics.gauge(2)
     end)
 

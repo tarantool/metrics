@@ -27,6 +27,7 @@ metrics.cfg({
         'info',
         'clock',
     }
+---@diagnostic disable-next-line: missing-parameter
 })
 
 local httpd = cartridge.service_get('httpd')
