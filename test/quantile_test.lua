@@ -23,6 +23,10 @@ local function getPerc(x, p, eps)
 end
 
 local x = {}
+-- This is a false positive due to an incorrect version in the
+-- annotations for the standard library built into the analyzer,
+-- see https://github.com/EmmyLuaLs/emmylua-analyzer-rust/issues/1213.
+---@diagnostic disable-next-line: access-invisible
 math.randomseed(0)
 for i = 1, 10^4 + 100 do
     local m = math.random() * 10^6
