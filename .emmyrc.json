@@ -13,7 +13,6 @@
     "disable": [
       "duplicate-require",
       "need-check-nil",
-      "param-type-mismatch",
       "preferred-local-alias",
       "redefined-local",
       "undefined-field",

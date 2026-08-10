@@ -26,6 +26,7 @@ g.test_clean_thread_info = function(cg)
 
         local observations = metrics.collect()
 
+        --- @type any
         local thread_obs = utils.find_metric('tnt_cpu_thread', observations)
         t.assert_not_equals(thread_obs, nil)
 
