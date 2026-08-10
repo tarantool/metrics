@@ -6,9 +6,12 @@
     "version": "LuaJIT"
   },
   "diagnostics": {
+    "globals": [
+      "box",
+      "_TARANTOOL"
+    ],
     "disable": [
       "duplicate-require",
-      "undefined-global",
       "inject-field",
       "need-check-nil",
       "param-type-mismatch",
