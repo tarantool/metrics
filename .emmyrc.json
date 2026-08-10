@@ -12,7 +12,6 @@
     ],
     "disable": [
       "duplicate-require",
-      "inject-field",
       "need-check-nil",
       "param-type-mismatch",
       "preferred-local-alias",
