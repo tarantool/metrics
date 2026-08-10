@@ -7,7 +7,6 @@
   },
   "diagnostics": {
     "disable": [
-      "assign-type-mismatch",
       "call-non-callable",
       "duplicate-require",
       "undefined-global",

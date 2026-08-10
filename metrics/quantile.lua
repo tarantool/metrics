@@ -47,6 +47,12 @@ local function insert_sample(sample_obj, value, width, delta)
     sample_obj.Delta = delta
 end
 
+--- @class stream
+--- @field stream { f: fun(s: table, r: number): number, l: any, n: integer, l_len: integer, l_cap: integer }
+--- @field b any
+--- @field b_len integer
+--- @field sorted boolean
+--- @field compress_cnt integer
 local stream = {}
 
 -- Stream computes quantiles for a stream of float64s.
