@@ -26,7 +26,7 @@ g.test_cartridge_issues_present_on_healthy_cluster = function()
 
     t.helpers.retrying({}, function()
         resp = main_server:http_request('get', '/metrics')
-        issues_metric = utils.find_metric('tnt_cartridge_issues', resp.json)
+        issues_metric = assert(utils.find_metric('tnt_cartridge_issues', resp.json))
         for _, v in ipairs(issues_metric) do
             t.assert_equals(v.value, 0, 'Issues count is zero cause new-built cluster should be healthy')
         end
