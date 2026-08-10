@@ -28,14 +28,14 @@ local function update_memory_metrics()
         end
     end
 
-    local memory_stat = 0
-    local memory_virt_stat = 0
+    local memory_stat = 0.0
+    local memory_virt_stat = 0.0
 
     if jit.os == 'Linux' then
         local data = psutils.get_process_stats()
         if data then
             memory_stat = data.rss * sys_mem_page_size
-            memory_virt_stat = data.vsize
+            memory_virt_stat = data.vsize or 0
         end
     else
         --[[memory]]

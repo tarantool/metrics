@@ -27,7 +27,7 @@ local function get_cpu_time()
     local stats = string.split(stats_raw, '\n')
     local cpu_times = string.split(stats[1])
 
-    local sum = 0
+    local sum = 0.0
     for i, cpu_time in ipairs(cpu_times) do
         if i > 1 then
             sum = sum + tonumber(cpu_time)
