@@ -43,6 +43,7 @@ function Summary:set_registry(registry)
 end
 
 function Summary:rotate_age_buckets(key)
+    --- @type any
     local obs_object = self.observations[key]
     local old_index = obs_object.head_bucket_index
     obs_object.head_bucket_index = ((obs_object.head_bucket_index + 1) % self.age_buckets_count) + 1

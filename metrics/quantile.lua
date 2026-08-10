@@ -47,8 +47,15 @@ local function insert_sample(sample_obj, value, width, delta)
     sample_obj.Delta = delta
 end
 
+--- @class stream_state
+--- @field f fun(s: table, r: number): number
+--- @field l any
+--- @field n integer
+--- @field l_len integer
+--- @field l_cap integer
+
 --- @class stream
---- @field stream { f: fun(s: table, r: number): number, l: any, n: integer, l_len: integer, l_cap: integer }
+--- @field stream stream_state
 --- @field b any
 --- @field b_len integer
 --- @field sorted boolean
@@ -107,6 +114,7 @@ function stream:sample_insert(value, width, delta, pos)
     end
     if len == cap then
         cap = math.modf(cap * 1.5)
+        --- @type any
         local new_arr = ffi.new('sample[?]', cap + 2)
 
         for i = 0, pos - 1 do
@@ -187,6 +195,7 @@ function stream:compress()
     if s.l_len < 2 then
         return
     end
+    --- @type any
     local x = make_sample(0)
     sample_copy(x, s.l[s.l_len])
     local xi = s.l_len
@@ -238,7 +247,9 @@ function quantile.NewTargeted(quantiles, max_samples)
         return math.max(m, 1)
     end
     local s = stream.new(fun, max_samples)
-    s.b = ffi.new('double[?]', s.__max_samples)
+    --- @type any
+    local buffer = ffi.new('double[?]', s.__max_samples)
+    s.b = buffer
 
     for i = 0, s.__max_samples - 1 do
         s.b[i] = math.huge
@@ -246,7 +257,9 @@ function quantile.NewTargeted(quantiles, max_samples)
 
     local minf_obj = make_sample(-math.huge)
 
-    s.stream.l = ffi.new('sample[?]', s.__max_samples * 2 + 2)
+    --- @type any
+    local samples = ffi.new('sample[?]', s.__max_samples * 2 + 2)
+    s.stream.l = samples
     s.stream.l[0] = minf_obj
     for i = 1, s.__max_samples * 2 + 1 do
         s.stream.l[i] = inf_obj

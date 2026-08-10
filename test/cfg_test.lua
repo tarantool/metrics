@@ -115,6 +115,7 @@ group.test_table_is_immutable = function(g)
         t.assert_error_msg_contains(
             'Use metrics.cfg{} instead',
             function()
+                ---@diagnostic disable-next-line: inject-field
                 metrics.cfg.include = {'info'}
             end
         )
@@ -122,6 +123,7 @@ group.test_table_is_immutable = function(g)
         t.assert_error_msg_contains(
             'Use metrics.cfg{} instead',
             function()
+                ---@diagnostic disable-next-line: inject-field
                 metrics.cfg.newfield = 'newvalue'
             end
         )

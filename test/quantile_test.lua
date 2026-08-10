@@ -85,6 +85,7 @@ local function assert_sorted(arr, low, high)
 end
 
 g.test_low_values_sorted = function()
+    --- @type any
     local lows = ffi.new('double[?]', ARR_SIZE)
     for i = 0, ARR_SIZE - 1 do
         lows[i] = math.random()*10^-6
@@ -94,6 +95,7 @@ g.test_low_values_sorted = function()
 end
 
 g.test_random_values_sorted = function()
+    --- @type any
     local rands = ffi.new('double[?]', ARR_SIZE)
     for i = 0, ARR_SIZE - 1 do
         rands[i] = math.random()*2*10^3 - 10^3
@@ -125,6 +127,7 @@ g.test_high_bound_higher_array_size = function()
 end
 
 g.test_not_sorted = function()
+    --- @type any
     local array = ffi.new('double[?]', 2)
     array[0] = math.huge
     array[1] = -math.huge
