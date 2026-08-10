@@ -1,3 +1,4 @@
+--- @type any
 local helpers = require('test.helper')
 
 local t = require('luatest')

@@ -7,7 +7,6 @@
   },
   "diagnostics": {
     "disable": [
-      "call-non-callable",
       "duplicate-require",
       "undefined-global",
       "inject-field",
