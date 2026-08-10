@@ -16,7 +16,6 @@
       "preferred-local-alias",
       "redefined-local",
       "undefined-field",
-      "unnecessary-if",
       "unresolved-require"
     ]
   }
