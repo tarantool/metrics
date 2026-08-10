@@ -80,6 +80,7 @@ local function item_selector(item)
 end
 
 function Registry:is_enabled(item)
+    --- @type { include_all: boolean, include: table, exclude_all: boolean, exclude: table }
     local filter = self.filter
     local metainfo = item and (item.metainfo or item)
     if metainfo and metainfo.default then
