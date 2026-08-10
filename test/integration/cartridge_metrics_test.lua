@@ -3,6 +3,7 @@ local t = require('luatest')
 local g = t.group()
 
 local utils = require('test.utils')
+--- @type any
 local helpers = require('test.helper')
 
 g.before_each(function()
