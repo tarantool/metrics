@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+# [1.8.2] - 2026-08-28
+
+This release introduces EmmyLUA annotations and fixes.
+
+### Added
+
+- EmmyLUA analyzer support and annotations (#551).
+
+### Changed
+
+- Set config.checks to 'off' in default_config to avoid
+  environment-dependent alerts (THP, readahead) in tests (#549).
+
 # [1.8.1] - 2026-07-02
 
 This release fixes a bug where custom metrics selectors would continue
