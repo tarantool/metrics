@@ -1,12 +1,17 @@
 name: Tests
 on:
   push:
-    branches:
-     - '**'
-    paths-ignore:
-     - 'doc/**'
+    branches: ['**']
+    paths-ignore: ['doc/**']
+  pull_request:
+    branches: ['**']
+    paths-ignore: ['doc/**']
 jobs:
   test:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository
     strategy:
       fail-fast: false
       matrix:
@@ -39,6 +44,12 @@ jobs:
             cartridge: ""
           - tarantool: "3.5"
             cartridge: ""
+          - tarantool: "3.6"
+            cartridge: ""
+          - tarantool: "3.7"
+            cartridge: ""
+          - tarantool: "3.8"
+            cartridge: ""
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -67,6 +78,10 @@ jobs:
         run: make test_with_coverage_report
 
   packpack:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-24.04
     needs: test
     steps:
@@ -79,6 +94,10 @@ jobs:
           ls -l build/
 
   promtool:
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-24.04
     strategy:
       matrix:
