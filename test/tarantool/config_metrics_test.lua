@@ -59,14 +59,6 @@ local default_config =  {
     metrics = {
         include = {'all'},
     },
-    conditional = {
-        {
-            ['if'] = 'tarantool_version >= 3.8.1',
-            config = {
-                checks = 'off',
-            },
-        },
-    },
 }
 
 local function write_config(cg, config)
