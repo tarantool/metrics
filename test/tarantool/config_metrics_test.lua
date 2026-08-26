@@ -18,56 +18,78 @@ g.after_all(function(cg)
 end)
 
 
-local default_config =  {
-    credentials = {
-        users = {
-            guest = {
-                roles = {'super'},
-            },
-            replicator = {
-                password = 'replicating',
-                roles = {'replication'},
+local function default_config()
+    -- System related alerts like one issued for enabled transparent huge pages
+    -- may affect test cases that check amount of warnings. Let's disable these
+    -- alerts.
+    local function disable_system_alerts(config)
+        -- NB: The require call is inlined to don't break testing on
+        -- tarantool 2.x.
+        local ok, config_lib = pcall(require, 'config')
+        if not ok then
+            return
+        end
+
+        if not config_lib.jsonschema then
+            return
+        end
+
+        local jsonschema = config_lib:jsonschema()
+        if jsonschema.properties.config.properties.checks == nil then
+            return
+        end
+
+        config.config = config.config or {}
+        config.config.checks = 'off'
+    end
+
+    local config = {
+        credentials = {
+            users = {
+                guest = {
+                    roles = {'super'},
+                },
+                replicator = {
+                    password = 'replicating',
+                    roles = {'replication'},
+                },
             },
         },
-    },
-    iproto = {
-        advertise = {
-            peer = {
-                login = 'replicator',
+        iproto = {
+            advertise = {
+                peer = {
+                    login = 'replicator',
+                },
             },
         },
-    },
-    groups = {
-        servers = {
-            replicasets = {
-                ['server-001'] = {
-                    leader = 'server-001-a',
-                    instances = {
-                        ['server-001-a'] = {
-                            iproto = {
-                                listen = {{uri = 'localhost:3301'}},
+        groups = {
+            servers = {
+                replicasets = {
+                    ['server-001'] = {
+                        leader = 'server-001-a',
+                        instances = {
+                            ['server-001-a'] = {
+                                iproto = {
+                                    listen = {{uri = 'localhost:3301'}},
+                                },
                             },
                         },
                     },
                 },
             },
         },
-    },
-    replication = {
-        failover = 'manual',
-    },
-    metrics = {
-        include = {'all'},
-    },
-    conditional = {
-        {
-            ['if'] = 'tarantool_version >= 3.8.1',
-            config = {
-                checks = 'off',
-            },
+        replication = {
+            failover = 'manual',
         },
-    },
-}
+        metrics = {
+            include = {'all'},
+        },
+    }
+
+    disable_system_alerts(config)
+
+    return config
+end
 
 local function write_config(cg, config)
     return treegen.write_script(cg.server_dir, 'config.yaml', yaml.encode(config))
@@ -78,7 +100,7 @@ local function start_server(cg)
               'Skip since Tarantool 3 config is unsupported')
 
     cg.server_dir = treegen.prepare_directory(cg.treegen, {}, {})
-    local config_file = write_config(cg, default_config)
+    local config_file = write_config(cg, default_config())
 
     cg.server = server_helper:new{
         alias = 'server-001-a',
@@ -170,7 +192,7 @@ g.before_test('test_config_metrics_if_minor_trouble', start_server)
 g.after_test('test_config_metrics_if_minor_trouble', stop_server)
 
 g.test_config_metrics_if_minor_trouble = function(cg)
-    local config = table.deepcopy(default_config)
+    local config = default_config()
     config['credentials']['users']['user_one'] = {roles = {'role_two'}}
     reload_config(cg, config)
 
@@ -190,7 +212,7 @@ g.before_test('test_config_metrics_if_critical_failure', start_server)
 g.after_test('test_config_metrics_if_critical_failure', stop_server)
 
 g.test_config_metrics_if_critical_failure = function(cg)
-    local config = table.deepcopy(default_config)
+    local config = default_config()
     config['groups']['servers'] = {}
     reload_config(cg, config)
 
