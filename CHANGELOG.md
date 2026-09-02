@@ -14,6 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+# [1.8.3] - 2026-09-02
+
+This release fixes the CI pipeline to run on external pull requests and
+makes tests compatible with any tarantool 3.x version.
+
+### Changed
+
+- CI is run on pull requests in addition to branch pushes; the runs are
+  skipped for pull requests from the base repository to avoid duplicates
+  (#555).
+
+### Fixed
+
+- `config_metrics_test`: disable system alerts only if the `config.checks`
+  option exists (instead of a tarantool version based check), so the test
+  passes on any tarantool 3.x version (#553).
+
 # [1.8.2] - 2026-08-28
 
 This release introduces EmmyLUA annotations and fixes.
