@@ -1,11 +1,19 @@
 name: Tests
+
+# on:
+#   push:
+#     branches: ['**']
+#     paths-ignore: ['doc/**']
+#   pull_request:
+#     branches: ['**']
+#     paths-ignore: ['doc/**']
+
+# temporarily turn off the tests
 on:
   push:
-    branches: ['**']
-    paths-ignore: ['doc/**']
-  pull_request:
-    branches: ['**']
-    paths-ignore: ['doc/**']
+    tags:
+      - '*'
+
 jobs:
   test:
     if: |

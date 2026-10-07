@@ -1,9 +1,18 @@
 name: packaging
 
+# on:
+#   push:
+#     tags:
+#       - '*'
+
+# temporarily turn on packaging
 on:
   push:
-    tags:
-      - '*'
+    branches: ['**']
+    paths-ignore: ['doc/**']
+  pull_request:
+    branches: ['**']
+    paths-ignore: ['doc/**']
 
 jobs:
   # Run not only on tags, otherwise dependent job will skip.
@@ -76,23 +85,24 @@ jobs:
       - name: Create packages
         run: ./packpack/packpack
 
-      - name: Deploy packages
-        # We need this step to run only on push with tag.
-        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
-        env:
-          RWS_URL_PART: https://rws.tarantool.org/tarantool-modules
-          RWS_AUTH: ${{ secrets.RWS_AUTH }}
-          PRODUCT_NAME: tarantool-metrics
-        run: |
-          CURL_CMD="curl -LfsS \
-            -X PUT ${RWS_URL_PART}/${OS}/${DIST} \
-            -u ${RWS_AUTH} \
-            -F product=${PRODUCT_NAME}"
+      # temporarily turn off deploy
+      # - name: Deploy packages
+      #   # We need this step to run only on push with tag.
+      #   if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
+      #   env:
+      #     RWS_URL_PART: https://rws.tarantool.org/tarantool-modules
+      #     RWS_AUTH: ${{ secrets.RWS_AUTH }}
+      #     PRODUCT_NAME: tarantool-metrics
+      #   run: |
+      #     CURL_CMD="curl -LfsS \
+      #       -X PUT ${RWS_URL_PART}/${OS}/${DIST} \
+      #       -u ${RWS_AUTH} \
+      #       -F product=${PRODUCT_NAME}"
 
-          for f in $(ls -I '*build*' -I '*.changes' ./build); do
-            CURL_CMD+=" -F $(basename ${f})=@./build/${f}"
-          done
+      #     for f in $(ls -I '*build*' -I '*.changes' ./build); do
+      #       CURL_CMD+=" -F $(basename ${f})=@./build/${f}"
+      #     done
 
-          echo ${CURL_CMD}
+      #     echo ${CURL_CMD}
 
-          ${CURL_CMD}
+      #     ${CURL_CMD}
