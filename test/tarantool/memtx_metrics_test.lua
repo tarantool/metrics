@@ -34,14 +34,19 @@ g.test_memtx = function(cg)
             'tnt_memtx_mvcc_conflicts',
         }
 
+        local function label_cmp(a, b)
+            return a.label_pairs.kind < b.label_pairs.kind
+        end
+
         for _, item in ipairs(metrics_list1) do
             log.info('checking metric: ' .. item)
             local metric = utils.find_metric(item, default_metrics)
+            table.sort(metric, label_cmp)
             t.assert(metric)
             t.assert_type(metric[1].value, 'number')
             t.assert_items_equals(metric[1].label_pairs, {kind = "average"})
-            t.assert_items_equals(metric[2].label_pairs, {kind = "total"})
-            t.assert_items_equals(metric[3].label_pairs, {kind = "max"})
+            t.assert_items_equals(metric[2].label_pairs, {kind = "max"})
+            t.assert_items_equals(metric[3].label_pairs, {kind = "total"})
         end
 
         local metrics_list2 = {
@@ -56,10 +61,11 @@ g.test_memtx = function(cg)
         for _, item in ipairs(metrics_list2) do
             log.info('checking metric: ' .. item)
             local metric = utils.find_metric(item, default_metrics)
+            table.sort(metric, label_cmp)
             t.assert(metric)
             t.assert_type(metric[1].value, 'number')
-            t.assert_items_equals(metric[1].label_pairs, {kind = "total"})
-            t.assert_items_equals(metric[2].label_pairs, {kind = "count"})
+            t.assert_items_equals(metric[1].label_pairs, {kind = "count"})
+            t.assert_items_equals(metric[2].label_pairs, {kind = "total"})
         end
     end)
 end

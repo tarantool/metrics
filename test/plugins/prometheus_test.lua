@@ -36,6 +36,10 @@ g.test_ll_ull_postfixes = function()
 end
 
 g.test_cdata_handling = function()
-    t.assert_str_contains(g.prometheus_metrics, 'tnt_space_bsize{name="random_space_for_prometheus",engine="memtx"} 0',
-        'Plugin output serialize 0ULL as +Inf')
+    t.assert_str_matches(
+        g.prometheus_metrics,
+        '.*tnt_space_bsize{[^}]*name="random_space_for_prometheus"[^}]*} 0.*',
+        1, string.len(g.prometheus_metrics),
+        'Plugin output serialize 0ULL as +Inf'
+    )
 end
