@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: ['**']
     paths-ignore: ['doc/**']
+
 jobs:
   test:
     if: |
