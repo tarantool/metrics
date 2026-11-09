@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+# [1.8.4] - 2026-11-09
+
+This release enables packaging for AlmaLinux 9 and fixes undefined order
+of inspected metrics in some tests.
+
+### Added
+
+- Enabled packaging for AlmaLinux 9 (#558).
+
+### Fixed
+
+- Undefined order of inspected metrics in some tests (#557).
+
 # [1.8.3] - 2026-09-02
 
 This release fixes the CI pipeline to run on external pull requests and
