@@ -2,4 +2,10 @@
 
 set -e -o pipefail
 
-curl -LsSf https://www.tarantool.io/release/3/installer.sh | sudo bash
+if [ "${OS:-}" = "almalinux" ]; then
+    tarantool_series=3
+else
+    tarantool_series=1.10
+fi
+
+curl -LsSf "https://www.tarantool.io/release/${tarantool_series}/installer.sh" | sudo bash
