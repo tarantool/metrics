@@ -51,6 +51,7 @@ local function invoke_callbacks()
     return registry:invoke_callbacks()
 end
 
+---@private
 ---@param collector metrics.collector
 ---@param result metrics.observation[]
 local function get_collector_values(collector, result)
@@ -84,6 +85,7 @@ local function collect(opts)
     return result
 end
 
+---@private
 --- Clear all collectors and callbacks from the registry.
 ---@return any
 local function clear()
@@ -178,6 +180,7 @@ local function set_global_labels(label_pairs)
     registry:set_labels(label_pairs)
 end
 
+---@private
 --- Set a runtime filter for collectors and callbacks by metric selectors.
 ---@param include string|table?
 ---@param exclude string|table?
@@ -188,12 +191,14 @@ local function set_filter(include, exclude)
     registry:set_filter(include, exclude)
 end
 
+---@private
 ---@class metrics.namespace
 ---@field selector string
 
 local Namespace = {}
 Namespace.__index = Namespace
 
+---@private
 ---@param self table
 ---@param name string
 ---@param metainfo metrics.metainfo?
@@ -205,6 +210,7 @@ local function namespace_metainfo(self, name, metainfo)
     return res
 end
 
+---@private
 --- Register a new counter in the namespace.
 ---@param name string
 ---@param help string?
@@ -216,6 +222,7 @@ function Namespace:counter(name, help, metainfo, label_keys)
                    label_keys)
 end
 
+---@private
 --- Register a new gauge in the namespace.
 ---@param name string
 ---@param help string?
@@ -227,6 +234,7 @@ function Namespace:gauge(name, help, metainfo, label_keys)
                  label_keys)
 end
 
+---@private
 --- Register a new histogram in the namespace.
 ---@param name string
 ---@param help string?
@@ -238,6 +246,7 @@ function Namespace:histogram(name, help, buckets, metainfo)
                      namespace_metainfo(self, name, metainfo))
 end
 
+---@private
 --- Register a new summary in the namespace.
 ---@param name string
 ---@param help string?
@@ -250,6 +259,7 @@ function Namespace:summary(name, help, objectives, params, metainfo)
                    namespace_metainfo(self, name, metainfo))
 end
 
+---@private
 --- Register a callback in the namespace.
 ---@param callback function
 ---@param metainfo metrics.metainfo?
@@ -260,6 +270,7 @@ function Namespace:register_callback(callback, metainfo)
     return register_callback(callback, res)
 end
 
+---@private
 --- Unregister a callback from the namespace.
 ---@param callback function
 ---@return any
@@ -267,6 +278,7 @@ function Namespace.unregister_callback(_, callback)
     return unregister_callback(callback)
 end
 
+---@private
 --- Create a namespace object that marks collectors and callbacks with
 --- selectors derived from `selector`.
 ---@param selector string

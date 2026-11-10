@@ -47,6 +47,7 @@ local function insert_sample(sample_obj, value, width, delta)
     sample_obj.Delta = delta
 end
 
+---@private
 --- @class stream_state
 --- @field f fun(s: table, r: number): number
 --- @field l any
@@ -54,6 +55,7 @@ end
 --- @field l_len integer
 --- @field l_cap integer
 
+---@private
 --- @class stream
 --- @field stream stream_state
 --- @field b any

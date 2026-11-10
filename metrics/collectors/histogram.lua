@@ -8,12 +8,9 @@ local DEFAULT_BUCKETS = {.005, .01, .025, .05, .075, .1, .25, .5,
                          .75, 1.0, 2.5, 5.0, 7.5, 10.0, INF}
 
 ---@class metrics.collector.histogram : metrics.collector
----@field buckets number[]
----@field count_collector metrics.collector.counter
----@field sum_collector metrics.collector.counter
----@field bucket_collector metrics.collector.counter
 local Histogram = Shared:new_class('histogram', {'observe_latency'})
 
+---@private
 ---@param buckets number[]
 ---@return boolean
 function Histogram.check_buckets(buckets)
@@ -27,6 +24,7 @@ function Histogram.check_buckets(buckets)
     return true
 end
 
+---@private
 ---@param name string
 ---@param help string?
 ---@param buckets number[]?
@@ -49,6 +47,7 @@ function Histogram:new(name, help, buckets, metainfo)
     return obj
 end
 
+---@private
 ---@param registry metrics.registry
 function Histogram:set_registry(registry)
     Shared.set_registry(self, registry)

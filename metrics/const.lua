@@ -1,3 +1,4 @@
+---@private
 ---@class metrics.const
 ---@field INF number
 ---@field NAN number

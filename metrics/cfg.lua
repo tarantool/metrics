@@ -9,6 +9,7 @@ local metrics_tarantool = require('metrics.tarantool')
 
 -- Split a metrics.cfg include/exclude side into two parts: built-in metric
 -- groups for metrics.tarantool and custom selectors for the registry filter.
+---@private
 ---@param values string|table|nil
 ---@param default_value string|table
 ---@param empty_default string|table
@@ -54,6 +55,7 @@ local function split_metric_groups_and_selectors(values, default_value,
     return default_metrics, custom_selectors
 end
 
+---@private
 ---@param cfg table
 ---@return table
 local function set_defaults_if_empty(cfg)
@@ -72,6 +74,7 @@ local function set_defaults_if_empty(cfg)
     return cfg
 end
 
+---@private
 ---@param cfg table
 ---@param opts {include?: string|table, exclude?: table, labels?: table}
 ---@return any
@@ -111,6 +114,7 @@ if _cfg_internal.initialized then
     configure(_cfg, {})
 end
 
+---@private
 --- Entrypoint to setup the module.
 ---@param self table
 ---@param opts {include?: string|table, exclude?: table, labels?: metrics.label_pairs}
@@ -131,6 +135,7 @@ local function __call(self, opts)
     return self
 end
 
+---@private
 ---@param key string
 ---@return any
 local function __index(_, key)
