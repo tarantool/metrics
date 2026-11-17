@@ -7,18 +7,12 @@ local log = require('log')
 ---@alias metrics.observation {metric_name: string, label_pairs: metrics.label_pairs, value: number, timestamp: integer}
 
 ---@class metrics.collector
----@field name string
----@field help string
----@field observations table<string, number>
----@field label_pairs table<string, metrics.label_pairs>
----@field label_keys string[]|nil
----@field metainfo metrics.metainfo
----@field registry metrics.registry|nil
 
 local Shared = {}
 
 -- Create collector class with the list of instance methods copied from
 -- this class (like an inheritance but with limited list of methods).
+---@private
 ---@param kind string
 ---@param method_names string[]?
 ---@return metrics.collector
@@ -40,6 +34,7 @@ function Shared:new_class(kind, method_names)
     return setmetatable(class, {__index = methods})
 end
 
+---@private
 ---@generic T
 ---@param self T
 ---@param name string
@@ -63,11 +58,13 @@ function Shared.new(self, name, help, metainfo, label_keys)
     }, self)
 end
 
+---@private
 ---@param registry metrics.registry
 function Shared:set_registry(registry)
     self.registry = registry
 end
 
+---@private
 ---@param label_pairs metrics.label_pairs|nil
 ---@param label_keys string[]?
 ---@return string
@@ -182,6 +179,7 @@ local function observe_latency_tail(collector, label_pairs, start_time, ok, resu
     return result, ...
 end
 
+---@private
 --- Measure latency of function call
 ---
 ---@param label_pairs metrics.label_pairs|fun(ok: boolean, result: any, ...: any): metrics.label_pairs|nil
@@ -194,6 +192,7 @@ function Shared:observe_latency(label_pairs, fn, ...)
     return observe_latency_tail(self, label_pairs, clock.monotonic(), pcall(fn, ...))
 end
 
+---@private
 ---@param label_pairs metrics.label_pairs|nil
 ---@return metrics.label_pairs
 function Shared:append_global_labels(label_pairs)

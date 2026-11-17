@@ -1,15 +1,13 @@
+---@private
 ---@alias metrics.registry.filter {include_all: boolean, include: string[], exclude_all: boolean, exclude: string[]}
 
 ---@class metrics.registry
----@field collectors table<string, metrics.collector>
----@field callbacks table<function, metrics.metainfo>
----@field label_pairs metrics.label_pairs
----@field filter metrics.registry.filter
 
 local Registry = {}
 Registry.__index = Registry
 
 --- Create a new registry.
+---@private
 ---@return metrics.registry
 function Registry.new()
     local obj = setmetatable({}, Registry)
@@ -18,6 +16,7 @@ function Registry.new()
 end
 
 --- Clear all collectors, callbacks, and labels from the registry.
+---@private
 function Registry:clear()
     self.collectors = {}
     self.callbacks = {}
@@ -25,6 +24,7 @@ function Registry:clear()
     self:reset_filter()
 end
 
+---@private
 function Registry:reset_filter()
     self.filter = {
         include_all = true,
@@ -42,6 +42,7 @@ function Registry:find(kind, name)
     return self.collectors[name .. kind]
 end
 
+---@private
 ---@param class metrics.collector
 ---@param name string
 ---@vararg any
@@ -54,6 +55,7 @@ local function is_empty(str)
     return str == nil or str == ''
 end
 
+---@private
 ---@param collector metrics.collector
 ---@return metrics.collector
 function Registry:register(collector)
@@ -101,6 +103,7 @@ local function item_selector(item)
     return metainfo.selector or item.name
 end
 
+---@private
 ---@param item metrics.collector|metrics.metainfo|nil
 ---@return boolean
 function Registry:is_enabled(item)
@@ -126,6 +129,7 @@ function Registry:is_enabled(item)
     return true
 end
 
+---@private
 ---@return table<string, metrics.collector>
 function Registry:filtered_collectors()
     local collectors = {}
@@ -139,6 +143,7 @@ function Registry:filtered_collectors()
     return collectors
 end
 
+---@private
 --- Invoke all registered callbacks.
 function Registry:invoke_callbacks()
     for registered_callback, metainfo in pairs(self.callbacks) do
@@ -148,6 +153,7 @@ function Registry:invoke_callbacks()
     end
 end
 
+---@private
 --- Collect observations from each collector.
 ---@return metrics.observation[]
 function Registry:collect()
@@ -160,6 +166,7 @@ function Registry:collect()
     return result
 end
 
+---@private
 --- Register a callback that is called right before metric collection.
 ---@param callback function
 ---@param metainfo metrics.metainfo?
@@ -167,12 +174,14 @@ function Registry:register_callback(callback, metainfo)
     self.callbacks[callback] = table.copy(metainfo) or {}
 end
 
+---@private
 --- Unregister a callback.
 ---@param callback function
 function Registry:unregister_callback(callback)
     self.callbacks[callback] = nil
 end
 
+---@private
 --- Set global labels applied to every observation.
 ---@param label_pairs metrics.label_pairs
 function Registry:set_labels(label_pairs)
@@ -215,6 +224,7 @@ local function normalize_filter_side(value, default)
     }
 end
 
+---@private
 --- Set a runtime filter for collectors and callbacks by metric selectors.
 ---@param include string|table|nil
 ---@param exclude string|table|nil

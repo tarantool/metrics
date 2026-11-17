@@ -1,0 +1,406 @@
+---@type metrics.registry
+local registry = {}
+
+---@class metrics.http_middleware
+---@field build_default_collector fun(type_name?: string, name?: string, help?: string): metrics.collector Register and return a collector for the middleware.
+---@field configure_default_collector fun(...: any) Register a collector for the middleware and set it as default.
+---@field get_default_collector fun(): metrics.collector Get the default collector.
+---@field set_default_collector fun(collector?: metrics.collector) Set the default collector.
+---@field v1 fun(handler: function, collector?: metrics.collector): function Latency measuring wrap-up for the HTTP 1.x handler.
+local http_middleware = {}
+
+---**Since:** [2.11.1](https://github.com/tarantool/tarantool/releases/tag/2.11.1)
+---
+---The `metrics` module provides the ability to collect and expose Tarantool metrics.
+---
+---Note
+---
+---If you use a Tarantool version below [2.11.1](https://github.com/tarantool/tarantool/releases/tag/2.11.1), it is necessary to install the latest version of [metrics](https://github.com/tarantool/metrics) first. For Tarantool 2.11.1 and above, you can also use the external `metrics` module. In this case, the external `metrics` module takes priority over the built-in one.
+---
+---
+---
+---**Overview**
+---
+---
+---
+---**Collectors**
+---
+---Tarantool provides the following metric collectors:
+---
+---- counter
+---
+---- gauge
+---
+---- histogram
+---
+---- summary
+---
+---A collector is a representation of one or more observations that change over time.
+---
+---
+---
+---counter
+---
+---A counter is a cumulative metric that denotes a single monotonically increasing counter. Its value might only increase or be reset to zero on restart. For example, you can use the counter to represent the number of requests served, tasks completed, or errors.
+---
+---The design is based on the [Prometheus counter](https://prometheus.io/docs/concepts/metric_types/#counter).
+---
+---
+---
+---gauge
+---
+---A gauge is a metric that denotes a single numerical value that can arbitrarily increase and decrease.
+---
+---The gauge type is typically used for measured values like temperature or current memory usage. It could also be used for values that can increase or decrease, such as the number of concurrent requests.
+---
+---The design is based on the [Prometheus gauge](https://prometheus.io/docs/concepts/metric_types/#gauge).
+---
+---
+---
+---histogram
+---
+---A histogram metric is used to collect and analyze statistical data about the distribution of values within the application. Unlike metrics that track the average value or quantity of events, a histogram provides detailed visibility into the distribution of values and can uncover hidden dependencies.
+---
+---The design is based on the [Prometheus histogram](https://prometheus.io/docs/concepts/metric_types/#histogram).
+---
+---
+---
+---summary
+---
+---A summary metric is used to collect statistical data about the distribution of values within the application.
+---
+---Each summary provides several measurements:
+---
+---- total count of measurements
+---
+---- sum of measured values
+---
+---- values at specific quantiles
+---
+---Similar to histograms, the summary also operates with value ranges. However, unlike histograms, it uses quantiles (defined by a number between 0 and 1) for this purpose. In this case, it is not required to define fixed boundaries. For summary type, the ranges depend on the measured values and the number of measurements.
+---
+---The design is based on the [Prometheus summary](https://prometheus.io/docs/concepts/metric_types/#summary).
+---
+---
+---
+---**Labels**
+---
+---A label is a piece of metainfo that you associate with a metric in the key-value format. For details, see [labels in Prometheus](https://prometheus.io/docs/practices/naming/#labels) and [tags in Graphite](https://graphite.readthedocs.io/en/latest/tags.html).
+---
+---Labels are used to differentiate between the characteristics of a thing being measured. For example, in a metric associated with the total number of HTTP requests, you can represent methods and statuses as label pairs:
+---
+---```
+---http_requests_total_counter:inc(1, { method = 'POST', status = '200' })
+---```
+---
+---The example above allows extracting the following time series:
+---
+---1. The total number of requests over time with `method = "POST"` (and any status).
+---
+---2. The total number of requests over time with `status = 500` (and any method).
+---
+---
+---
+---**Configuring metrics**
+---
+---To configure metrics, use `metrics.cfg()`. This function can be used to turn on or off the specified metrics or to configure labels applied to all collectors. Moreover, you can use the following shortcut functions to set-up metrics or labels:
+---
+---- `metrics.enable_default_metrics()`
+---
+---- `metrics.set_global_labels()`
+---
+---Note
+---
+---Starting from version 3.0, metrics can be configured using a configuration file in the metrics section.
+---
+---
+---
+---**Custom metrics**
+---
+---
+---
+---**Creating custom metrics**
+---
+---To create a custom metric, follow the steps below:
+---
+---1. **Create a metric**
+---
+---   To create a new metric, you need to call a function corresponding to the desired collector type. For example, call metrics.counter() or metrics.gauge() to create a new counter or gauge, respectively. In the example below, a new counter is created:
+---
+---```
+---local metrics = require('metrics')
+---local bands_replace_count = metrics.counter('bands_replace_count', 'The number of data operations')
+---```
+---
+---   This counter is intended to collect the number of data operations performed on the specified space.
+---
+---   In the next example, a gauge is created:
+---
+---```
+---local metrics = require('metrics')
+---local bands_waste_size = metrics.gauge('bands_waste_size', 'The size of memory wasted due to internal fragmentation')
+---```
+---
+---2. **Observe a value**
+---
+---   You can observe a value in two ways:
+---
+---   - At the appropriate place, for example, in an API request handler or trigger. In this example below, the counter value is increased any time a data operation is performed on the `bands` space. To increase a counter value, counter_obj:inc() is called.
+---
+---```
+---local metrics = require('metrics')
+---local bands_replace_count = metrics.counter('bands_replace_count', 'The number of data operations')
+---local trigger = require('trigger')
+---trigger.set(
+---        'box.space.bands.on_replace',
+---        'update_bands_replace_count_metric',
+---        function(_, _, _, request_type)
+---            bands_replace_count:inc(1, { request_type = request_type })
+---        end
+---)
+---```
+---
+---   - At the time of requesting the data collected by metrics. In this case, you need to collect the required metric inside metrics.register_callback(). The example below shows how to use a gauge collector to measure the size of memory wasted due to internal fragmentation:
+---
+---```
+---local metrics = require('metrics')
+---local bands_waste_size = metrics.gauge('bands_waste_size', 'The size of memory wasted due to internal fragmentation')
+---metrics.register_callback(function()
+---    bands_waste_size:set(box.space.bands:stat()['tuple']['memtx']['waste_size'])
+---end)
+---```
+---
+---     To set a gauge value, gauge_obj:set() is called.
+---
+---You can find the full example on GitHub: [metrics_collect_custom](https://github.com/tarantool/doc/tree/latest/doc/code_snippets/snippets/config/instances.enabled/metrics_collect_custom).
+---
+---
+---
+---**Possible limitations**
+---
+---The module allows to add your own metrics, but there are some subtleties when working with specific tools.
+---
+---When adding your custom metric, it's important to ensure that the number of label value combinations is kept to a minimum. Otherwise, combinatorial explosion may happen in the timeseries database with metrics values stored. Examples of data labels:
+---
+---- [Labels](https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels) in Prometheus
+---
+---- [Tags](https://docs.influxdata.com/influxdb/v1/concepts/glossary/#tag) in InfluxDB
+---
+---For example, if your company uses InfluxDB for metric collection, you can potentially disrupt the entire monitoring setup, both for your application and for all other systems within the company. As a result, monitoring data is likely to be lost.
+---
+---Example:
+---
+---```
+---local some_metric = metrics.counter('some', 'Some metric')
+---
+----- THIS IS POSSIBLE
+---local function on_value_update(instance_alias)
+---   some_metric:inc(1, { alias = instance_alias })
+---end
+---
+----- THIS IS NOT ALLOWED
+---local function on_value_update(customer_id)
+---   some_metric:inc(1, { customer_id = customer_id })
+---end
+---```
+---
+---In the example, there are two versions of the function `on_value_update`. The top version labels the data with the cluster instance's alias. Since there's a relatively small number of nodes, using them as labels is feasible. In the second case, an identifier of a record is used. If there are many records, it's recommended to avoid such situations.
+---
+---The same principle applies to URLs. Using the entire URL with parameters is not recommended. Use a URL template or the name of the command instead.
+---
+---In essence, when designing custom metrics and selecting labels or tags, it's crucial to opt for a minimal set of values that can uniquely identify the data without introducing unnecessary complexity or potential conflicts with existing metrics and systems.
+---
+---
+---
+---**Collecting HTTP metrics**
+---
+---The `metrics` module provides middleware for monitoring HTTP latency statistics for endpoints that are created using the [http](https://github.com/tarantool/http) module. The latency collector observes both latency information and the number of invocations. The metrics collected by HTTP middleware are separated by a set of labels:
+---
+---- a route (`path`)
+---
+---- a method (`method`)
+---
+---- an HTTP status code (`status`)
+---
+---For each route that you want to track, you must specify the middleware explicitly. The example below shows how to collect statistics for requests made to the `/metrics/hello` endpoint.
+---
+---```
+---httpd = require('http.server').new('127.0.0.1', 8080)
+---local metrics = require('metrics')
+---metrics.http_middleware.configure_default_collector('summary')
+---httpd:route({
+---    method = 'GET',
+---    path = '/metrics/hello'
+---}, metrics.http_middleware.v1(
+---        function()
+---            return { status = 200,
+---                     headers = { ['content-type'] = 'text/plain' },
+---                     body = 'Hello from http_middleware!' }
+---        end))
+---
+---httpd:start()
+---```
+---
+---Note
+---
+---The middleware does not cover the 404 errors.
+---
+---
+---
+---**Collecting metrics using plugins**
+---
+---The `metrics` module provides a set of plugins that let you collect metrics through a unified interface:
+---
+---- [metrics.plugins.prometheus](prometheus/#metrics-prometheus-api-reference)
+---
+---- [metrics.plugins.json](json/#metrics-json-api-reference)
+---
+---- [metrics.plugins.graphite](graphite/#metrics-graphite-api-reference)
+---
+---For example, you can obtain an HTTP response object containing metrics in the Prometheus format by calling the `metrics.plugins.prometheus.collect_http()` function:
+---
+---```
+---local prometheus_plugin = require('metrics.plugins.prometheus')
+---local prometheus_metrics = prometheus_plugin.collect_http()
+---```
+---
+---To expose the collected metrics, you can use the [http](https://github.com/tarantool/http) module:
+---
+---```
+---httpd = require('http.server').new('127.0.0.1', 8080)
+---httpd:route({
+---    method = 'GET',
+---    path = '/metrics/prometheus'
+---}, function()
+---    local prometheus_plugin = require('metrics.plugins.prometheus')
+---    local prometheus_metrics = prometheus_plugin.collect_http()
+---    return prometheus_metrics
+---end)
+---httpd:start()
+---```
+---
+---Example on GitHub: [metrics_plugins](https://github.com/tarantool/doc/tree/latest/doc/code_snippets/snippets/config/instances.enabled/metrics_plugins)
+---
+---
+---
+---**Creating custom plugins**
+---
+---Use the following API to create custom plugins:
+---
+---- `metrics.invoke_callbacks()`
+---
+---- `metrics.collectors()`
+---
+---- collector_object
+---
+---To create a plugin, you need to include the following in your main export function:
+---
+---~~~
+----- Invoke all callbacks registered via `metrics.register_callback(<callback-function>)`
+---metrics.invoke_callbacks()
+---
+----- Loop over collectors
+---for _, c in pairs(metrics.collectors()) do
+---    ...
+---
+---    -- Loop over instant observations in the collector
+---    for _, obs in pairs(c:collect()) do
+---        -- Export observation `obs`
+---        ...
+---    end
+---end
+---~~~
+---
+---See the source code of built-in plugins in the [metrics GitHub repository](https://github.com/tarantool/metrics/tree/master/metrics/plugins).
+---
+local metrics = {
+    registry = registry,
+    http_middleware = http_middleware,
+}
+
+---Entrypoint to setup the module.
+---
+---@param opts {include?: string|table, exclude?: table, labels?: metrics.label_pairs}?
+---@return table
+function metrics.cfg(opts) end
+
+---Collect observations from each collector.
+---
+---@param opts {invoke_callbacks?: boolean, default_only?: boolean}?
+---@return metrics.observation[]
+function metrics.collect(opts) end
+
+---List all collectors in the registry.
+---
+---@return table<string, metrics.collector>
+function metrics.collectors() end
+
+---Register a new counter.
+---
+---@param name string
+---@param help string?
+---@param metainfo metrics.metainfo?
+---@param label_keys string[]?
+---@return metrics.collector.counter
+function metrics.counter(name, help, metainfo, label_keys) end
+
+---Enable default metrics.
+---
+---@param include string|table?
+---@param exclude table?
+---@return any
+function metrics.enable_default_metrics(include, exclude) end
+
+---Register a new gauge.
+---
+---@param name string
+---@param help string?
+---@param metainfo metrics.metainfo?
+---@param label_keys string[]?
+---@return metrics.collector.gauge
+function metrics.gauge(name, help, metainfo, label_keys) end
+
+---Register a new histogram.
+---
+---@param name string
+---@param help string?
+---@param buckets number[]?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.histogram
+function metrics.histogram(name, help, buckets, metainfo) end
+
+---Invoke all registered callbacks.
+---
+---@return any
+function metrics.invoke_callbacks() end
+
+---Register a callback that is called right before metric collection.
+---
+---@param callback function
+---@param metainfo metrics.metainfo?
+---@return any
+function metrics.register_callback(callback, metainfo) end
+
+---Set global labels applied to every observation.
+---
+---@param label_pairs metrics.label_pairs?
+---@return any
+function metrics.set_global_labels(label_pairs) end
+
+---Register a new summary.
+---
+---@param name string
+---@param help string?
+---@param objectives table<number, number>?
+---@param params {age_buckets_count?: number, max_age_time?: number}?
+---@param metainfo metrics.metainfo?
+---@return metrics.collector.summary
+function metrics.summary(name, help, objectives, params, metainfo) end
+
+---Unregister a callback.
+---
+---@param callback function
+---@return any
+function metrics.unregister_callback(callback) end
+
+return metrics

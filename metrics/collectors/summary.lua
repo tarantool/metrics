@@ -5,15 +5,9 @@ local Quantile = require('metrics.quantile')
 local fiber = require('fiber')
 
 ---@class metrics.collector.summary : metrics.collector
----@field count_collector metrics.collector.counter
----@field sum_collector metrics.collector.counter
----@field objectives table<number, number>|nil
----@field quantiles number[]|nil
----@field max_age_time number|nil
----@field age_buckets_count number
----@field observations table<string, table>
 local Summary = Shared:new_class('summary', {'observe_latency'})
 
+---@private
 ---@param name string
 ---@param help string?
 ---@param objectives table<number, number>?
@@ -41,6 +35,7 @@ function Summary:new(name, help, objectives, params, metainfo)
     return obj
 end
 
+---@private
 ---@param objectives table<number, number>
 ---@return boolean
 function Summary.check_quantiles(objectives)
@@ -52,6 +47,7 @@ function Summary.check_quantiles(objectives)
     return true
 end
 
+---@private
 ---@param registry metrics.registry
 function Summary:set_registry(registry)
     Shared.set_registry(self, registry)
@@ -59,6 +55,7 @@ function Summary:set_registry(registry)
     self.sum_collector:set_registry(registry)
 end
 
+---@private
 ---@param key string
 function Summary:rotate_age_buckets(key)
     --- @type any
@@ -126,6 +123,7 @@ function Summary:remove(label_pairs)
 end
 
 ---@return metrics.observation[]
+---@private
 function Summary:collect_quantiles()
     local quantiles = self.quantiles
     if not self.objectives or not quantiles or next(self.observations) == nil then
@@ -174,6 +172,7 @@ end
 -- single quantile object if summary has only one bucket
 ---@param label_pairs metrics.label_pairs?
 ---@return table|any
+---@private
 function Summary:get_observations(label_pairs)
     local key = self.make_key(label_pairs or {})
     local obs = self.observations[key]

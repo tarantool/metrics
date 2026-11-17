@@ -68,6 +68,7 @@ function export.configure_default_collector(...)
     export.set_default_collector(export.build_default_collector(...))
 end
 
+---@private
 --- Measure latency and invoke collector with labels from given route.
 ---@param collector metrics.collector
 ---@param route {path: string, method: string}
