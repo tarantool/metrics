@@ -11,6 +11,7 @@ local default_metrics = {
     system              = require('metrics.tarantool.system'),
     replicas            = require('metrics.tarantool.replicas'),
     info                = require('metrics.tarantool.info'),
+    failover            = require('metrics.tarantool.failover'),
     slab                = require('metrics.tarantool.slab'),
     runtime             = require('metrics.tarantool.runtime'),
     memory              = require('metrics.tarantool.memory'),

@@ -15,6 +15,9 @@ local election_states = {
 }
 
 local function update_info_metrics()
+    collectors_list.info_uptime = utils.set_gauge('info_uptime', 'Tarantool uptime',
+        box.info.uptime, nil, nil, {default = true})
+
     if not utils.box_is_configured() then
         return
     end
@@ -23,8 +26,6 @@ local function update_info_metrics()
 
     collectors_list.info_lsn = utils.set_gauge('info_lsn', 'Tarantool lsn',
         info.lsn, nil, nil, {default = true})
-    collectors_list.info_uptime = utils.set_gauge('info_uptime', 'Tarantool uptime',
-        info.uptime, nil, nil, {default = true})
 
     for k, v in pairs(info.vclock) do
         collectors_list.info_vclock = utils.set_gauge('info_vclock', 'VClock',

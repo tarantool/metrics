@@ -4,6 +4,53 @@ local t = require('luatest')
 local g = t.group('info_metric')
 local utils = require('test.utils')
 
+local unconfigured = t.group('info_metric_unconfigured')
+
+-- A subprocess avoids the CE runner's replacement of box.cfg with a table.
+unconfigured.test_uptime_before_box_cfg = function()
+    local popen = require('popen')
+    local builtin = debug.getinfo(require('metrics').collect).source
+        :match('^@builtin') ~= nil
+    local script = string.format([[
+        local t = require('luatest')
+        local rock_utils = require('test.rock_utils')
+        if %s then
+            rock_utils.remove_override('metrics')
+            rock_utils.assert_builtin('metrics')
+        else
+            rock_utils.assert_nonbuiltin('metrics')
+        end
+        local metrics = require('metrics')
+        t.assert_type(box.cfg, 'function')
+        metrics.clear()
+        metrics.cfg{include = {'info'}, exclude = {}, labels = {alias = 'test'}}
+        local observations = metrics.collect{invoke_callbacks = true}
+        t.assert_equals(#observations, 1)
+        t.assert_equals(observations[1].metric_name, 'tnt_info_uptime')
+        t.assert_equals(observations[1].label_pairs, {alias = 'test'})
+        t.assert_type(observations[1].value, 'number')
+        t.assert_gt(observations[1].value, 0)
+        metrics.cfg{include = {'failover'}, exclude = {}, labels = {}}
+        t.assert_equals(metrics.collect{invoke_callbacks = true}, {})
+    ]], tostring(builtin))
+    local env = os.environ()
+    env.LUA_PATH = utils.LUA_PATH or env.LUA_PATH
+    local process = assert(popen.new({arg[-1], '-e', script}, {
+        env = env, stderr = popen.opts.PIPE,
+    }))
+    local ok, status, output = pcall(function()
+        local chunks = {}
+        repeat
+            local chunk = assert(process:read({stderr = true, timeout = 30}))
+            table.insert(chunks, chunk)
+        until chunk == ''
+        return assert(process:wait({timeout = 30})), table.concat(chunks)
+    end)
+    process:close()
+    t.assert(ok, status)
+    t.assert_equals(status.exit_code, 0, output)
+end
+
 g.before_all(utils.create_server)
 
 g.after_all(utils.drop_server)

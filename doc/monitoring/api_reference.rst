@@ -560,6 +560,7 @@ Metrics functions
     *   ``system``
     *   ``replicas``
     *   ``info``
+    *   ``failover``
     *   ``slab``
     *   ``runtime``
     *   ``memory``
