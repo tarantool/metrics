@@ -19,9 +19,64 @@ General instance information:
         *   -   ``tnt_cfg_current_time``
             -   Instance system time in the Unix timestamp format
         *   -   ``tnt_info_uptime``
-            -   Time in seconds since the instance has started
+            -   Time in seconds since the instance has started. Available in the
+                ``info`` group even before ``box.cfg()``.
         *   -   ``tnt_read_only``
             -   Indicates if the instance is in read-only mode (``1`` if true, ``0`` if false)
+
+Failover metrics
+----------------
+
+The ``failover`` group exposes coordinator monitoring state when an internal
+snapshot source is registered. Without a source it produces no observations
+and does not load Enterprise failover modules or start any monitoring.
+Collection works before ``box.cfg()`` and does not depend on HTTP.
+
+* ``tarantool_coordinator_active`` (gauge): ``1`` when the coordinator owns
+  the lock, otherwise ``0``.
+* ``tarantool_instance_status`` (gauge): ``1`` for an ``alive`` instance,
+  otherwise ``0``, with ``replicaset`` and ``instance`` labels. Passive
+  coordinators also report instance status.
+
+Internal integrations register or replace a provider with
+``require('metrics.tarantool.failover').set_source(provider)`` and detach it
+with ``set_source(nil)``. This is not a public application API. The provider
+returns a fresh snapshot of existing monitoring state:
+
+.. code-block:: lua
+
+    {
+        alias = 'coordinator-uuid',
+        active = true,
+        replicasets = {
+            ['rs-001'] = {
+                ['instance-001'] = 'alive',
+                ['instance-002'] = 'uncallable',
+                ['instance-003'] = false,
+            },
+        },
+    }
+
+``active`` is a boolean. Each replicaset maps instance names to status
+strings, or ``false`` for missing status. A missing table key means the
+instance is no longer monitored, so it is removed rather than reported as
+down. Include every monitored instance, even those ineligible to become
+master. The provider must not yield, access the network, run expensive
+checks, or change failover state. Collection does not mutate the snapshot.
+Provider errors propagate to the caller.
+
+The snapshot's optional ``alias`` is identity metadata, not an observation
+label. The integration sets the default alias through global labels and
+merges user labels over it. An explicit global alias therefore overrides
+the default; shared alias overrides can make coordinators indistinguishable.
+Global labels cannot override the collector's ``replicaset`` and ``instance``.
+
+Registration does not enable collection. Enable the group through
+``metrics.cfg{include = {'info', 'failover'}, exclude = {}, labels = labels}``.
+Uptime remains in ``info``. Removed instances, moved instances, and removed
+replicasets lose their old observations on the next collection. Replacing or
+detaching a source clears its observations immediately. Disabling the group
+removes its callback and collectors, but retains the source for re-enabling.
 
 ..  _metrics-reference-schema:
 
@@ -1071,4 +1126,3 @@ These metrics are available starting from Tarantool 3.0.
 
                 For example, this set of metrics means that current configuration
                 for ``router-001-a`` status is ``ready``.
-                
